@@ -1,0 +1,198 @@
+.gold-coin-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  min-height: 400px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  /* overflow: hidden; */ /* Removed to allow splash outside bounds */
+  background: transparent;
+}
+
+.gold-coin-area {
+  position: relative;
+  cursor: pointer;
+  width: min(400px, 90vw);
+  height: min(500px, 70vh);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.gold-coin {
+  width: clamp(150px, 30vw, 250px);
+  height: clamp(150px, 30vw, 250px);
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffd700, #ffc000 30%, #ffb300 60%, #ffa500);
+  box-shadow: 
+    0 0 30px rgba(255, 215, 0, 0.4),
+    inset 0 0 30px rgba(255, 255, 255, 0.4);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: transform 0.3s ease;
+  z-index: 1;
+  position: relative;
+  border: 12px solid transparent;
+}
+
+/* Outer ring with ridges */
+.gold-coin::before {
+  content: '';
+  position: absolute;
+  top: -12px;
+  left: -12px;
+  right: -12px;
+  bottom: -12px;
+  background: linear-gradient(45deg, #ffd700, #ffc000);
+  border-radius: 50%;
+  z-index: -1;
+  background-image: repeating-conic-gradient(
+    from 0deg,
+    #ffd700 0deg 10deg,
+    #ffc000 10deg 20deg
+  );
+}
+
+/* Inner metallic effect */
+.gold-coin::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: 
+    radial-gradient(circle at 30% 30%, 
+      rgba(255, 255, 255, 0.2) 0%,
+      rgba(255, 255, 255, 0.1) 20%,
+      transparent 60%
+    ),
+    radial-gradient(circle at 70% 70%, 
+      rgba(0, 0, 0, 0.1) 0%,
+      rgba(0, 0, 0, 0.2) 40%,
+      transparent 70%
+    );
+  z-index: 2;
+}
+
+.coin-content {
+  width: 85%;
+  height: 85%;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  background: radial-gradient(circle at center, 
+    #ffd700 0%,
+    #ffc000 40%,
+    #ffb300 70%,
+    #ffa500 100%
+  );
+  box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.2);
+}
+
+.coin-text {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  color: #8B4513;
+  font-weight: 900;
+  text-shadow: 
+    -1px -1px 0 #FFD700,
+    1px -1px 0 #FFD700,
+    -1px 1px 0 #FFD700,
+    1px 1px 0 #FFD700,
+    0 2px 4px rgba(0, 0, 0, 0.3);
+  transform: scale(1.2);
+}
+
+.wealth {
+  font-size: clamp(1.5rem, 3vw, 2.5rem);
+  line-height: 1;
+  letter-spacing: 1px;
+}
+
+.clicks {
+  font-size: clamp(1rem, 2.5vw, 1.8rem);
+  margin-top: -5px;
+  letter-spacing: 2px;
+}
+
+.gold-coin:hover {
+  transform: scale(1.15) rotate(5deg);
+}
+
+.gold-coin.pulse {
+  animation: pulse 0.5s ease-in-out;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1) rotate(0deg);
+  }
+  50% {
+    transform: scale(1.25) rotate(5deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.coin {
+  position: fixed; /* Changed to fixed to position relative to viewport */
+  width: clamp(30px, 8vw, 60px); /* Further reduced falling coin size */
+  height: clamp(30px, 8vw, 60px); /* Further reduced falling coin size */
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 30%, #ffd700, #ffc000 30%, #ffb300 60%, #ffa500);
+  box-shadow: 0 0 8px rgba(255, 215, 0, 0.6); /* Adjusted shadow */
+  animation: splashCoin var(--speed) ease-out forwards;
+  animation-delay: var(--delay);
+  z-index: 1000; /* Ensure coins are on top */
+  transform-origin: center;
+  pointer-events: none;
+  /* Start coins from the center of the viewport initially (will be updated by JS) */
+  top: 50%; 
+  left: 50%;
+  transform: translate(-50%, -50%); 
+  opacity: 0; /* Start hidden until animation begins */
+  border: 4px solid transparent; /* Adjusted border size for proportion */
+}
+
+.coin::before {
+  content: '';
+  position: absolute;
+  top: -4px; /* Adjusted position */
+  left: -4px; /* Adjusted position */
+  right: -4px; /* Adjusted position */
+  bottom: -4px; /* Adjusted position */
+  background: linear-gradient(45deg, #ffd700, #ffc000);
+  border-radius: 50%;
+  z-index: -1;
+  background-image: repeating-conic-gradient(
+    from 0deg,
+    #ffd700 0deg 10deg,
+    #ffc000 10deg 20deg
+  );
+}
+
+.coin .coin-text {
+  transform: scale(0.2); /* Further adjusted scale for smaller coins */
+}
+
+@keyframes splashCoin {
+  0% {
+    /* Start centered (relative to initial fixed pos) and visible */
+    transform: translate(-50%, -50%) scale(1);
+    opacity: 1;
+  }
+  100% {
+    /* Move to random splash coordinates relative to viewport center */
+    transform: translate(calc(-50% + var(--splash-x)), calc(-50% + var(--splash-y))) 
+               scale(0.4) 
+               rotate(var(--splash-rotate));
+    opacity: 0;
+  }
+} 

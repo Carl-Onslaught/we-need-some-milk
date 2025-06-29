@@ -1,0 +1,516 @@
+import React, { useState, useEffect } from 'react';
+import {
+  Box,
+  Card,
+  CardBody,
+  SimpleGrid,
+  VStack,
+  Text,
+  Heading,
+  Badge,
+  Container,
+  Button,
+  Input,
+  useToast,
+  Icon,
+  Flex,
+  Image
+} from '@chakra-ui/react';
+import { FaWallet, FaUsers, FaChartLine, FaGift } from 'react-icons/fa';
+import AgentLayout from '../../components/AgentLayout';
+import axios from 'axios';
+import ClickingTask from '../../components/ClickingTask';
+
+const StatCard = ({ title, stat, icon, subtext }) => {
+  return (
+    <Card bg="#1E2528" borderWidth="1px" borderColor="gray.700" height="100%">
+      <CardBody>
+        <VStack align="start" spacing={2} height="100%">
+          <Flex justify="space-between" align="center" width="100%">
+            <Text color="gray.400" noOfLines={1}>{title}</Text>
+            {icon && (
+              <Box
+                p={2}
+                bg="#FDB137"
+                borderRadius="full"
+                color="black"
+                transition="all 0.2s"
+                _hover={{ 
+                  transform: 'scale(0.95)',
+                  bg: '#BD5301',
+                  color: 'white'
+                }}
+                display="flex"
+                alignItems="center"
+                justifyContent="center"
+                width="32px"
+                height="32px"
+                flexShrink={0}
+              >
+                <Icon as={icon} w={5} h={5} color="currentColor" />
+              </Box>
+            )}
+          </Flex>
+          <Heading size="lg" color="white" noOfLines={1}>{stat}</Heading>
+          {subtext && (
+            <Text color="#FDB137" fontSize="sm" noOfLines={2}>
+              {subtext}
+            </Text>
+          )}
+        </VStack>
+      </CardBody>
+    </Card>
+  );
+};
+
+const SharedCapitalPackage = ({ packageNumber, minimum, onEnter, walletBalance }) => {
+  const [amount, setAmount] = useState('');
+  const [isRequesting, setIsRequesting] = useState(false);
+  const toast = useToast();
+
+  const handlePackageRequest = async () => {
+    if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) < minimum) {
+      toast({
+        title: 'Invalid Amount',
+        description: `Please enter an amount greater than or equal to ₱${minimum}`,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    if (parseFloat(amount) > walletBalance) {
+      toast({
+        title: 'Insufficient Balance',
+        description: 'You do not have enough balance in your wallet',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+      return;
+    }
+
+    setIsRequesting(true);
+    try {
+      await onEnter(amount);
+      toast({
+        title: 'Package Activated',
+        description: 'Your package has been successfully activated',
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+      setAmount('');
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error.response?.data?.message || 'Failed to activate package',
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    } finally {
+      setIsRequesting(false);
+    }
+  };
+
+  const isInvalid = !amount || parseFloat(amount) < minimum || parseFloat(amount) > walletBalance;
+
+  return (
+    <Card 
+      bg="#1E2528" 
+      borderWidth="1px"
+      borderColor="gray.700"
+      overflow="hidden"
+      transition="all 0.3s ease"
+      _hover={{
+        transform: 'translateY(-5px)',
+        borderColor: '#FDB137',
+        boxShadow: '0 10px 20px rgba(0,0,0,0.2)'
+      }}
+    >
+      <CardBody p={0}>
+        <Image src={`/package${packageNumber}.jpg`} alt={`Package ${packageNumber}`} objectFit="cover" />
+        <Box p={4}>
+          <VStack spacing={4}>
+            <Input
+              placeholder={`Enter amount (Min: ₱${minimum})`}
+              value={amount}
+              onChange={(e) => setAmount(e.target.value)}
+              bg="#181E20"
+              color="white"
+              borderColor="gray.600"
+              _hover={{ borderColor: '#FDB137' }}
+              _focus={{ borderColor: '#FDB137', boxShadow: '0 0 0 1px #FDB137' }}
+            />
+            <Button
+              bg="#FDB137"
+              color="#181E20"
+              width="full"
+              fontWeight="bold"
+              _hover={{ bg: '#BD5301', color: 'white' }}
+              transition="all 0.2s"
+              onClick={handlePackageRequest}
+              isLoading={isRequesting}
+              loadingText="Processing..."
+              isDisabled={isInvalid || isRequesting}
+            >
+              AVAIL PACKAGE
+            </Button>
+          </VStack>
+          </Box>
+      </CardBody>
+    </Card>
+  );
+};
+
+export default function Dashboard() {
+  const [stats, setStats] = useState({
+    wallet: 0,
+    directReferral: 0,
+    indirectReferral: 0,
+    totalClicks: 0,
+    sharedEarnings: 0,
+    pendingEarnings: 0,
+    immaturePackages: 0,
+    immatureAmount: 0
+  });
+  const [activePackages, setActivePackages] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [dailyClicks, setDailyClicks] = useState(0);
+  const [dailyEarnings, setDailyEarnings] = useState(0);
+  const toast = useToast();
+
+  useEffect(() => {
+    fetchData();
+  }, []);
+
+  const fetchData = async () => {
+    try {
+      setIsLoading(true);
+      const [statsRes, packagesRes, userRes] = await Promise.all([
+        axios.get('/api/agent/earnings'),
+        axios.get('/api/agent/packages/active'),
+        axios.get('/api/auth/me')
+      ]);
+      setStats(statsRes.data);
+      setActivePackages(Array.isArray(packagesRes.data) ? packagesRes.data : packagesRes.data.packages || []);
+      
+      // Set daily clicks and earnings from user data
+      setDailyClicks(userRes.data.dailyClicks || 0);
+      setDailyEarnings(userRes.data.dailyClickEarnings || 0);
+    } catch (error) {
+      console.error('Error fetching dashboard data:', error);
+      toast({
+        title: 'Error',
+        description: 'Failed to fetch dashboard data',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+      setActivePackages([]);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const handleClick = async () => {
+    try {
+      const response = await axios.post('/api/agent/click');
+      
+      // Update the daily clicks and earnings from the response
+      setDailyClicks(response.data.clicks);
+      setDailyEarnings(response.data.dailyEarnings);
+      
+      // Refresh the dashboard data to update the stats
+      fetchData();
+      
+    } catch (error) {
+      console.error('Error recording click:', error);
+      
+      // Show appropriate error message
+      const errorMessage = error.response?.data?.message || 'Failed to record click';
+      toast({
+        title: 'Error',
+        description: errorMessage,
+        status: 'error',
+        duration: 3000,
+        isClosable: true,
+      });
+    }
+  };
+
+  const handlePackageEnter = async (amount, packageNumber) => {
+    try {
+      const response = await axios.post('/api/agent/packages/activate', {
+        amount: parseFloat(amount),
+        packageId: packageNumber
+      });
+      
+      // Update wallet balance and refresh dashboard data
+      if (response.data.newBalance !== undefined) {
+        setStats(prevStats => ({
+          ...prevStats,
+          wallet: response.data.newBalance
+        }));
+      }
+      
+      // Refresh all dashboard data to ensure everything is up to date
+      fetchData();
+      
+      return response.data;
+    } catch (error) {
+      console.error('Error activating package:', error);
+      throw error;
+    }
+  };
+
+  const handleClaimPackage = async (packageId) => {
+    try {
+      const response = await axios.post('/api/agent/claim-package', { packageId });
+      
+      toast({
+        title: 'Package Claimed',
+        description: `Successfully claimed ₱${response.data.amount.toLocaleString()}`,
+        status: 'success',
+        duration: 5000,
+        isClosable: true,
+      });
+      
+      // Refresh dashboard data to update stats and package list
+      fetchData();
+    } catch (error) {
+      console.error('Error claiming package:', error);
+      toast({
+        title: 'Error',
+        description: error.response?.data?.message || 'Failed to claim package',
+        status: 'error',
+        duration: 5000,
+        isClosable: true,
+      });
+    }
+  };
+
+  return (
+    <AgentLayout>
+      <Container maxW="7xl">
+        {/* Clicking Task Section */}
+        <Box mb={8}>
+          <ClickingTask
+            onEarn={handleClick}
+            dailyClicks={dailyClicks}
+            dailyEarnings={dailyEarnings}
+          />
+        </Box>
+
+        {/* Stats Grid */}
+        <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4} mb={8} templateColumns="repeat(auto-fill, minmax(250px, 1fr))">
+          <StatCard
+            title="Wallet"
+            stat={`₱${stats.wallet.toLocaleString()}`}
+            icon={FaWallet}
+            subtext={stats.immaturePackages > 0 ? `₱${stats.immatureAmount.toLocaleString()} in ${stats.immaturePackages} immature package(s)` : null}
+          />
+          <StatCard
+            title="Direct Referral Income"
+            stat={`₱${stats.directReferral.toLocaleString()}`}
+            icon={FaUsers}
+          />
+          <StatCard
+            title="Indirect Referral Income"
+            stat={`₱${stats.indirectReferral.toLocaleString()}`}
+            icon={FaUsers}
+          />
+          <StatCard
+            title="Total Clicks Earnings"
+            stat={`₱${stats.totalClicks.toLocaleString()}`}
+            icon={FaChartLine}
+          />
+          <StatCard
+            title="Shared Capital Earnings"
+            stat={`₱${stats.sharedEarnings.toLocaleString()}`}
+            icon={FaWallet}
+            subtext={stats.pendingEarnings > 0 ? `₱${stats.pendingEarnings.toLocaleString()} pending claim` : null}
+          />
+          <StatCard
+            title="Total Withdraw"
+            stat={`₱${stats.totalWithdraw?.toLocaleString() || '0'}`}
+            icon={FaWallet}
+          />
+        </SimpleGrid>
+
+        {/* Active Packages */}
+        {activePackages.length > 0 && (
+          <Box mb={8}>
+            <Heading 
+              as="h2" 
+              fontSize="22px" 
+              fontWeight="600" 
+              color="white" 
+              mb={4}
+              fontFamily="'Montserrat', sans-serif"
+            >
+              Active Packages
+            </Heading>
+            <SimpleGrid columns={{ base: 2, md: 3, lg: 4 }} spacing={4}>
+              {activePackages.map((pkg) => (
+                <Card 
+                  key={pkg._id}
+                  bg="#1E2528" 
+                  borderWidth="1px" 
+                  borderColor={pkg.isMatured && !pkg.claimed ? "#FDB137" : "gray.700"}
+                  position="relative"
+                  overflow="hidden"
+                  _hover={{ 
+                    transform: 'translateY(-5px)',
+                    boxShadow: pkg.isMatured && !pkg.claimed ? '0 0 15px rgba(253, 177, 55, 0.3)' : 'lg',
+                    borderColor: '#FDB137',
+                    transition: 'all 0.3s ease'
+                  }}
+                  transition="all 0.2s ease"
+                  cursor={pkg.isMatured && !pkg.claimed ? "pointer" : "default"}
+                  onClick={() => {
+                    if (pkg.isMatured && !pkg.claimed) {
+                      handleClaimPackage(pkg._id);
+                    }
+                  }}
+                >
+                  {pkg.isMatured && !pkg.claimed && (
+                    <Box
+                      position="absolute"
+                      top={0}
+                      right={0}
+                      width="100%"
+                      height="100%"
+                      pointerEvents="none"
+                      overflow="hidden"
+                    >
+                      <Box
+                        position="absolute"
+                        top={-10}
+                        right={-10}
+                        width="60px"
+                        height="60px"
+                        bg="#FDB137"
+                        transform="rotate(45deg)"
+                        zIndex={1}
+                      />
+                      <Box
+                        position="absolute"
+                        top={3}
+                        right={3}
+                        zIndex={2}
+                        fontSize="xs"
+                        fontWeight="bold"
+                        color="#181E20"
+                        transform="rotate(45deg)"
+                      >
+                        CLAIM
+                      </Box>
+                    </Box>
+                  )}
+                  <CardBody p={3}>
+                    <VStack align="start" spacing={2}>
+                      <Flex justify="space-between" width="100%" align="center">
+                        <Badge 
+                          bg="#FDB137"
+                          color="#181E20"
+                          fontSize="xs"
+                          fontWeight="bold"
+                        >
+                          PKG {pkg.packageType}
+                        </Badge>
+                        {pkg.isMatured && !pkg.claimed && (
+                          <Badge 
+                            bg="#FDB137" 
+                            color="#181E20"
+                            fontSize="xs"
+                          >
+                            MATURED
+                          </Badge>
+                        )}
+                      </Flex>
+                      
+                      <Box width="100%">
+                        <Flex justify="space-between">
+                          <Text color="gray.400" fontSize="xs">Investment</Text>
+                          <Text color="white" fontSize="sm" fontWeight="bold">₱{pkg.amount.toLocaleString()}</Text>
+                        </Flex>
+                      </Box>
+
+                      <Box width="100%">
+                        <Flex justify="space-between">
+                          <Text color="gray.400" fontSize="xs">Daily</Text>
+                          <Text color="white" fontSize="xs">₱{pkg.dailyIncome.toLocaleString()}</Text>
+                        </Flex>
+                      </Box>
+
+                      <Box width="100%">
+                        <Flex justify="space-between" mb={1}>
+                          <Text color="gray.400" fontSize="xs">Remaining</Text>
+                          <Flex align="center">
+                            <Text color={pkg.daysRemaining === 0 ? "#FDB137" : "white"} fontSize="sm" fontWeight="bold" mr={1}>
+                              {pkg.daysRemaining}
+                            </Text>
+                            <Text color="gray.400" fontSize="xs">days</Text>
+                          </Flex>
+                        </Flex>
+                        {/* Progress bar for days remaining */}
+                        <Box width="100%" height="4px" bg="gray.700" borderRadius="full" overflow="hidden" position="relative">
+                          <Box 
+                            height="100%" 
+                            width={`${pkg.isMatured ? 100 : (100 - (pkg.daysRemaining / (pkg.packageType === 1 ? 12 : 20) * 100))}%`} 
+                            bg="#FDB137"
+                            transition="width 0.5s ease-in-out"
+                          />
+                        </Box>
+                      </Box>
+
+                      {pkg.isMatured && (
+                        <Box width="100%">
+                          <Flex justify="space-between">
+                            <Text color="gray.400" fontSize="xs">Total</Text>
+                            <Text color="#FDB137" fontSize="sm" fontWeight="bold">₱{pkg.totalEarnings.toLocaleString()}</Text>
+                          </Flex>
+                        </Box>
+                      )}
+                    </VStack>
+                  </CardBody>
+                </Card>
+              ))}
+            </SimpleGrid>
+          </Box>
+        )}
+
+        {/* Shared Capital Packages */}
+        <Box mt={8}>
+          <Heading 
+            as="h2" 
+            fontSize="22px" 
+            fontWeight="600" 
+            color="white" 
+            mb={4}
+            fontFamily="'Montserrat', sans-serif"
+          >
+            Generate Passive Income Through Shared Capital
+          </Heading>
+          <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={4}>
+            <SharedCapitalPackage
+              packageNumber={1}
+              minimum={100}
+              onEnter={(amount) => handlePackageEnter(amount, 1)}
+              walletBalance={stats.wallet}
+            />
+            <SharedCapitalPackage
+              packageNumber={2}
+              minimum={500}
+              onEnter={(amount) => handlePackageEnter(amount, 2)}
+              walletBalance={stats.wallet}
+            />
+          </SimpleGrid>
+        </Box>
+      </Container>
+    </AgentLayout>
+  );
+} 

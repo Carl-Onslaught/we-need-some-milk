@@ -1,0 +1,196 @@
+const Investment = require('../models/Investment');
+const Transaction = require('../models/Transaction');
+const User = require('../models/User');
+
+// Constants for referral rates
+const REFERRAL_RATES = {
+  direct: 0.05, // 5%
+  level2: 0.02, // 2%
+  level3: 0.02, // 2%
+  level4: 0.01  // 1%
+};
+
+// Create new investment
+exports.createInvestment = async (req, res) => {
+  try {
+    const { packageType } = req.body;
+    const user = req.user;
+
+    // Validate package type
+    if (![1, 2].includes(packageType)) {
+      return res.status(400).json({ message: 'Invalid package type' });
+    }
+
+    // Create investment
+    const investment = new Investment({
+      user: user._id,
+      packageType
+    });
+
+    // Check if user has sufficient balance
+    if (user.balance < investment.amount) {
+      return res.status(400).json({ message: 'Insufficient balance' });
+    }
+
+    // Deduct investment amount from user balance
+    user.balance -= investment.amount;
+
+    // Create transaction record
+    const transaction = new Transaction({
+      user: user._id,
+      type: 'investment',
+      amount: -investment.amount,
+      description: `Investment in Package ${packageType}`,
+      status: 'completed',
+      metadata: {
+        packageType,
+        investmentId: investment._id
+      }
+    });
+
+    // Process referral commissions
+    await processReferralCommissions(user, investment);
+
+    // Save all changes
+    await Promise.all([
+      investment.save(),
+      transaction.save(),
+      user.save()
+    ]);
+
+    res.status(201).json({
+      message: 'Investment created successfully',
+      investment,
+      balance: user.balance
+    });
+  } catch (error) {
+    console.error('Investment creation error:', error);
+    res.status(500).json({ message: 'Error creating investment' });
+  }
+};
+
+// Process daily interest
+exports.processDailyInterest = async (investment) => {
+  try {
+    const user = await User.findById(investment.user);
+    if (!user) return;
+
+    // Calculate interest for today
+    const interest = investment.dailyInterest;
+    
+    // Update investment
+    investment.totalInterest += interest;
+    investment.lastInterestPayout = new Date();
+
+    // Update user balance
+    user.balance += interest;
+
+    // Create transaction record
+    const transaction = new Transaction({
+      user: user._id,
+      type: 'interest',
+      amount: interest,
+      description: `Daily interest from Package ${investment.packageType}`,
+      status: 'completed',
+      metadata: {
+        packageType: investment.packageType,
+        investmentId: investment._id
+      }
+    });
+
+    // Check if investment is completed
+    const today = new Date();
+    if (today >= investment.endDate) {
+      investment.status = 'completed';
+    }
+
+    // Save all changes
+    await Promise.all([
+      investment.save(),
+      transaction.save(),
+      user.save()
+    ]);
+
+    return true;
+  } catch (error) {
+    console.error('Error processing daily interest:', error);
+    return false;
+  }
+};
+
+// Get user investments
+exports.getUserInvestments = async (req, res) => {
+  try {
+    const investments = await Investment.find({ user: req.user._id })
+      .sort({ createdAt: -1 });
+
+    res.json(investments);
+  } catch (error) {
+    console.error('Error fetching investments:', error);
+    res.status(500).json({ message: 'Error fetching investments' });
+  }
+};
+
+// Process referral commissions
+const processReferralCommissions = async (user, investment) => {
+  try {
+    let currentUser = user;
+    let level = 1;
+    const processedUsers = new Set();
+
+    while (currentUser.referrer && level <= 4 && !processedUsers.has(currentUser.referrer.toString())) {
+      const referrer = await User.findById(currentUser.referrer);
+      if (!referrer || !referrer.isActive) {
+        break;
+      }
+
+      // Calculate commission
+      let commissionRate;
+      if (level === 1) {
+        commissionRate = REFERRAL_RATES.direct;
+      } else if (level === 2) {
+        commissionRate = REFERRAL_RATES.level2;
+      } else if (level === 3) {
+        commissionRate = REFERRAL_RATES.level3;
+      } else {
+        commissionRate = REFERRAL_RATES.level4;
+      }
+
+      const commissionAmount = investment.amount * commissionRate;
+
+      // Create referral transaction
+      const transaction = new Transaction({
+        user: referrer._id,
+        type: 'referral',
+        amount: commissionAmount,
+        description: `Level ${level} referral commission from investment`,
+        status: 'completed',
+        relatedUser: user._id,
+        metadata: {
+          referralLevel: level,
+          investmentId: investment._id
+        }
+      });
+
+      // Update referrer's balance and earnings
+      referrer.balance += commissionAmount;
+      if (level === 1) {
+        referrer.referralEarnings.direct += commissionAmount;
+      } else {
+        referrer.referralEarnings.indirect += commissionAmount;
+      }
+
+      await Promise.all([
+        transaction.save(),
+        referrer.save()
+      ]);
+
+      processedUsers.add(referrer._id.toString());
+      currentUser = referrer;
+      level++;
+    }
+  } catch (error) {
+    console.error('Error processing referral commissions:', error);
+    throw error;
+  }
+}; 

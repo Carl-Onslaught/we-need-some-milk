@@ -1,0 +1,128 @@
+name: Deploy WealthClick Application
+
+on: 
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+
+  backup:
+    name: Backup Database
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 20
+
+    steps:
+      - name: SSH to server and backup database
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ vars.DEPLOY_HOST }}
+          username: ${{ vars.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          port: ${{ vars.DEPLOY_PORT }}
+          script: |
+            cd ${{ vars.DEPLOY_PATH }}
+            chmod +x deployment/backup.sh
+
+            if docker ps -a --format "{{.Names}}" | tr -d "\r" | grep -Fx "${{vars.DOCKER_SERVICE_DB}}"; then
+              echo "Backing up database from docker service: ${{ vars.DOCKER_SERVICE_DB }}..."
+              export MONGODB_USER=${{ vars.MONGODB_USER }}
+              export MONGODB_PASSWORD=${{ secrets.MONGODB_PASSWORD }}
+              export MONGODB_NAME=${{ vars.MONGODB_NAME }}
+              export DB_BACKUP_PATH=${{ vars.DB_BACKUP_PATH }}
+              export DOCKER_SERVICE_DB=${{ vars.DOCKER_SERVICE_DB }}
+              ./deployment/backup.sh
+            else
+              echo "Nothing to Backup. Database service ${{ vars.DOCKER_SERVICE_DB }} does not exists."
+            fi
+        continue-on-error: false
+  deploy:
+    name: Deploy Application
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 20
+    needs: backup
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+          
+      - name: Create env file
+        run: |
+          touch .env
+          touch client/.env
+
+      - name: Add environment variables to .env
+        run: |
+          echo "PORT=${{vars.API_PORT}}" >> .env
+          echo "HOST=${{vars.DEPLOY_HOST}}" >> .env
+          echo "DOMAIN_NAME=${{vars.DOMAIN_NAME}}" >> .env
+          echo "MONGODB_HOST=${{vars.MONGODB_HOST}}" >> .env
+          echo "MONGODB_NAME=${{vars.MONGODB_NAME}}" >> .env
+          echo "MONGODB_PORT=${{vars.MONGODB_PORT}}" >> .env
+          echo "MONGODB_USER=${{vars.MONGODB_USER}}" >> .env
+          echo "MONGOEXPRESS_PORT=${{vars.MONGOEXPRESS_PORT}}" >> .env
+          echo "MONGOEXPRESS_USER=${{vars.MONGOEXPRESS_USER}}" >> .env
+          echo "MONGO_ROOT_USER=${{vars.MONGO_ROOT_USER}}" >> .env
+          echo "OWNER_EMAIL=${{vars.OWNER_EMAIL}}" >> .env
+          echo "VITE_API_URL=${{vars.VITE_API_URL}}" >> client/.env
+          echo "VITE_BASE_URL=https://${{vars.DOMAIN_NAME}}" >> client/.env
+          echo "#Secrets"
+          echo "JWT_SECRET=${{secrets.JWT_SECRET}}" >> .env
+          echo "MONGODB_PASSWORD=${{secrets.MONGODB_PASSWORD}}" >> .env
+          echo "MONGOEXPRESS_PASSWORD=${{secrets.MONGOEXPRESS_PASSWORD}}" >> .env
+          echo "MONGO_ROOT_PASSWORD=${{secrets.MONGO_ROOT_PASSWORD}}" >> .env
+          echo "PAYMENT_API_KEY=${{secrets.PAYMENT_API_KEY}}" >> .env
+          echo "PAYMENT_API_SECRET=${{secrets.PAYMENT_API_SECRET}}" >> .env
+          echo "#Docker instances"
+          echo "DOCKER_VOLUME_CLIENT=${{vars.DOCKER_VOLUME_CLIENT}}" >> .env
+          echo "DOCKER_VOLUME_DB=${{vars.DOCKER_VOLUME_DB}}" >> .env
+          echo "DOCKER_VOLUME_DB_CONFIG=${{vars.DOCKER_VOLUME_DB_CONFIG}}" >> .env
+          echo "DOCKER_NETWORK=${{vars.DOCKER_NETWORK}}" >> .env
+          chmod 644 .env  # Ensure it's readable
+
+      - name: Create destination directory and set permissions
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ vars.DEPLOY_HOST }}
+          username: ${{ vars.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          port: ${{ vars.DEPLOY_PORT }}
+          script: |
+            sudo mkdir -p ${{ vars.DEPLOY_PATH }}
+            sudo chmod 775 ${{ vars.DEPLOY_PATH }}
+            sudo chown -R ${{ vars.DEPLOY_USER }}:${{ vars.DEPLOY_USER }} ${{ vars.DEPLOY_PATH }}
+            sudo chmod -R u+w ${{ vars.DEPLOY_PATH }}
+
+      - name: Deploy files to server
+        id: deploy
+        uses: burnett01/rsync-deployments@6.0.0
+        with:
+            switches: '-avhz --progress --exclude-from=./deployment/exclude.txt --chmod=Du=rwx,Dg=rx,Do=rx,Fu=rw,Fg=r,Fo=r -oHostKeyAlgorithms=ssh-rsa --delete --force --verbose'
+            remote_path: ${{ vars.DEPLOY_PATH }}
+            remote_host: ${{ vars.DEPLOY_HOST }}
+            remote_port: ${{ vars.DEPLOY_PORT }}
+            remote_user: ${{ vars.DEPLOY_USER }}
+            remote_key: ${{ secrets.DEPLOY_KEY }}
+  
+  migration:
+    name: Run Migration
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 20
+    needs: deploy
+
+    steps:
+      - name: SSH to server and run migration script
+        uses: appleboy/ssh-action@v0.1.0
+        with:
+          host: ${{ vars.DEPLOY_HOST }}
+          username: ${{ vars.DEPLOY_USER }}
+          key: ${{ secrets.DEPLOY_KEY }}
+          script: |
+            cd ${{vars.DEPLOY_PATH}}
+            bash ./startup.sh
+            
+            echo "Restarting nginx service..."
+            docker exec -i ${{vars.DOCKER_SERVICE_NGINX}} sh -c "nginx -s reload"

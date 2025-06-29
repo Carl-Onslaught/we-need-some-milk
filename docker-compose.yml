@@ -1,0 +1,166 @@
+volumes:
+  wc_db_data:
+    external: true
+    name: wc_db_data
+  wc_db_config:
+    external: true
+    name: wc_db_config
+  wc_client_data:
+    external: true
+    name: wc_client_data
+  wc_app_logs:
+    driver: local
+
+networks:
+  wc_net:
+    external: true
+    name: wc_net
+
+services:
+
+  wc_api:
+    build:
+      context: ./server
+      dockerfile: Dockerfile
+    container_name: wc_api
+    restart: always
+    environment:
+      - MONGODB_URI=mongodb://${MONGODB_USER}:${MONGODB_PASSWORD}@${MONGODB_HOST}:${MONGODB_PORT}/${MONGODB_NAME}?authSource=${MONGODB_NAME}
+      - JWT_SECRET=${JWT_SECRET}
+      - PORT=${PORT}
+    volumes:
+      - wc_app_logs:/app/logs
+    command: >
+      sh -c "
+        mkdir -p /app/logs &&
+        (crontab -l 2>/dev/null; echo '0 * * * * cd /app && node scripts/processInterest.js >> /app/logs/cron.log 2>&1') | crontab - &&
+        crond &&
+        node server.js
+      "
+    ports:
+      - ${PORT}:${PORT}
+    depends_on:
+          wc_db:
+            condition: service_healthy
+    networks:
+      - wc_net
+  wc_db:
+    image: mongo:7.0.11
+    restart: always
+    container_name: wc_db
+    environment:
+      - MONGODB_NAME=${MONGODB_NAME}
+      - MONGODB_USER=${MONGODB_USER}
+      - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+      - MONGO_ROOT_USER=${MONGO_ROOT_USER}
+      - MONGO_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+      - MONGO_INITDB_ROOT_USERNAME=${MONGO_ROOT_USER}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGO_ROOT_PASSWORD}
+    expose:
+      - "${MONGODB_PORT}"
+    volumes:
+      - wc_db_data:/data/db
+      - wc_db_config:/data/configdb
+      - ./docker-entrypoint.sh:/docker-entrypoint-initdb.d/docker-entrypoint.sh:ro
+    healthcheck:
+        test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand(\"ping\").ok' || exit 1"]
+        interval: 10s
+        timeout: 10s
+        retries: 4
+    networks:
+      - wc_net
+    # dns:
+    #   - ${MONGODB_HOST} # Replace this with your local DNS address usually, localhost or 127.0.0.1
+
+  # Database-manager like compass and robo3t but this one runs in a browser
+  # Access your MongoExpress through your browser: http://localhost:${MONGOEXPRESS_PORT} (e.g., http://locahost:8081)
+  # Use your MONGOEXPRESS_USER and MONGOEXPRESS_PASSWORD as your login credentials
+  wc_mongoxp:
+    image: mongo-express:1.0.2
+    container_name: wc_mongoxp
+    restart: unless-stopped
+    environment:
+      - WAIT_HOSTS=wc_db:27027
+      - ME_CONFIG_MONGODB_SERVER=wc_db #should be the name of your mongodb service
+      - ME_CONFIG_MONGODB_PORT=27017 #should be the same as your mongodb service port
+      - ME_CONFIG_MONGODB_ENABLE_ADMIN=true
+      - ME_CONFIG_MONGODB_AUTH_DATABASE=admin
+      - ME_CONFIG_MONGODB_ADMINUSERNAME=${MONGO_ROOT_USER}
+      - ME_CONFIG_MONGODB_ADMINPASSWORD=${MONGO_ROOT_PASSWORD}
+      - ME_CONFIG_BASICAUTH_USERNAME=${MONGOEXPRESS_USER}
+      - ME_CONFIG_BASICAUTH_PASSWORD=${MONGOEXPRESS_PASSWORD}
+    depends_on:
+      - wc_db
+    ports:
+      - ${MONGOEXPRESS_PORT}:8081
+    networks:
+      - wc_net
+    # dns:
+    #   - ${MONGODB_HOST} # Replace this with your local DNS address usually, localhost or 127.0.0.1
+
+  wc_client:
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: wc_client
+    volumes:
+      - wc_client_data:/dist
+    ports:
+      - "3000:3000"
+    depends_on:
+      - wc_api
+    networks:
+      - wc_net
+
+  wc_nginx:
+    image: nginx:1.27.4-alpine-slim
+    container_name: wc_nginx
+    depends_on:
+        - wc_api
+        - wc_client
+    tty: true
+    restart: unless-stopped
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./nginx_logs:/var/log/nginx
+      - ./deployment/nginx.conf:/etc/nginx/nginx.conf:ro
+      - ./cert/:/etc/nginx/ssl
+      - wc_client_data:/var/www/html/client/dist:ro
+      - ../certbot/www:/var/www
+      - ../certbot/conf/live:/etc/letsencrypt/live
+      - ../certbot/conf/archive:/etc/letsencrypt/archive
+    networks:
+      - wc_net
+
+  wc_certbot_init:
+    image: certbot/certbot
+    container_name: wc_certbot_init
+    volumes:
+      - ../certbot/www:/var/www
+      - ../certbot/conf/live:/etc/letsencrypt/live
+      - ../certbot/conf/archive:/etc/letsencrypt/archive
+    entrypoint: >
+      certbot certonly --webroot -w /var/www
+      --email ${OWNER_EMAIL}
+      -d ${DOMAIN_NAME} -d www.${DOMAIN_NAME}
+      --agree-tos --non-interactive
+    profiles:
+      - certbot_init
+    networks:
+      - wc_net
+
+  wc_certbot_renew:
+    image: certbot/certbot
+    container_name: wc_certbot_renew
+    volumes:
+      - ../certbot/www:/var/www/html/client
+      - ../certbot/conf/live:/etc/letsencrypt/live
+      - ../certbot/conf/archive:/etc/letsencrypt/archive
+    entrypoint: >
+      sh -c "certbot renew --webroot -w /var/www/html/client --verbose"
+    profiles:
+      - certbot_renew
+    networks:
+      - wc_net

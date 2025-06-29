@@ -1,0 +1,20 @@
+{
+  "version": "0.2",
+  "language": "en",
+  "words": [
+    "gcash",
+    "gotyme",
+    "Tyme",
+    "GoTyme",
+    "payment",
+    "withdraw",
+    "withdrawal",
+    "Downlines",
+    "downlines"
+  ],
+  "ignorePaths": [
+    "node_modules/**",
+    "dist/**",
+    "build/**"
+  ]
+} 
