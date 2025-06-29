@@ -3,8 +3,8 @@ const protocol = window.location.protocol;
 const hostname = window.location.hostname;
 const port = 5001; // Server port
 
-export const API_URL = import.meta.env.VITE_API_URL || 'https://wealth-click-website-1.onrender.com/api';
-export const BASE_URL = 'https://wealth-click-website-1.onrender.com';
+export const API_URL = import.meta.env.VITE_API_URL || 'https://wealth-click-website.onrender.com/api';
+export const BASE_URL = 'https://wealth-click-website.onrender.com';
 
 // For development, allow both localhost and network access
 if (process.env.NODE_ENV === 'development') {
