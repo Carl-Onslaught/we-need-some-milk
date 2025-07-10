@@ -4,3 +4,4 @@
 /client/node_modules
 /client/.env
 /nginx_logs
+/node_modules
