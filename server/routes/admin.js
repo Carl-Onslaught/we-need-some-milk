@@ -53,6 +53,7 @@ router.post('/registration/load', adminController.loadRegistration);
 
 // Shared capital
 router.post('/shared/load', adminController.loadSharedCapital);
+router.get('/shared/total-points', adminController.getTotalPointsSentInSharedCapital);
 
 // Package requests management
 router.get('/packages/pending', adminController.getPendingPackages);
@@ -171,6 +172,12 @@ router.get('/earnings/shared-capital', async (req, res) => {
   }
 });
 
+// Withdrawal statistics
+router.get('/withdrawals/stats', adminController.getWithdrawalStats);
+
+// Get total points sent in shared capital
+router.get('/shared/total-points', auth, adminAuth, adminController.getTotalPointsSentInSharedCapital);
+
 // Shared capital management
 router.get('/transactions/shared', adminController.getSharedTransactions);
 router.get('/withdrawals/shared', adminController.getSharedWithdrawals);
@@ -221,21 +228,13 @@ router.post('/load-capital', [auth, adminAuth], async (req, res) => {
 // Get total shared capital sent to agents
 router.get('/load-capital/total-sent', [auth, adminAuth], async (req, res) => {
   try {
-    // Aggregate all agents' wallet increases from shared capital loading
-    // For now, sum all positive registration transactions of type 'registration' or 'shared_capital_load' if tracked
-    // But since /load-capital only updates wallet, we need to sum all loads
-    // If you want to track only loads via this endpoint, you should also log a Transaction or similar
-    // For now, let's sum all wallet increases for agents (not ideal, but matches current logic)
-    // If you want to be precise, you should log a Transaction in /load-capital POST as well
-
-    // Option 1: If you want to sum all wallet increases, you can sum all agents' wallet fields
-    // const agents = await User.find({ role: 'agent' });
-    // const totalSent = agents.reduce((sum, agent) => sum + (agent.wallet || 0), 0);
-
-    // Option 2: If you want to sum all loads, you should log a Transaction in /load-capital POST and sum those
-    // For now, let's sum all agents' wallet fields
-    const agents = await require('../models/User').find({ role: 'agent' });
-    const totalSent = agents.reduce((sum, agent) => sum + (agent.wallet || 0), 0);
+    // Sum all completed deposit transactions (admin loads)
+    const SharedCapitalTransaction = require('../models/sharedCapitalTransaction');
+    const result = await SharedCapitalTransaction.aggregate([
+      { $match: { type: 'deposit', status: 'completed' } },
+      { $group: { _id: null, total: { $sum: "$amount" } } }
+    ]);
+    const totalSent = result[0]?.total || 0;
     res.json({ totalSent });
   } catch (error) {
     console.error('Error fetching total shared capital sent:', error);
@@ -339,5 +338,8 @@ router.post('/shared-capital/revert/:id', async (req, res) => {
     res.status(500).json({ message: 'Error reverting shared capital load' });
   }
 });
+
+// Withdrawals by source (for Earnings & Withdrawals tabbed view)
+router.get('/withdrawals/by-source', adminController.getWithdrawalsBySource);
 
 module.exports = router;

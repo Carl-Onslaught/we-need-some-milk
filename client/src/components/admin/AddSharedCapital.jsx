@@ -50,7 +50,7 @@ const AddSharedCapital = () => {
       }
 
       // Make API request
-      await axios.post('/api/admin/shared-capital', {
+      await axios.post('/admin/shared-capital', {
         username: formData.username,
         amount: parseFloat(formData.amount),
         packageType: parseInt(formData.packageType)

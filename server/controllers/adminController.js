@@ -50,8 +50,13 @@ exports.getDashboardStats = async (req, res) => {
         // Get total users count
         const totalUsers = await User.countDocuments({ role: 'agent' });
 
-        // Get total investments
+        // Get total investments (only approved, active, or completed investments)
         const investmentStats = await Investment.aggregate([
+            {
+                $match: {
+                    status: { $in: ['approved', 'active', 'completed'] }
+                }
+            },
             {
                 $group: {
                     _id: null,
@@ -59,39 +64,83 @@ exports.getDashboardStats = async (req, res) => {
                 }
             }
         ]);
-        const totalInvestments = investmentStats[0]?.totalInvestments || 0;
-
-        // Get total withdrawals
-        const totalWithdrawals = await Withdrawal.aggregate([
-            { 
-                $match: { status: 'completed' } 
+        const totalInvestments = investmentStats.length > 0 ? investmentStats[0].totalInvestments : 0;
+        
+        // Calculate total earnings from all agents (referral earnings + click earnings + shared earnings)
+        const earningsStats = await User.aggregate([
+            {
+                $match: { role: 'agent' }
             },
             {
                 $group: {
                     _id: null,
+                    totalDirectReferral: { $sum: '$referralEarnings.direct' },
+                    totalIndirectReferral: { $sum: '$referralEarnings.indirect' },
+                    totalClickEarnings: { $sum: '$clickEarnings' },
+                    totalSharedEarnings: { $sum: '$sharedEarnings' }
+                }
+            }
+        ]);
+        
+        const totalReferralEarnings = (earningsStats[0]?.totalDirectReferral || 0) + 
+                                    (earningsStats[0]?.totalIndirectReferral || 0);
+        const totalEarnings = totalReferralEarnings + 
+                            (earningsStats[0]?.totalClickEarnings || 0) +
+                            (earningsStats[0]?.totalSharedEarnings || 0);
+
+        // Get total withdrawals by source type
+        const withdrawalsBySource = await Withdrawal.aggregate([
+            {
+                $match: { status: 'completed' }
+            },
+            {
+                $group: {
+                    _id: '$source',
                     total: { $sum: '$amount' }
                 }
             }
         ]);
 
-        // Get pending withdrawals
-        const pendingWithdrawals = await Withdrawal.aggregate([
-            { 
-                $match: { status: 'pending' } 
+        // Get pending withdrawals by source type
+        const pendingWithdrawalsBySource = await Withdrawal.aggregate([
+            {
+                $match: { status: 'pending' }
             },
             {
                 $group: {
-                    _id: null,
+                    _id: '$source',
                     total: { $sum: '$amount' }
                 }
             }
         ]);
+
+        // Calculate totals
+        const totalWithdrawals = withdrawalsBySource.reduce((sum, item) => sum + item.total, 0);
+        const totalPendingWithdrawals = pendingWithdrawalsBySource.reduce((sum, item) => sum + item.total, 0);
+
+        // Format withdrawal stats by source
+        const withdrawalStats = {
+            referral: withdrawalsBySource.find(item => item._id === 'direct_indirect')?.total || 0,
+            click: withdrawalsBySource.find(item => item._id === 'click_earnings')?.total || 0,
+            sharedCapital: withdrawalsBySource.find(item => item._id === 'shared_capital')?.total || 0,
+            pending: {
+                referral: pendingWithdrawalsBySource.find(item => item._id === 'direct_indirect')?.total || 0,
+                click: pendingWithdrawalsBySource.find(item => item._id === 'click_earnings')?.total || 0,
+                sharedCapital: pendingWithdrawalsBySource.find(item => item._id === 'shared_capital')?.total || 0,
+                total: totalPendingWithdrawals
+            },
+            total: totalWithdrawals
+        };
 
         res.json({
             totalUsers,
             totalInvestments,
-            totalWithdrawals: totalWithdrawals[0]?.total || 0,
-            pendingWithdrawals: pendingWithdrawals[0]?.total || 0
+            totalEarnings,
+            totalReferralEarnings,
+            totalSharedEarnings: earningsStats[0]?.totalSharedEarnings || 0,
+            totalWithdrawals: withdrawalStats.total,
+            pendingWithdrawals: withdrawalStats.pending.total,
+            withdrawalStats
         });
     } catch (error) {
         console.error('Get dashboard stats error:', error);
@@ -156,7 +205,10 @@ exports.loadSharedCapital = async (req, res) => {
 exports.getEarningsTransactions = async (req, res) => {
     try {
         const transactions = await Transaction.find({ 
-            type: { $in: ['commission', 'click', 'referral'] } 
+            $or: [
+                { type: { $in: ['commission', 'click', 'referral'] } },
+                { type: 'withdrawal', status: 'completed' }
+            ]
         })
             .populate('user', '-password')
             .sort({ createdAt: -1 });
@@ -191,6 +243,16 @@ exports.approveEarningsWithdrawal = async (req, res) => {
         withdrawal.processedAt = new Date();
         await withdrawal.save();
 
+        // Create a Transaction record for the approved withdrawal
+        await Transaction.create({
+            user: withdrawal.agentId,
+            type: 'withdrawal',
+            amount: withdrawal.amount,
+            status: 'completed',
+            withdrawal: withdrawal._id,
+            description: `Earnings withdrawal of ₱${withdrawal.amount} approved via ${withdrawal.method}`
+        });
+
         res.json({ message: 'Withdrawal approved successfully' });
     } catch (error) {
         console.error('Error approving withdrawal:', error);
@@ -217,39 +279,59 @@ exports.rejectEarningsWithdrawal = async (req, res) => {
 
         res.json({ message: 'Withdrawal rejected successfully' });
     } catch (error) {
-        console.error('Error rejecting withdrawal:', error);
         res.status(500).json({ message: 'Error rejecting withdrawal' });
     }
 };
 
-exports.getSharedTransactions = async (req, res) => {
+// New function to get total points sent in shared capital
+exports.getTotalPointsSentInSharedCapital = async (req, res) => {
     try {
-        const transactions = await Transaction.find({ type: 'shared' })
-            .populate('user', '-password')
-            .sort({ createdAt: -1 });
-        res.json(transactions);
+        const totalPointsSent = await Investment.aggregate([
+            {
+                $match: { 
+                    package: { $exists: true, $ne: null },
+                    status: 'completed' // Only count completed investments
+                }
+            },
+            {
+                $group: {
+                    _id: null,
+                    totalPoints: { $sum: '$amount' }
+                }
+            }
+        ]);
+
+        // Handle case when there are no investments yet
+        const total = totalPointsSent.length > 0 ? totalPointsSent[0].totalPoints : 0;
+        
+        res.json({ 
+            success: true,
+            totalPointsSent: total 
+        });
     } catch (error) {
-        console.error('Get shared transactions error:', error);
-        res.status(500).json({ message: 'Error fetching shared transactions' });
+        console.error('Error getting total points sent in shared capital:', error);
+        res.status(500).json({ 
+            success: false,
+            message: 'Error getting total points sent in shared capital',
+            error: error.message 
+        });
     }
 };
 
 exports.approveSharedWithdrawal = async (req, res) => {
     try {
-        console.log('Starting shared withdrawal approval process...');
         const { id } = req.params;
-        console.log('Withdrawal ID:', id);
-
         const withdrawal = await Withdrawal.findById(id).populate('agentId');
-        console.log('Found withdrawal:', withdrawal);
-        
         if (!withdrawal) {
             return res.status(404).json({ message: 'Withdrawal not found' });
         }
-
-        console.log('Creating shared capital transaction record...');
+        if (withdrawal.source === 'shared_capital') {
+            const user = await User.findById(withdrawal.agentId._id);
+            user.sharedEarnings = Math.max(0, (user.sharedEarnings || 0) - withdrawal.amount);
+            await user.save();
+        }
         // Create shared capital transaction record
-        const transaction = await SharedCapitalTransaction.create({
+        await SharedCapitalTransaction.create({
             user: withdrawal.agentId._id,
             type: 'withdrawal',
             amount: withdrawal.amount,
@@ -259,171 +341,52 @@ exports.approveSharedWithdrawal = async (req, res) => {
             createdAt: new Date(),
             updatedAt: new Date()
         });
-        console.log('Created transaction:', transaction);
-
-        // Update withdrawal status
-        console.log('Updating withdrawal status...');
         withdrawal.status = 'completed';
         withdrawal.processedAt = new Date();
         await withdrawal.save();
-        console.log('Withdrawal updated successfully');
-
-        // Verify the transaction was created
-        const verifyTransaction = await SharedCapitalTransaction.findById(transaction._id);
-        console.log('Verified transaction exists:', verifyTransaction);
-
         res.json({ message: 'Shared withdrawal approved successfully' });
     } catch (error) {
-        console.error('Error approving shared withdrawal:', error);
         res.status(500).json({ message: 'Error approving shared withdrawal' });
     }
 };
 
 exports.rejectSharedWithdrawal = async (req, res) => {
     try {
-        console.log('Starting withdrawal rejection process...');
         const { id } = req.params;
-        console.log('Withdrawal ID:', id);
-
-        // Get withdrawal with populated user data
         const withdrawal = await Withdrawal.findById(id).populate('agentId');
-        console.log('Found withdrawal:', withdrawal);
-        
         if (!withdrawal) {
             return res.status(404).json({ message: 'Withdrawal not found' });
         }
-
         if (withdrawal.status !== 'pending') {
             return res.status(400).json({ message: 'Withdrawal is not in pending status' });
         }
-
-        // Get fresh user data to ensure we have the latest balances
         const user = await User.findById(withdrawal.agentId._id);
-        console.log('Found user:', user?.username);
-
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
         }
-
-        // Restore balance based on withdrawal source
-        if (withdrawal.source === 'direct_indirect') {
-            // Split the amount between direct and indirect referrals
-            const halfAmount = withdrawal.amount / 2;
-            if (!user.referralEarnings) {
-                user.referralEarnings = { direct: 0, indirect: 0 };
-            }
-            user.referralEarnings.direct = Number(user.referralEarnings.direct || 0) + halfAmount;
-            user.referralEarnings.indirect = Number(user.referralEarnings.indirect || 0) + halfAmount;
-            console.log('Restored referral earnings:', user.referralEarnings);
-        } 
-        else if (withdrawal.source === 'click_earnings') {
-            // Restore click earnings
-            const currentClickEarnings = Number(user.clickEarnings || 0);
-            const newClickEarnings = parseFloat((currentClickEarnings + withdrawal.amount).toFixed(2));
-            user.clickEarnings = newClickEarnings;
-            console.log('Restored click earnings:', user.clickEarnings);
+        if (withdrawal.source === 'shared_capital') {
+            user.sharedEarnings = (user.sharedEarnings || 0) + withdrawal.amount;
+            await user.save();
         }
-        else if (withdrawal.source === 'shared_capital') {
-            // Get user's packages
-            const packages = await Package.find({
-                user: user._id,
-                status: { $in: ['active', 'completed'] }
-            }).sort({ amount: 1 });
-
-            // Add the rejected amount back to the first available package
-            if (packages.length > 0) {
-                const pkg = packages[0];
-                pkg.amount = (pkg.amount || 0) + withdrawal.amount;
-                await pkg.save();
-                console.log('Restored amount to package:', {
-                    packageId: pkg._id,
-                    previousAmount: pkg.amount - withdrawal.amount,
-                    restoredAmount: withdrawal.amount,
-                    newAmount: pkg.amount
-                });
-            } else {
-                // If no package found, create a new one
-                const newPackage = await Package.create({
-                    user: user._id,
-                    amount: withdrawal.amount,
-                    status: 'active',
-                    startDate: new Date(),
-                    dailyIncome: withdrawal.amount * 0.01 // 1% daily income
-                });
-                console.log('Created new package with restored amount:', newPackage);
-            }
-        }
-        
-        // Update withdrawal status
         withdrawal.status = 'rejected';
         withdrawal.processedAt = new Date();
         await withdrawal.save();
-        console.log('Updated withdrawal status to rejected');
-
-        // Reduce total withdraw amount
-        user.totalWithdraw = Math.max(0, (user.totalWithdraw || 0) - withdrawal.amount);
-        await user.save();
-        console.log('Updated user total withdraw amount');
-
-        // Get updated user data to send in response
-        const updatedUser = await User.findById(user._id).populate('packages');
-        
-        // Calculate current shared earnings
-        const sharedEarnings = updatedUser.packages.reduce((total, pkg) => {
-            if (pkg.status === 'completed') {
-                return total + (pkg.totalEarnings || 0);
-            } else {
-                const now = new Date();
-                const lastUpdate = pkg.lastUpdated || pkg.startDate;
-                const daysSinceUpdate = Math.floor((now - lastUpdate) / (1000 * 60 * 60 * 24));
-                const currentEarnings = (pkg.dailyIncome || 0) * daysSinceUpdate;
-                return total + (pkg.amount || 0) + currentEarnings;
-            }
-        }, 0);
-
-        // Notify the agent via WebSocket
-        if (global.io) {
-            global.io.emit('withdrawal_status_update', {
-                type: 'withdrawal_status_update',
-                agentId: user._id,
-                status: 'rejected',
-                source: withdrawal.source,
-                amount: withdrawal.amount,
-                updatedBalances: {
-                    referralEarnings: updatedUser.referralEarnings,
-                    clickEarnings: updatedUser.clickEarnings,
-                    totalWithdraw: updatedUser.totalWithdraw,
-                    sharedEarnings: sharedEarnings
-                }
-            });
-        }
-
-        res.json({
-            message: 'Withdrawal rejected and balance restored successfully',
-            updatedBalances: {
-                referralEarnings: updatedUser.referralEarnings,
-                clickEarnings: updatedUser.clickEarnings,
-                totalWithdraw: updatedUser.totalWithdraw,
-                sharedEarnings: sharedEarnings
-            }
-        });
+        res.json({ message: 'Withdrawal rejected and balance restored' });
     } catch (error) {
-        console.error('Reject shared withdrawal error:', error);
-        res.status(500).json({ message: 'Error rejecting withdrawal' });
+        res.status(500).json({ message: 'Error rejecting shared withdrawal' });
     }
 };
 
 exports.getSharedWithdrawals = async (req, res) => {
     try {
-        console.log('Fetching pending shared capital withdrawals...');
+        console.log('Fetching all shared capital withdrawals...');
         const withdrawals = await Withdrawal.find({
-            source: 'shared_capital',
-            status: 'pending' // Only get pending withdrawals
+            source: 'shared_capital'
         })
         .populate('agentId', 'username email')
         .sort({ createdAt: -1 });
 
-        console.log('Found pending shared capital withdrawals:', withdrawals.length);
+        console.log('Found shared capital withdrawals:', withdrawals.length);
         if (withdrawals.length > 0) {
             console.log('Sample withdrawal:', JSON.stringify(withdrawals[0], null, 2));
             console.log('Sample agentId:', withdrawals[0].agentId);
@@ -456,7 +419,7 @@ exports.getSettings = async (req, res) => {
 
 exports.updateSettings = async (req, res) => {
     try {
-        const { clickReward, referralBonus, minimumWithdrawal, sharedEarningPercentage, paymentMethods } = req.body;
+        const { clickReward, dailyClickCap, referralBonus, minimumWithdrawal, sharedEarningPercentage, sharedCapReferralRates, paymentMethods } = req.body;
         
         // Validate payment methods
         if (paymentMethods && !Array.isArray(paymentMethods)) {
@@ -477,9 +440,11 @@ exports.updateSettings = async (req, res) => {
             {},
             {
                 clickReward,
+                dailyClickCap,
                 referralBonus,
                 minimumWithdrawal,
                 sharedEarningPercentage,
+                sharedCapReferralRates,
                 paymentMethods
             },
             { new: true, upsert: true }
@@ -495,6 +460,7 @@ exports.updateSettings = async (req, res) => {
     }
 };
 
+// Get pending investments
 exports.getPendingInvestments = async (req, res) => {
     try {
         const pendingInvestments = await Investment.find({ status: 'pending' })
@@ -505,6 +471,20 @@ exports.getPendingInvestments = async (req, res) => {
     } catch (error) {
         console.error('Get pending investments error:', error);
         res.status(500).json({ message: 'Error fetching pending investments' });
+    }
+};
+
+// Get shared capital transactions
+exports.getSharedTransactions = async (req, res) => {
+    try {
+        const sharedTransactions = await SharedCapitalTransaction.find()
+            .populate('user', 'username email')
+            .sort({ createdAt: -1 });
+
+        res.json(sharedTransactions);
+    } catch (error) {
+        console.error('Get shared transactions error:', error);
+        res.status(500).json({ message: 'Error fetching shared transactions' });
     }
 };
 
@@ -563,7 +543,7 @@ exports.rejectInvestment = async (req, res) => {
 exports.getPendingWithdrawals = async (req, res) => {
     try {
         const pendingWithdrawals = await Withdrawal.find({ status: 'pending' })
-            .populate('user', 'username email')
+            .populate('agentId', 'username email')
             .sort({ createdAt: -1 });
         
         res.json(pendingWithdrawals);
@@ -578,9 +558,9 @@ exports.approveWithdrawal = async (req, res) => {
         const { id } = req.params;
         const withdrawal = await Withdrawal.findByIdAndUpdate(
             id,
-            { status: 'approved', approvedAt: new Date() },
+            { status: 'completed', processedAt: new Date() },
             { new: true }
-        ).populate('user', 'username email');
+        ).populate('agentId', 'username email');
 
         if (!withdrawal) {
             return res.status(404).json({ message: 'Withdrawal not found' });
@@ -588,9 +568,19 @@ exports.approveWithdrawal = async (req, res) => {
 
         // Deduct from user's wallet
         await User.findByIdAndUpdate(
-            withdrawal.user._id,
+            withdrawal.agentId._id,
             { $inc: { wallet: -withdrawal.amount } }
         );
+
+        // Create a Transaction record for the withdrawal
+        await Transaction.create({
+            user: withdrawal.agentId._id,
+            type: 'withdrawal',
+            amount: withdrawal.amount,
+            status: 'completed',
+            withdrawal: withdrawal._id,
+            description: `Withdrawal of ₱${withdrawal.amount} approved via ${withdrawal.method}`
+        });
 
         res.json({
             message: 'Withdrawal approved successfully',
@@ -605,18 +595,55 @@ exports.approveWithdrawal = async (req, res) => {
 exports.rejectWithdrawal = async (req, res) => {
     try {
         const { id } = req.params;
+        // Find the withdrawal and populate agentId
         const withdrawal = await Withdrawal.findByIdAndUpdate(
             id,
             { status: 'rejected', rejectedAt: new Date() },
             { new: true }
-        ).populate('user', 'username email');
+        ).populate('agentId');
 
         if (!withdrawal) {
             return res.status(404).json({ message: 'Withdrawal not found' });
         }
 
+        // Restore the amount to the agent's balance based on withdrawal type
+        const user = await User.findById(withdrawal.agentId._id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Handle different withdrawal sources
+        if (withdrawal.source === 'direct_indirect') {
+            // For referral earnings
+            if (!user.referralEarnings) {
+                user.referralEarnings = { direct: 0, indirect: 0 };
+            }
+            // Split the amount evenly between direct and indirect
+            const half = withdrawal.amount / 2;
+            user.referralEarnings.direct = (user.referralEarnings.direct || 0) + half;
+            user.referralEarnings.indirect = (user.referralEarnings.indirect || 0) + (withdrawal.amount - half);
+        } else if (withdrawal.source === 'click_earnings') {
+            // For click earnings
+            user.clickEarnings = (user.clickEarnings || 0) + withdrawal.amount;
+        } else if (withdrawal.source === 'shared_capital') {
+            // For shared capital withdrawals
+            user.sharedCapital = (user.sharedCapital || 0) + withdrawal.amount;
+            
+            // Create a transaction record for the returned funds
+            const transaction = new Transaction({
+                user: user._id,
+                amount: withdrawal.amount,
+                type: 'shared_capital_return',
+                status: 'completed',
+                description: `Returned rejected withdrawal (${withdrawal._id})`
+            });
+            await transaction.save();
+        }
+
+        await user.save();
+
         res.json({
-            message: 'Withdrawal rejected successfully',
+            message: 'Withdrawal rejected and amount restored successfully',
             withdrawal
         });
     } catch (error) {
@@ -729,12 +756,12 @@ exports.getReferralData = async (req, res) => {
             await admin.save();
         }
         
-        // Get total referrals (all users who used this referral code)
-        const totalReferrals = await User.countDocuments({ referrer: req.user._id });
+        // Get total referrals across the platform (all agent users)
+        const totalReferrals = await User.countDocuments({ role: 'agent' });
         
-        // Get active referrals (approved and active users)
+        // Get active referrals (agents that are active and approved)
         const activeReferrals = await User.countDocuments({ 
-            referrer: req.user._id,
+            role: 'agent',
             isActive: true,
             status: 'approved'
         });
@@ -756,29 +783,13 @@ exports.getReferralData = async (req, res) => {
             }
         ]);
 
-        // Get pending commission
-        const pendingCommission = await Transaction.aggregate([
-            {
-                $match: {
-                    user: req.user._id,
-                    type: 'referral',
-                    status: 'pending'
-                }
-            },
-            {
-                $group: {
-                    _id: null,
-                    total: { $sum: '$amount' }
-                }
-            }
-        ]);
+
 
         res.json({
             referralCode: admin.referralCode,
             totalReferrals,
             activeReferrals,
-            completedCommission: completedCommission[0]?.total || 0,
-            pendingCommission: pendingCommission[0]?.total || 0
+            completedCommission: completedCommission[0]?.total || 0
         });
     } catch (error) {
         console.error('Get referral data error:', error);
@@ -878,4 +889,75 @@ exports.rejectPackage = async (req, res) => {
     console.error('Error rejecting package:', error);
     res.status(500).json({ message: 'Error rejecting package' });
   }
+};
+
+// Get withdrawal statistics by source type
+exports.getWithdrawalStats = async (req, res) => {
+    try {
+        // Get total withdrawals by source type
+        const withdrawalsBySource = await Withdrawal.aggregate([
+            {
+                $match: { status: 'completed' }
+            },
+            {
+                $group: {
+                    _id: '$source',
+                    total: { $sum: '$amount' }
+                }
+            }
+        ]);
+
+        // Get pending withdrawals by source type
+        const pendingWithdrawalsBySource = await Withdrawal.aggregate([
+            {
+                $match: { status: 'pending' }
+            },
+            {
+                $group: {
+                    _id: '$source',
+                    total: { $sum: '$amount' }
+                }
+            }
+        ]);
+
+        // Format the response
+        const result = {
+            totalWithdrawals: withdrawalsBySource.reduce((sum, item) => sum + item.total, 0),
+            totalPending: pendingWithdrawalsBySource.reduce((sum, item) => sum + item.total, 0),
+            referral: {
+                total: withdrawalsBySource.find(item => item._id === 'referral_earnings')?.total || 0,
+                pending: pendingWithdrawalsBySource.find(item => item._id === 'referral_earnings')?.total || 0
+            },
+            click: {
+                total: withdrawalsBySource.find(item => item._id === 'click_earnings')?.total || 0,
+                pending: pendingWithdrawalsBySource.find(item => item._id === 'click_earnings')?.total || 0
+            },
+            shared: {
+                total: withdrawalsBySource.find(item => item._id === 'shared_capital')?.total || 0,
+                pending: pendingWithdrawalsBySource.find(item => item._id === 'shared_capital')?.total || 0
+            }
+        };
+
+        res.json(result);
+    } catch (error) {
+        console.error('Get withdrawal stats error:', error);
+        res.status(500).json({ message: 'Error fetching withdrawal statistics' });
+    }
+};
+
+// Fetch agent withdrawal requests by source (direct_indirect or click_earnings)
+exports.getWithdrawalsBySource = async (req, res) => {
+    try {
+        const { source } = req.query;
+        if (!source || !['direct_indirect', 'click_earnings'].includes(source)) {
+            return res.status(400).json({ message: 'Invalid or missing source parameter' });
+        }
+        const withdrawals = await Withdrawal.find({ source })
+            .populate('agentId', 'username email')
+            .sort({ createdAt: -1 });
+        res.json(withdrawals);
+    } catch (error) {
+        console.error('Error fetching withdrawals by source:', error);
+        res.status(500).json({ message: 'Error fetching withdrawals by source' });
+    }
 };

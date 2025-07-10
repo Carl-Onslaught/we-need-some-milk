@@ -141,8 +141,10 @@ router.post('/packages/activate', auth, async (req, res) => {
     const dailyIncome = (amount * packageConfig.incomeRate) / packageConfig.duration;
 
     // Deduct from wallet
+    console.log('Wallet before deduction:', user.wallet, 'Amount to deduct:', amount);
     user.wallet -= amount;
     await user.save();
+    console.log('Wallet after deduction:', user.wallet);
 
     // Create new package with proper initial state
     const newPackage = new Package({

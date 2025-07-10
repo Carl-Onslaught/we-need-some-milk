@@ -43,12 +43,12 @@ export default function LoadSharedCapital() {
   }, []);
 
   const fetchTotalPoints = async () => {
-    const res = await axios.get('/api/admin/load-capital/total-sent');
+    const res = await axios.get('/admin/load-capital/total-sent');
     setTotalPoints(res.data.totalSent || 0);
   };
 
   const fetchHistory = async () => {
-    const res = await axios.get('/api/admin/shared-capital/history');
+    const res = await axios.get('/admin/shared-capital/history');
     setHistory(res.data.transactions || []);
   };
 
@@ -57,7 +57,7 @@ export default function LoadSharedCapital() {
     setLoading(true);
 
     try {
-      await axios.post('/api/admin/shared/load', {
+      await axios.post('/admin/shared/load', {
         username,
         amount: parseFloat(amount),
         packageType: parseInt(packageType)

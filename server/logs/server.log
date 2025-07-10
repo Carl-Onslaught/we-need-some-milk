@@ -5055,3 +5055,53 @@
 2025-06-27T15:08:55.754Z - MongoDB connection error: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.o7yokb3.mongodb.net
 2025-06-27T15:08:55.879Z - MongoDB connection error: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.o7yokb3.mongodb.net
 2025-06-27T15:08:55.928Z - MongoDB connection error: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-07T16:56:24.885Z - Error claiming package: ReferenceError: SharedCapitalTransaction is not defined
+2025-07-07T17:19:03.916Z - Error claiming package: ReferenceError: SharedCapitalTransaction is not defined
+2025-07-08T02:36:09.433Z - MongoDB connection error: Error: querySrv ETIMEOUT _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-08T02:36:09.442Z - MongoDB connection error: Error: querySrv ETIMEOUT _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-08T02:37:43.250Z - MongoDB connection error: Error: querySrv ETIMEOUT _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-08T02:37:43.258Z - MongoDB connection error: Error: querySrv ETIMEOUT _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-08T02:39:22.207Z - MongoDB connection error: Error: querySrv ETIMEOUT _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-08T02:39:22.218Z - MongoDB connection error: Error: querySrv ETIMEOUT _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-08T07:43:36.149Z - Get pending withdrawals error: StrictPopulateError: Cannot populate path `user` because it is not in your schema. Set the `strictPopulate` option to false to override.
+2025-07-08T07:43:36.834Z - Get pending withdrawals error: StrictPopulateError: Cannot populate path `user` because it is not in your schema. Set the `strictPopulate` option to false to override.
+2025-07-08T07:44:06.468Z - Get pending withdrawals error: StrictPopulateError: Cannot populate path `user` because it is not in your schema. Set the `strictPopulate` option to false to override.
+2025-07-08T07:44:36.766Z - Get pending withdrawals error: StrictPopulateError: Cannot populate path `user` because it is not in your schema. Set the `strictPopulate` option to false to override.
+2025-07-08T07:45:07.292Z - Get pending withdrawals error: StrictPopulateError: Cannot populate path `user` because it is not in your schema. Set the `strictPopulate` option to false to override.
+2025-07-08T07:45:36.355Z - Get pending withdrawals error: StrictPopulateError: Cannot populate path `user` because it is not in your schema. Set the `strictPopulate` option to false to override.
+2025-07-08T07:46:06.957Z - Get pending withdrawals error: StrictPopulateError: Cannot populate path `user` because it is not in your schema. Set the `strictPopulate` option to false to override.
+2025-07-08T07:46:34.438Z - Uncaught Exception: Error: listen EADDRINUSE: address already in use 0.0.0.0:5001
+2025-07-08T07:53:25.243Z - Reject shared withdrawal error: StrictPopulateError: Cannot populate path `packages` because it is not in your schema. Set the `strictPopulate` option to false to override.
+2025-07-08T07:53:30.529Z - Reject shared withdrawal error: StrictPopulateError: Cannot populate path `packages` because it is not in your schema. Set the `strictPopulate` option to false to override.
+2025-07-08T08:00:10.119Z - Uncaught Exception: Error: listen EADDRINUSE: address already in use 0.0.0.0:5001
+2025-07-08T08:00:31.531Z - Reject shared withdrawal error: StrictPopulateError: Cannot populate path `packages` because it is not in your schema. Set the `strictPopulate` option to false to override.
+2025-07-08T08:26:27.222Z - Error in submitWithdrawal: ReferenceError: withdrawal is not defined
+2025-07-08T09:37:45.463Z - Reject withdrawal error: StrictPopulateError: Cannot populate path `user` because it is not in your schema. Set the `strictPopulate` option to false to override.
+2025-07-08T09:52:53.199Z - Approve withdrawal error: StrictPopulateError: Cannot populate path `user` because it is not in your schema. Set the `strictPopulate` option to false to override.
+2025-07-08T10:56:36.297Z - Reject shared withdrawal error: StrictPopulateError: Cannot populate path `packages` because it is not in your schema. Set the `strictPopulate` option to false to override.
+2025-07-09T10:06:42.463Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:06:43.373Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:07:12.684Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:07:42.622Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:08:12.356Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:08:42.609Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:09:12.294Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:09:43.381Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:10:12.730Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:11:17.710Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:12:17.627Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:13:17.592Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:13:52.142Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:14:22.684Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:14:52.612Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:15:22.739Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:15:52.726Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:16:22.348Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:17:17.367Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:18:17.643Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:19:17.651Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:20:17.693Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:20:23.171Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:20:39.171Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:20:39.806Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-09T10:21:09.444Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')

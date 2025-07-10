@@ -1,14 +1,7 @@
 const Investment = require('../models/Investment');
 const Transaction = require('../models/Transaction');
 const User = require('../models/User');
-
-// Constants for referral rates
-const REFERRAL_RATES = {
-  direct: 0.05, // 5%
-  level2: 0.02, // 2%
-  level3: 0.02, // 2%
-  level4: 0.01  // 1%
-};
+const { getSettings } = require('../utils/settingsService');
 
 // Create new investment
 exports.createInvestment = async (req, res) => {
@@ -134,6 +127,15 @@ exports.getUserInvestments = async (req, res) => {
 // Process referral commissions
 const processReferralCommissions = async (user, investment) => {
   try {
+    // Fetch the latest referral rate map from settings (fallback to defaults)
+    const settings = await getSettings();
+    const rates = settings.sharedCapReferralRates || {
+      direct: 0.05,
+      level2: 0.02,
+      level3: 0.02,
+      level4: 0.01
+    };
+
     let currentUser = user;
     let level = 1;
     const processedUsers = new Set();
@@ -147,13 +149,13 @@ const processReferralCommissions = async (user, investment) => {
       // Calculate commission
       let commissionRate;
       if (level === 1) {
-        commissionRate = REFERRAL_RATES.direct;
+        commissionRate = rates.direct;
       } else if (level === 2) {
-        commissionRate = REFERRAL_RATES.level2;
+        commissionRate = rates.level2;
       } else if (level === 3) {
-        commissionRate = REFERRAL_RATES.level3;
+        commissionRate = rates.level3;
       } else {
-        commissionRate = REFERRAL_RATES.level4;
+        commissionRate = rates.level4;
       }
 
       const commissionAmount = investment.amount * commissionRate;
@@ -193,4 +195,52 @@ const processReferralCommissions = async (user, investment) => {
     console.error('Error processing referral commissions:', error);
     throw error;
   }
-}; 
+};
+
+// Claim matured investment
+exports.claimInvestment = async (req, res) => {
+  try {
+    const { packageId } = req.body;
+    const userId = req.user._id;
+
+    const investment = await Investment.findOne({ _id: packageId, user: userId });
+    if (!investment) {
+      return res.status(404).json({ message: 'Investment not found' });
+    }
+
+    const now = new Date();
+    if (now < investment.endDate) {
+      return res.status(400).json({ message: 'Investment has not yet matured' });
+    }
+
+    if (investment.status === 'claimed') {
+      return res.status(400).json({ message: 'Investment already claimed' });
+    }
+
+    const payout = investment.amount + investment.totalEarnings;
+
+    const user = await User.findById(userId);
+    user.balance += payout;
+    user.sharedEarnings += payout;
+
+    investment.status = 'claimed';
+
+    const transaction = new Transaction({
+      user: userId,
+      type: 'shared_capital_claim',
+      amount: payout,
+      description: `Claim of matured package #${investment.packageNumber}`,
+      status: 'completed',
+      metadata: {
+        investmentId: investment._id
+      }
+    });
+
+    await Promise.all([user.save(), investment.save(), transaction.save()]);
+
+    res.json({ message: 'Package claimed successfully', amount: payout });
+  } catch (error) {
+    console.error('Claim investment error:', error);
+    res.status(500).json({ message: 'Error claiming package' });
+  }
+};

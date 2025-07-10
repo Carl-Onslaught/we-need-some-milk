@@ -39,7 +39,7 @@ const PendingRegistrations = () => {
 
   const fetchPendingRegistrations = async () => {
     try {
-      const response = await axios.get('/api/admin/pending-registrations');
+      const response = await axios.get('/admin/pending-registrations');
       setPendingRegistrations(response.data);
       setTotalPages(Math.ceil(response.data.length / 10));
     } catch (error) {
@@ -56,7 +56,7 @@ const PendingRegistrations = () => {
 
   const handleApprove = async (userId) => {
     try {
-      await axios.post(`/api/admin/approve-registration/${userId}`, { action: 'approve' });
+      await axios.post(`/admin/approve-registration/${userId}`, { action: 'approve' });
       toast({
         title: 'Success',
         description: 'Registration approved successfully',
@@ -79,7 +79,7 @@ const PendingRegistrations = () => {
 
   const handleReject = async (userId) => {
     try {
-      await axios.post(`/api/admin/approve-registration/${userId}`, { action: 'reject' });
+      await axios.post(`/admin/approve-registration/${userId}`, { action: 'reject' });
       toast({
         title: 'Success',
         description: 'Registration rejected successfully',

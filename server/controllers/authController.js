@@ -1,6 +1,7 @@
 const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 const jwt = require('jsonwebtoken');
+const { getSettings } = require('../utils/settingsService');
 
 // Helper function to generate JWT token
 const generateToken = (userId) => {
@@ -31,11 +32,27 @@ exports.register = async (req, res) => {
     });
 
     // Handle referral if code provided
+    let referralBonusAmount = 0;
     if (req.body.referralCode) {
       const referrer = await User.findOne({ referralCode: req.body.referralCode });
       if (referrer) {
         user.referrer = referrer._id;
-        // Referral bonus will be processed upon admin approval, not here.
+        // Fetch settings for bonus amount
+        const settings = await getSettings();
+        referralBonusAmount = settings.referralBonus;
+
+        // Credit referrer immediately
+        referrer.referralEarnings.direct += referralBonusAmount;
+        await referrer.save();
+
+        // Create transaction record for referrer
+        await new Transaction({
+          user: referrer._id,
+          type: 'referral',
+          amount: referralBonusAmount,
+          description: `Direct referral bonus for inviting ${username}`,
+          status: 'completed'
+        }).save();
       }
     }
 

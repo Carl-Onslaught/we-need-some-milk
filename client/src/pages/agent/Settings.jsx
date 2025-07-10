@@ -41,7 +41,7 @@ export default function Settings() {
 
     setIsSubmitting(true);
     try {
-      await axios.post('/api/agent/change-password', {
+      await axios.post('/agent/change-password', {
         currentPassword,
         newPassword,
       });
@@ -125,8 +125,10 @@ export default function Settings() {
               <Divider borderColor="gray.700" />
               
               <FormControl isRequired>
-                <FormLabel color="white">Current Password</FormLabel>
+                <FormLabel color="white" htmlFor="current-password">Current Password</FormLabel>
                 <Input
+                  id="current-password"
+                  name="currentPassword"
                   type="password"
                   value={currentPassword}
                   onChange={(e) => setCurrentPassword(e.target.value)}
@@ -141,8 +143,10 @@ export default function Settings() {
               </FormControl>
 
               <FormControl isRequired>
-                <FormLabel color="white">New Password</FormLabel>
+                <FormLabel color="white" htmlFor="new-password">New Password</FormLabel>
                 <Input
+                  id="new-password"
+                  name="newPassword"
                   type="password"
                   value={newPassword}
                   onChange={(e) => setNewPassword(e.target.value)}
@@ -157,8 +161,10 @@ export default function Settings() {
               </FormControl>
 
               <FormControl isRequired>
-                <FormLabel color="white">Confirm New Password</FormLabel>
+                <FormLabel color="white" htmlFor="confirm-password">Confirm New Password</FormLabel>
                 <Input
+                  id="confirm-password"
+                  name="confirmPassword"
                   type="password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}

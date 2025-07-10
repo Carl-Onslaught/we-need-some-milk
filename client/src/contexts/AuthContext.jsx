@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
-import { BASE_URL } from '../config';
+import { API_URL } from '../config';
 
 const AuthContext = createContext({
   user: null,
@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
   // Initialize axios defaults
   useEffect(() => {
     axios.defaults.withCredentials = true;
-    axios.defaults.baseURL = BASE_URL || 'http://localhost:5001';
+    axios.defaults.baseURL = API_URL;
   }, []);
 
   // Add token to requests if available
@@ -63,7 +63,7 @@ export const AuthProvider = ({ children }) => {
 
   const fetchUser = async () => {
     try {
-      const { data } = await axios.get('/api/auth/me');
+      const { data } = await axios.get('/auth/me');
       setUser(data);
     } catch (error) {
       console.error('Error fetching user:', error);
@@ -76,7 +76,7 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (loginData) => {
     try {
-      const response = await axios.post('/api/auth/login', loginData);
+      const response = await axios.post('/auth/login', loginData);
       const { data } = response;
       
       if (!data.token) {
@@ -107,7 +107,7 @@ export const AuthProvider = ({ children }) => {
 
   const register = async (userData) => {
     try {
-      const { data } = await axios.post('/api/auth/register', userData);
+      const { data } = await axios.post('/auth/register', userData);
       return data;
     } catch (error) {
       throw error;

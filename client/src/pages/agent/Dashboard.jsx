@@ -190,13 +190,23 @@ export default function Dashboard() {
     try {
       setIsLoading(true);
       const [statsRes, packagesRes, userRes] = await Promise.all([
-        axios.get('/api/agent/earnings'),
-        axios.get('/api/agent/packages/active'),
-        axios.get('/api/auth/me')
+        axios.get('/agent/earnings'),
+        axios.get('/agent/packages/active'),
+        axios.get('/auth/me')
       ]);
       setStats(statsRes.data);
-      setActivePackages(Array.isArray(packagesRes.data) ? packagesRes.data : packagesRes.data.packages || []);
-      
+      // Compute daysRemaining for each package
+      const now = new Date();
+      const packages = Array.isArray(packagesRes.data) ? packagesRes.data : packagesRes.data.packages || [];
+      const packagesWithDays = packages.map(pkg => {
+        const start = new Date(pkg.startDate);
+        const end = new Date(pkg.endDate);
+        const totalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+        const daysLeft = Math.max(0, Math.ceil((end - now) / (1000 * 60 * 60 * 24)));
+        const isMatured = daysLeft === 0;
+        return { ...pkg, daysRemaining: daysLeft, totalDays, isMatured };
+      });
+      setActivePackages(packagesWithDays);
       // Set daily clicks and earnings from user data
       setDailyClicks(userRes.data.dailyClicks || 0);
       setDailyEarnings(userRes.data.dailyClickEarnings || 0);
@@ -217,7 +227,7 @@ export default function Dashboard() {
 
   const handleClick = async () => {
     try {
-      const response = await axios.post('/api/agent/click');
+      const response = await axios.post('/agent/click');
       
       // Update the daily clicks and earnings from the response
       setDailyClicks(response.data.clicks);
@@ -243,7 +253,7 @@ export default function Dashboard() {
 
   const handlePackageEnter = async (amount, packageNumber) => {
     try {
-      const response = await axios.post('/api/agent/packages/activate', {
+      const response = await axios.post('/agent/packages/activate', {
         amount: parseFloat(amount),
         packageId: packageNumber
       });
@@ -268,7 +278,7 @@ export default function Dashboard() {
 
   const handleClaimPackage = async (packageId) => {
     try {
-      const response = await axios.post('/api/agent/claim-package', { packageId });
+      const response = await axios.post('/agent/claim-package', { packageId });
       
       toast({
         title: 'Package Claimed',
@@ -331,7 +341,6 @@ export default function Dashboard() {
             title="Shared Capital Earnings"
             stat={`₱${stats.sharedEarnings.toLocaleString()}`}
             icon={FaWallet}
-            subtext={stats.pendingEarnings > 0 ? `₱${stats.pendingEarnings.toLocaleString()} pending claim` : null}
           />
           <StatCard
             title="Total Withdraw"
@@ -341,7 +350,7 @@ export default function Dashboard() {
         </SimpleGrid>
 
         {/* Active Packages */}
-        {activePackages.length > 0 && (
+        {activePackages.filter(pkg => !pkg.claimed).length > 0 && (
           <Box mb={8}>
             <Heading 
               as="h2" 
@@ -354,62 +363,22 @@ export default function Dashboard() {
               Active Packages
             </Heading>
             <SimpleGrid columns={{ base: 2, md: 3, lg: 4 }} spacing={4}>
-              {activePackages.map((pkg) => (
+              {activePackages.filter(pkg => !pkg.claimed).map((pkg) => (
                 <Card 
                   key={pkg._id}
                   bg="#1E2528" 
                   borderWidth="1px" 
-                  borderColor={pkg.isMatured && !pkg.claimed ? "#FDB137" : "gray.700"}
+                  borderColor="#FDB137"
                   position="relative"
                   overflow="hidden"
                   _hover={{ 
                     transform: 'translateY(-5px)',
-                    boxShadow: pkg.isMatured && !pkg.claimed ? '0 0 15px rgba(253, 177, 55, 0.3)' : 'lg',
+                    boxShadow: '0 0 15px rgba(253, 177, 55, 0.3)',
                     borderColor: '#FDB137',
                     transition: 'all 0.3s ease'
                   }}
                   transition="all 0.2s ease"
-                  cursor={pkg.isMatured && !pkg.claimed ? "pointer" : "default"}
-                  onClick={() => {
-                    if (pkg.isMatured && !pkg.claimed) {
-                      handleClaimPackage(pkg._id);
-                    }
-                  }}
                 >
-                  {pkg.isMatured && !pkg.claimed && (
-                    <Box
-                      position="absolute"
-                      top={0}
-                      right={0}
-                      width="100%"
-                      height="100%"
-                      pointerEvents="none"
-                      overflow="hidden"
-                    >
-                      <Box
-                        position="absolute"
-                        top={-10}
-                        right={-10}
-                        width="60px"
-                        height="60px"
-                        bg="#FDB137"
-                        transform="rotate(45deg)"
-                        zIndex={1}
-                      />
-                      <Box
-                        position="absolute"
-                        top={3}
-                        right={3}
-                        zIndex={2}
-                        fontSize="xs"
-                        fontWeight="bold"
-                        color="#181E20"
-                        transform="rotate(45deg)"
-                      >
-                        CLAIM
-                      </Box>
-                    </Box>
-                  )}
                   <CardBody p={3}>
                     <VStack align="start" spacing={2}>
                       <Flex justify="space-between" width="100%" align="center">
@@ -421,59 +390,83 @@ export default function Dashboard() {
                         >
                           PKG {pkg.packageType}
                         </Badge>
-                        {pkg.isMatured && !pkg.claimed && (
-                          <Badge 
-                            bg="#FDB137" 
-                            color="#181E20"
-                            fontSize="xs"
-                          >
-                            MATURED
-                          </Badge>
-                        )}
+                        <Badge 
+                          bg="#FDB137" 
+                          color="#181E20"
+                          fontSize="xs"
+                        >
+                          {pkg.isMatured ? 'MATURED' : 'ACTIVE'}
+                        </Badge>
                       </Flex>
-                      
                       <Box width="100%">
                         <Flex justify="space-between">
                           <Text color="gray.400" fontSize="xs">Investment</Text>
                           <Text color="white" fontSize="sm" fontWeight="bold">₱{pkg.amount.toLocaleString()}</Text>
                         </Flex>
                       </Box>
-
                       <Box width="100%">
                         <Flex justify="space-between">
                           <Text color="gray.400" fontSize="xs">Daily</Text>
                           <Text color="white" fontSize="xs">₱{pkg.dailyIncome.toLocaleString()}</Text>
                         </Flex>
                       </Box>
-
                       <Box width="100%">
                         <Flex justify="space-between" mb={1}>
                           <Text color="gray.400" fontSize="xs">Remaining</Text>
                           <Flex align="center">
-                            <Text color={pkg.daysRemaining === 0 ? "#FDB137" : "white"} fontSize="sm" fontWeight="bold" mr={1}>
+                            <Text color="#FDB137" fontSize="sm" fontWeight="bold" mr={1}>
                               {pkg.daysRemaining}
                             </Text>
                             <Text color="gray.400" fontSize="xs">days</Text>
                           </Flex>
                         </Flex>
-                        {/* Progress bar for days remaining */}
                         <Box width="100%" height="4px" bg="gray.700" borderRadius="full" overflow="hidden" position="relative">
                           <Box 
                             height="100%" 
-                            width={`${pkg.isMatured ? 100 : (100 - (pkg.daysRemaining / (pkg.packageType === 1 ? 12 : 20) * 100))}%`} 
+                            width={`100%`} 
                             bg="#FDB137"
                             transition="width 0.5s ease-in-out"
                           />
                         </Box>
                       </Box>
-
-                      {pkg.isMatured && (
-                        <Box width="100%">
-                          <Flex justify="space-between">
-                            <Text color="gray.400" fontSize="xs">Total</Text>
-                            <Text color="#FDB137" fontSize="sm" fontWeight="bold">₱{pkg.totalEarnings.toLocaleString()}</Text>
-                          </Flex>
-                        </Box>
+                      <Box width="100%">
+                        <Flex justify="space-between">
+                          <Text color="gray.400" fontSize="xs">Total</Text>
+                          <Text color="#FDB137" fontSize="sm" fontWeight="bold">₱{pkg.totalEarnings.toLocaleString()}</Text>
+                        </Flex>
+                      </Box>
+                      {pkg.isMatured ? (
+                      <Button
+                        mt={2}
+                        size="sm"
+                        leftIcon={<FaGift />}
+                        bg="#FDB137"
+                        color="#181E20"
+                        fontWeight="bold"
+                        _hover={{
+                          bg: '#BD5301',
+                          color: 'white',
+                          transform: 'scale(1.08)',
+                          boxShadow: '0 0 10px #FDB137',
+                        }}
+                        transition="all 0.2s"
+                        onClick={() => handleClaimPackage(pkg._id)}
+                        title="Claim your matured package earnings!"
+                      >
+                        Claim
+                      </Button>
+                      ) : (
+                        <Button
+                          mt={2}
+                          size="sm"
+                          bg="gray.700"
+                          color="gray.400"
+                          fontWeight="bold"
+                          isDisabled
+                          transition="all 0.2s"
+                        >
+                          Not Yet Matured
+                        </Button>
                       )}
                     </VStack>
                   </CardBody>

@@ -61,7 +61,7 @@ export default function Team() {
 
   const fetchReferralCode = async () => {
     try {
-      const { data } = await axios.get('/api/agent/profile');
+      const { data } = await axios.get('/agent/profile');
       setReferralCode(data.referralCode || '');
     } catch (error) {
       console.error('Error fetching referral code:', error);
@@ -77,7 +77,7 @@ export default function Team() {
   const fetchTeam = async () => {
     try {
       setIsLoading(true);
-      const { data } = await axios.get('/api/agent/downlines');
+      const { data } = await axios.get('/agent/downlines');
       setTeamData(data || {
         directDownlines: [],
         indirectDownlines: [],

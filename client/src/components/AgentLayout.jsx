@@ -65,40 +65,45 @@ const SidebarContent = ({ onClose = null }) => {
       <SidebarButton icon={FaCog} to="/agent/settings">
         Settings
       </SidebarButton>
+      <SidebarButton icon={FiLogOut} onClick={handleLogout} asButton>
+        Logout
+      </SidebarButton>
       
       <Spacer />
-
-      <Button
-        leftIcon={<FiLogOut />}
-        bg="transparent"
-        color="white"
-        width="full"
-        display="flex"
-        alignItems="center"
-        justifyContent="flex-start"
-        fontWeight="normal"
-        borderRadius="lg"
-        py={3}
-        px={4}
-        _hover={{
-          bg: 'red.600',
-          color: 'white',
-        }}
-        transition="all 0.2s"
-        onClick={handleLogout}
-      >
-        Logout
-      </Button>
     </VStack>
   );
 };
 
-const SidebarButton = ({ icon, children, to }) => {
+const SidebarButton = ({ icon, children, to, onClick, asButton }) => {
   const buttonBg = '#FDB137';
   const hoverBg = '#BD5301';
   const location = useLocation();
-  const isActive = location.pathname === to;
+  const isActive = to && location.pathname === to;
 
+  if (asButton) {
+    return (
+      <Button
+        leftIcon={<Icon as={icon} boxSize="20px" />}
+        bg="transparent"
+        color="white"
+        _hover={{
+          bg: 'red.600',
+          color: 'white',
+        }}
+        variant="ghost"
+        justifyContent="flex-start"
+        w="full"
+        fontSize="md"
+        fontWeight="medium"
+        h="48px"
+        transition="all 0.2s"
+        onClick={onClick}
+        style={{ userSelect: 'none' }}
+      >
+        {children}
+      </Button>
+    );
+  }
   return (
     <Link
       as={RouterLink}

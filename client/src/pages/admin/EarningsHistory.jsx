@@ -38,7 +38,7 @@ export default function EarningsHistory() {
 
   const fetchTransactions = async () => {
     try {
-      const response = await axios.get('/api/admin/transactions/earnings');
+      const response = await axios.get('/admin/transactions/earnings');
       setTransactions(response.data);
     } catch (error) {
       console.error('Error fetching transactions:', error);
@@ -103,17 +103,23 @@ export default function EarningsHistory() {
               <Select
                       value={filter}
                       onChange={(e) => setFilter(e.target.value)}
-                      bg="#242C2E"
+                      bg="#181E20"
+                      color="#FDB137"
                       borderColor="#181E20"
-                      color="white"
                       _hover={{
-                        borderColor: '#FDB137'
+                        borderColor: '#FDB137',
+                        bg: '#181E20',
+                        color: '#FDB137'
+                      }}
+                      _focus={{
+                        borderColor: '#FDB137',
+                        boxShadow: '0 0 0 1px #FDB137',
+                        bg: '#181E20',
+                        color: '#FDB137'
                       }}
                     >
-                      <option value="all">All Types</option>
-                      <option value="commission">Commission</option>
-                      <option value="referral">Referral</option>
-                      <option value="click">Click</option>
+                      <option value="pending">Pending</option>
+                      <option value="rejected">Rejected</option>
               </Select>
             </FormControl>
 

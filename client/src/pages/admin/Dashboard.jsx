@@ -53,22 +53,24 @@ import { Link as RouterLink } from 'react-router-dom';
 import axios from 'axios';
 import AdminLayout from '../../components/AdminLayout';
 import AddSharedCapital from '../../components/admin/AddSharedCapital';
-import {
-  FaUsers,
-  FaMoneyBillWave,
-  FaHandHoldingUsd,
-  FaExchangeAlt,
-  FaWallet,
-  FaClock,
-  FaCopy,
-  FaShare,
-  FaChartLine,
-  FaSearch,
-  FaChevronLeft,
-  FaChevronRight,
-  FaHistory,
-  FaCog,
+import { 
+  FaUsers, 
+  FaMoneyBillWave, 
+  FaHandHoldingUsd, 
+  FaExchangeAlt, 
+  FaWallet, 
+  FaClock, 
+  FaCopy, 
+  FaShare, 
+  FaChartLine, 
+  FaSearch, 
+  FaChevronLeft, 
+  FaChevronRight, 
+  FaHistory, 
+  FaCog, 
   FaClipboardList,
+  FaMousePointer,
+  FaCoins
 } from 'react-icons/fa';
 
 const StatCard = ({ title, stat, icon, helpText }) => {
@@ -83,13 +85,13 @@ const StatCard = ({ title, stat, icon, helpText }) => {
       transition="all 0.3s"
       _hover={{ transform: 'translateY(-2px)', borderColor: '#FDB137', boxShadow: '0 0 20px rgba(253, 177, 55, 0.1)' }}
     >
-      <Flex justify="space-between" align="center">
-        <Box flex="1">
+      <Flex direction={{ base: 'column', md: 'row' }} justify="space-between" align={{ base: 'center', md: 'center' }}>
+        <Box flex="1" textAlign={{ base: 'center', md: 'left' }}>
           <Stat>
             <StatLabel color="gray.400" fontSize="sm" fontWeight="medium">
               {title}
             </StatLabel>
-            <StatNumber color="white" fontSize="2xl" fontWeight="bold">
+            <StatNumber color="white" fontSize={{ base: 'lg', md: 'xl' }} fontWeight="semibold" wordBreak="normal">
               {stat}
             </StatNumber>
             {helpText && (
@@ -100,12 +102,14 @@ const StatCard = ({ title, stat, icon, helpText }) => {
           </Stat>
         </Box>
         <Box
+          mt={{ base: 2, md: 0 }}
+          ml={{ base: 0, md: 4 }}
           p={2}
           bg="#FDB137"
           borderRadius="full"
           color="black"
-          width="40px"
-          height="40px"
+          width="36px"
+          height="36px"
           display="flex"
           alignItems="center"
           justifyContent="center"
@@ -125,7 +129,6 @@ function AdminDashboard() {
   const [referralStats, setReferralStats] = useState({
     totalReferrals: 0,
     activeReferrals: 0,
-    pendingCommission: 0,
   });
   const [stats, setStats] = useState({
     totalUsers: 0,
@@ -133,7 +136,13 @@ function AdminDashboard() {
     totalInvestments: 0,
     totalWithdrawals: 0,
     totalEarnings: 0,
-    totalReferralEarnings: 0
+    totalReferralEarnings: 0,
+    totalPointsSent: 0,
+    withdrawalStats: {
+      referral: { total: 0, pending: 0 },
+      click: { total: 0, pending: 0 },
+      shared: { total: 0, pending: 0 }
+    }
   });
   const [users, setUsers] = useState([]);
   const [investments, setInvestments] = useState([]);
@@ -155,7 +164,7 @@ function AdminDashboard() {
   // Add fetchStats function
   const fetchStats = async () => {
     try {
-      const response = await axios.get('/api/admin/stats');
+      const response = await axios.get('/admin/stats');
       setStats(response.data);
     } catch (error) {
       console.error('Error fetching stats:', error);
@@ -209,22 +218,51 @@ function AdminDashboard() {
 
     const loadData = async () => {
       if (isMounted) {
-    try {
-      const [statsRes, usersRes, investmentsRes, withdrawalsRes] = await Promise.all([
-        axios.get('/api/admin/stats'),
-        axios.get('/api/admin/users'),
-        axios.get('/api/admin/investments/pending'),
-        axios.get('/api/admin/withdrawals/pending')
-      ]);
+        try {
+          const [
+            dashboardStatsRes, 
+            usersRes, 
+            investmentsRes, 
+            withdrawalsRes,
+            totalPointsRes
+          ] = await Promise.all([
+            axios.get('/admin/stats'),
+            axios.get('/admin/users'),
+            axios.get('/admin/investments/pending'),
+            axios.get('/admin/withdrawals/pending'),
+            axios.get('/admin/load-capital/total-sent') // <-- updated endpoint
+          ]);
 
-      setStats({
-            totalUsers: usersRes.data?.length || 0,
+          // Fetch withdrawal stats by source type
+          const withdrawalStatsRes = await axios.get('/admin/withdrawals/stats');
+          
+          console.log('Dashboard stats response:', dashboardStatsRes.data);
+          console.log('Total points sent:', totalPointsRes.data);
+          
+          setStats({
+            totalUsers: dashboardStatsRes.data?.totalUsers || 0,
             totalAgents: usersRes.data?.filter(user => user.role === 'agent')?.length || 0,
-            totalInvestments: statsRes.data?.sharedCapitalPackage1 || 0,
-            totalWithdrawals: statsRes.data?.sharedCapitalPackage2 || 0,
-            totalEarnings: statsRes.data?.sharedEarnings || 0,
-            totalReferralEarnings: statsRes.data?.totalReferralEarnings || 0
-      });
+            totalInvestments: dashboardStatsRes.data?.totalInvestments || 0,
+            totalWithdrawals: dashboardStatsRes.data?.totalWithdrawals || 0,
+            totalEarnings: dashboardStatsRes.data?.totalEarnings || 0,
+            totalReferralEarnings: dashboardStatsRes.data?.totalReferralEarnings || 0,
+            totalSharedEarnings: dashboardStatsRes.data?.totalSharedEarnings || 0,
+            totalPointsSent: totalPointsRes.data?.totalSent || 0, // <-- use totalSent
+            withdrawalStats: {
+              referral: { 
+                total: dashboardStatsRes.data?.withdrawalStats?.referral || 0, 
+                pending: dashboardStatsRes.data?.withdrawalStats?.pending?.referral || 0 
+              },
+              click: { 
+                total: dashboardStatsRes.data?.withdrawalStats?.click || 0, 
+                pending: dashboardStatsRes.data?.withdrawalStats?.pending?.click || 0 
+              },
+              shared: { 
+                total: dashboardStatsRes.data?.withdrawalStats?.sharedCapital || 0, 
+                pending: dashboardStatsRes.data?.withdrawalStats?.pending?.sharedCapital || 0 
+              }
+            }
+          });
       setUsers(usersRes.data || []);
       setInvestments(investmentsRes.data || []);
       setWithdrawals(withdrawalsRes.data || []);
@@ -261,8 +299,8 @@ function AdminDashboard() {
       if (isMounted) {
         try {
           const [earningsData, sharedData] = await Promise.all([
-            axios.get('/api/admin/transactions/earnings'),
-            axios.get('/api/admin/transactions/shared')
+            axios.get('/admin/transactions/earnings'),
+            axios.get('/admin/transactions/shared')
           ]);
           setEarningsHistory(earningsData.data || []);
           setReferralData(sharedData.data?.transactions || []);
@@ -296,14 +334,13 @@ function AdminDashboard() {
     const loadReferralData = async () => {
       if (isMounted) {
         try {
-          const response = await axios.get('/api/admin/referral');
+          const response = await axios.get('/admin/referral');
           const data = response.data || {};
           setReferralCode(data.referralCode || '');
           setReferralLink(`${window.location.origin}/register?ref=${data.referralCode || ''}`);
           setReferralStats({
             totalReferrals: data.totalReferrals || 0,
             activeReferrals: data.activeReferrals || 0,
-            pendingCommission: data.pendingCommission || 0,
           });
         } catch (error) {
           console.error('Error fetching referral data:', error);
@@ -329,7 +366,7 @@ function AdminDashboard() {
 
   const handleWithdrawalAction = async (id, action) => {
     try {
-      await axios.post(`/api/admin/withdrawals/${id}/${action}`);
+      await axios.post(`/admin/withdrawals/${id}/${action}`);
       toast({
         title: 'Success',
         description: `Withdrawal ${action}ed successfully`,
@@ -352,7 +389,7 @@ function AdminDashboard() {
 
   const loadRegistration = async (userId, amount) => {
     try {
-      await axios.post('/api/admin/load-registration', { userId, amount });
+      await axios.post('/admin/load-registration', { userId, amount });
       toast({
         title: 'Success',
         description: 'Registration loaded successfully',
@@ -375,7 +412,7 @@ function AdminDashboard() {
 
   const loadSharedCapital = async (userId, amount, packageType) => {
     try {
-      await axios.post('/api/admin/load-shared-capital', { userId, amount, packageType });
+      await axios.post('/admin/load-shared-capital', { userId, amount, packageType });
       toast({
         title: 'Success',
         description: 'Shared capital loaded successfully',
@@ -432,7 +469,7 @@ function AdminDashboard() {
   // Add handleUserStatusToggle function
   const handleUserStatusToggle = async (userId, newStatus) => {
     try {
-      await axios.post(`/api/admin/users/${userId}/toggle-status`, { isActive: newStatus });
+      await axios.post(`/admin/users/${userId}/toggle-status`, { isActive: newStatus });
       toast({
         title: 'Success',
         description: `User ${newStatus ? 'activated' : 'deactivated'} successfully`,
@@ -477,7 +514,7 @@ function AdminDashboard() {
 
     setIsUpdatingPassword(true);
     try {
-      await axios.post(`/api/admin/users/${selectedUser._id}/change-password`, {
+      await axios.post(`/admin/users/${selectedUser._id}/change-password`, {
         newPassword
       });
       toast({
@@ -507,39 +544,68 @@ function AdminDashboard() {
     <AdminLayout sidebarBg="#181E20">
       <Box bg="#181E20" minH="100vh">
         <Container maxW="7xl" py={8}>
-          {/* Stats Grid */}
-          <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={6} mb={8}>
-                <StatCard
-                  title="Total Users"
+          {/* Main Stats */}
+          <SimpleGrid columns={{ base: 1, md: 2, lg: 4 }} spacing={6} mb={8}>
+            <StatCard
+              title="Total Users"
               stat={stats.totalUsers || 0}
               icon={FaUsers}
+              helpText={`Agents: ${stats.totalAgents || 0}`}
             />
             <StatCard
-              title="Total Agents"
-              stat={stats.totalAgents || 0}
-                  icon={FaUsers}
-                />
-                <StatCard
-              title="Total Investments"
-              stat={`₱${(stats.totalInvestments || 0).toFixed(2)}`}
-                  icon={FaMoneyBillWave}
-                />
-                <StatCard
-              title="Total Withdrawals"
-              stat={`₱${(stats.totalWithdrawals || 0).toFixed(2)}`}
-              icon={FaHandHoldingUsd}
+              title="Investments"
+              stat={stats.totalPointsSent?.toLocaleString() || 0}
+              icon={FaMoneyBillWave}
+              // Removed helpText
             />
             <StatCard
               title="Total Earnings"
               stat={`₱${(stats.totalEarnings || 0).toFixed(2)}`}
-                  icon={FaChartLine}
-                />
-                <StatCard
-              title="Total Referral Earnings"
-              stat={`₱${(stats.totalReferralEarnings || 0).toFixed(2)}`}
-              icon={FaExchangeAlt}
-                />
-              </SimpleGrid>
+              icon={FaChartLine}
+            />
+            <StatCard
+              title="Withdrawals"
+              stat={`₱${(stats.totalWithdrawals || 0).toFixed(2)}`}
+              icon={FaHandHoldingUsd}
+
+            />
+          </SimpleGrid>
+
+          {/* Withdrawal Breakdown */}
+          <Box mb={8} p={4} bg="#1E2528" borderRadius="lg" borderWidth="1px" borderColor="gray.700">
+            <Heading size="md" color="white" mb={4}>Withdrawal Breakdown</Heading>
+            <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
+              <Box>
+                <Text color="gray.400" fontSize="sm" mb={1}>Referral Withdrawals</Text>
+                <Flex align="center">
+                  <Icon as={FaExchangeAlt} color="#FDB137" mr={2} />
+                  <Text color="white" fontWeight="bold">
+                    ₱{(stats.withdrawalStats?.referral?.total || 0).toFixed(2)}
+                    
+                  </Text>
+                </Flex>
+              </Box>
+              <Box>
+                <Text color="gray.400" fontSize="sm" mb={1}>Click Earnings Withdrawals</Text>
+                <Flex align="center">
+                  <Icon as={FaMousePointer} color="#FDB137" mr={2} />
+                  <Text color="white" fontWeight="bold">
+                    ₱{(stats.withdrawalStats?.click?.total || 0).toFixed(2)}
+                    
+                  </Text>
+                </Flex>
+              </Box>
+              <Box>
+                <Text color="gray.400" fontSize="sm" mb={1}>Shared Capital Withdrawals</Text>
+                <Flex align="center">
+                  <Icon as={FaCoins} color="#FDB137" mr={2} />
+                  <Text color="white" fontWeight="bold">
+                    ₱{(stats.withdrawalStats?.shared?.total || 0).toFixed(2)}
+                  </Text>
+                </Flex>
+              </Box>
+            </SimpleGrid>
+          </Box>
 
               {/* Referral Section */}
           <Box mb={8}>
@@ -611,7 +677,7 @@ function AdminDashboard() {
                   >
                     Share Referral Link
                   </Button>
-                  <SimpleGrid columns={{ base: 1, md: 3 }} spacing={4}>
+                  <SimpleGrid columns={{ base: 1, md: 2 }} spacing={4}>
                     <StatCard
                       title="Total Referrals"
                       stat={referralStats.totalReferrals || 0}
@@ -622,11 +688,7 @@ function AdminDashboard() {
                       stat={referralStats.activeReferrals || 0}
                       icon={FaUsers}
                     />
-                    <StatCard
-                      title="Pending Commission"
-                      stat={`₱${(referralStats.pendingCommission || 0).toFixed(2)}`}
-                      icon={FaMoneyBillWave}
-                    />
+
                   </SimpleGrid>
                       </VStack>
                     </CardBody>

@@ -22,6 +22,38 @@ router.post('/request', auth, async (req, res) => {
   try {
     const { packageType, amount } = req.body;
     
+    // Validate package type and amount
+    if (![1, 2].includes(packageType)) {
+      return res.status(400).json({ message: 'Invalid package type' });
+    }
+
+    // Validate amount based on package type
+    if ((packageType === 1 && amount !== 100) || 
+        (packageType === 2 && amount !== 500)) {
+      return res.status(400).json({ 
+        message: packageType === 1 
+          ? 'Package 1 amount must be ₱100' 
+          : 'Package 2 amount must be ₱500' 
+      });
+    }
+    
+    // Check if user already has an active package of this type
+    const existingPackage = await Package.findOne({
+      user: req.user.id,
+      packageType,
+      status: 'active',
+      $or: [
+        { claimed: { $exists: false } },
+        { claimed: false }
+      ]
+    });
+    
+    if (existingPackage) {
+      return res.status(400).json({ 
+        message: `You already have an active Package ${packageType}` 
+      });
+    }
+    
     // Find the user
     const user = await User.findById(req.user.id);
     if (!user) {
@@ -36,15 +68,14 @@ router.post('/request', auth, async (req, res) => {
     // Calculate package details
     const startDate = new Date();
     const endDate = new Date(startDate);
-    // Set duration based on package type (1 = 12 days, 2 = 20 days)
-    const duration = packageType === 1 ? 12 : 20;
+    const duration = packageType === 1 ? 12 : 20; // 12 or 20 days
     endDate.setDate(endDate.getDate() + duration);
     
-    // Calculate daily income based on package type
-    // PLAN: Package 1 = 20% total over 12 days, Package 2 = 50% total over 20 days
-    const dailyIncome = packageType === 1 
-      ? amount * (0.20 / 12) // ≈1.67% daily for 12 days
-      : amount * (0.50 / 20); // 2.5% daily for 20 days
+    // Calculate total interest and daily income
+    const totalInterest = packageType === 1 
+      ? amount * 0.20  // 20% for Package 1
+      : amount * 0.50; // 50% for Package 2
+    const dailyIncome = totalInterest / duration;
     
     const package = new Package({
       user: req.user.id,

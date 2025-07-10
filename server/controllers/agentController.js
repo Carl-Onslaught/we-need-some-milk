@@ -5,6 +5,7 @@ const Withdrawal = require('../models/Withdrawal');
 const Agent = require('../models/Agent');
 const Package = require('../models/Package');
 const catchAsync = require('../utils/catchAsync');
+const SharedCapitalTransaction = require('../models/sharedCapitalTransaction');
 
 // Get agent's earnings and stats
 exports.getEarnings = async (req, res) => {
@@ -31,15 +32,14 @@ exports.getEarnings = async (req, res) => {
             const endDate = new Date(pkg.endDate);
             const totalDays = pkg.packageType === 1 ? 12 : 20;
             
-            // For stats cards: Only include if package has matured
-            if (now >= endDate) {
-                // Package has matured - include in stats with total earnings
-                const totalEarnings = pkg.amount + (pkg.dailyIncome * totalDays);
-                if (!pkg.claimed) {
-                    pendingEarnings += totalEarnings;
-                } else {
-                    sharedEarnings += totalEarnings;
-                }
+            // Only include claimed packages in sharedEarnings
+            if (pkg.claimed) {
+                const totalEarnings = (pkg.amount || 0) + (pkg.totalEarnings || 0);
+                sharedEarnings += totalEarnings;
+            } else if (now >= endDate) {
+                // Matured but not claimed
+                const totalEarnings = (pkg.amount || 0) + (pkg.totalEarnings || 0);
+                pendingEarnings += totalEarnings;
             } else {
                 // Not matured - track amount but don't show in stats
                 immatureAmount += pkg.amount;
@@ -58,7 +58,7 @@ exports.getEarnings = async (req, res) => {
             directReferral: user.referralEarnings?.direct || 0,
             indirectReferral: user.referralEarnings?.indirect || 0,
             totalClicks: user.clickEarnings || 0,
-            sharedEarnings,
+            sharedEarnings: sharedEarnings,
             pendingEarnings
         });
 
@@ -201,16 +201,42 @@ exports.submitWithdrawal = async (req, res) => {
         availableBalance += pkg.amount + currentEarnings;
       }
     } else if (source === 'direct_indirect') {
+      console.log('DEBUG: Referral Earnings - direct:', user.referralEarnings?.direct, 'indirect:', user.referralEarnings?.indirect);
       availableBalance = (user.referralEarnings?.direct || 0) + (user.referralEarnings?.indirect || 0);
-    } else {
+    } else if (source === 'click_earnings') {
+      console.log('DEBUG: Click Earnings:', user.clickEarnings);
       availableBalance = user.clickEarnings || 0;
+    } else if (source === 'shared_capital') {
+      // Deduct from both pkg.totalEarnings and pkg.amount across all packages, in order
+      let remainingAmount = requestedAmount;
+      // Sort packages by createdAt ascending (oldest first)
+      const sortedPackages = packages.sort((a, b) => a.createdAt - b.createdAt);
+      for (const pkg of sortedPackages) {
+        if (remainingAmount <= 0) break;
+        // Deduct from totalEarnings first if available
+        if (pkg.totalEarnings && pkg.totalEarnings > 0) {
+          const deduction = Math.min(pkg.totalEarnings, remainingAmount);
+          pkg.totalEarnings -= deduction;
+          remainingAmount -= deduction;
+        }
+        // Then deduct from amount if still needed
+        if (remainingAmount > 0 && pkg.amount && pkg.amount > 0) {
+          const deduction = Math.min(pkg.amount, remainingAmount);
+          pkg.amount -= deduction;
+          remainingAmount -= deduction;
+        }
+        await pkg.save();
+      }
+      // Update total withdrawals for shared capital
+      user.totalWithdraw = (user.totalWithdraw || 0) + requestedAmount;
+      console.log('Updated total withdrawals:', {
+        before: user.totalWithdraw - requestedAmount,
+        added: requestedAmount,
+        after: user.totalWithdraw
+      });
     }
 
-    console.log('Balance check:', {
-      source,
-      available: availableBalance,
-      requested: requestedAmount
-    });
+    console.log('DEBUG: Calculated availableBalance:', availableBalance);
 
     // Check if enough balance
     if (availableBalance < requestedAmount) {
@@ -220,7 +246,7 @@ exports.submitWithdrawal = async (req, res) => {
       });
     }
 
-    // Create withdrawal record
+    // Create withdrawal record BEFORE deduction logic
     const withdrawal = new Withdrawal({
       agentId: req.user._id,
       amount: requestedAmount,
@@ -230,69 +256,57 @@ exports.submitWithdrawal = async (req, res) => {
       source,
       status: 'pending'
     });
-
     await withdrawal.save();
     console.log('Withdrawal record created:', withdrawal);
 
-    // Update user's balance and add to total withdrawals
+    // After withdrawal creation and balance check
     if (source === 'direct_indirect') {
-      // For referral earnings, we zero out both direct and indirect
-      const totalReferral = (user.referralEarnings.direct || 0) + (user.referralEarnings.indirect || 0);
-      console.log('Deducting referral earnings:', {
-        before: { direct: user.referralEarnings.direct, indirect: user.referralEarnings.indirect },
-        requested: requestedAmount,
-        total: totalReferral
-      });
-      user.referralEarnings.direct = 0;
-      user.referralEarnings.indirect = 0;
+      let remainingAmount = requestedAmount;
+      // Deduct from direct first
+      if (user.referralEarnings.direct && user.referralEarnings.direct > 0) {
+        const deduction = Math.min(user.referralEarnings.direct, remainingAmount);
+        user.referralEarnings.direct -= deduction;
+        remainingAmount -= deduction;
+      }
+      // Then deduct from indirect if needed
+      if (remainingAmount > 0 && user.referralEarnings.indirect && user.referralEarnings.indirect > 0) {
+        const deduction = Math.min(user.referralEarnings.indirect, remainingAmount);
+        user.referralEarnings.indirect -= deduction;
+        remainingAmount -= deduction;
+      }
+      user.wallet = Math.max(0, (user.wallet || 0) - requestedAmount); // Deduct from wallet
       user.totalWithdraw = (user.totalWithdraw || 0) + requestedAmount;
     } else if (source === 'click_earnings') {
-      // For click earnings, we deduct the exact amount
-      console.log('Deducting click earnings:', {
-        before: user.clickEarnings,
-        deducting: requestedAmount,
-        after: user.clickEarnings - requestedAmount
-      });
-      user.clickEarnings = Math.max(0, (user.clickEarnings || 0) - requestedAmount);
+      let remainingAmount = requestedAmount;
+      if (user.clickEarnings && user.clickEarnings > 0) {
+        const deduction = Math.min(user.clickEarnings, remainingAmount);
+        user.clickEarnings -= deduction;
+          remainingAmount -= deduction;
+      }
+      user.wallet = Math.max(0, (user.wallet || 0) - requestedAmount); // Deduct from wallet
       user.totalWithdraw = (user.totalWithdraw || 0) + requestedAmount;
     } else if (source === 'shared_capital') {
-      // For shared capital, we need to deduct from packages
       let remainingAmount = requestedAmount;
-      
-      // First try to deduct from completed packages
-      for (const pkg of packages) {
-        if (pkg.status === 'completed' && remainingAmount > 0) {
-          const deduction = Math.min(pkg.totalEarnings || 0, remainingAmount);
-          pkg.totalEarnings = (pkg.totalEarnings || 0) - deduction;
+      // Deduct from both pkg.totalEarnings and pkg.amount across all claimed packages, in order
+      const claimedPackages = packages.filter(pkg => pkg.claimed).sort((a, b) => a.createdAt - b.createdAt);
+      for (const pkg of claimedPackages) {
+        if (remainingAmount <= 0) break;
+        // Deduct from totalEarnings first if available
+        if (pkg.totalEarnings && pkg.totalEarnings > 0) {
+          const deduction = Math.min(pkg.totalEarnings, remainingAmount);
+          pkg.totalEarnings -= deduction;
           remainingAmount -= deduction;
-          await pkg.save();
         }
-      }
-
-      // Then deduct from active packages if needed
-      if (remainingAmount > 0) {
-        for (const pkg of packages) {
-          if (pkg.status === 'active' && remainingAmount > 0) {
-            const startDate = new Date(pkg.startDate);
-            const daysSinceStart = Math.max(0, Math.floor((now - startDate) / (1000 * 60 * 60 * 24)));
-            const currentEarnings = (pkg.dailyIncome || 0) * daysSinceStart;
-            
-            // Calculate how much we can deduct from this package
-            const packageTotal = pkg.amount + currentEarnings;
-            const deduction = Math.min(packageTotal, remainingAmount);
-            
-            // Update package
-            pkg.amount = Math.max(0, packageTotal - deduction);
-            pkg.lastUpdated = now;
+        // Then deduct from amount if still needed
+        if (remainingAmount > 0 && pkg.amount && pkg.amount > 0) {
+          const deduction = Math.min(pkg.amount, remainingAmount);
+          pkg.amount -= deduction;
             remainingAmount -= deduction;
-            await pkg.save();
-          }
         }
+        await pkg.save();
       }
-      
-      // Update total withdrawals for shared capital
       user.totalWithdraw = (user.totalWithdraw || 0) + requestedAmount;
-      console.log('Updated total withdrawals:', {
+      console.log('Updated total withdrawals (shared capital):', {
         before: user.totalWithdraw - requestedAmount,
         added: requestedAmount,
         after: user.totalWithdraw
@@ -477,38 +491,9 @@ exports.claimMaturedPackage = async (req, res) => {
 
     res.json({ message: 'Earnings claimed successfully!', totalEarnings });
   } catch (error) {
-    console.error('Error claiming matured package:', error);
-    res.status(500).json({ message: 'Error claiming matured package.' });
+    console.error('Error claiming earnings:', error);
+    res.status(500).json({ message: 'Error claiming earnings' });
   }
-};
-
-// Change password
-exports.changePassword = async (req, res) => {
-    try {
-        const userId = req.user._id;
-        const { currentPassword, newPassword } = req.body;
-
-        // Find user
-        const user = await User.findById(userId);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        // Verify current password
-        const isMatch = await user.comparePassword(currentPassword);
-        if (!isMatch) {
-            return res.status(400).json({ message: 'Current password is incorrect' });
-        }
-
-        // Update password - the User model's pre-save middleware will hash it
-        user.password = newPassword;
-        await user.save();
-
-        res.json({ message: 'Password updated successfully' });
-    } catch (error) {
-        console.error('Error changing password:', error);
-        res.status(500).json({ message: 'Error changing password' });
-    }
 };
 
 // Get agent's profile
@@ -530,31 +515,43 @@ exports.getProfile = async (req, res) => {
     }
 };
 
-// Update package earnings
+// Update package earnings and process matured packages
 exports.updatePackageEarnings = async (req, res) => {
     try {
         const now = new Date();
         
-        // Find all active packages
+        // Find all active packages that haven't matured yet
         const activePackages = await Package.find({
             status: 'active',
-            endDate: { $gt: now }
+            endDate: { $gt: now },
+            $or: [
+                { claimed: { $exists: false } },
+                { claimed: false }
+            ]
         });
         
         let updatedCount = 0;
         
         for (const pkg of activePackages) {
-            // Calculate days since last update
+            // Calculate days since last update (minimum 1 day)
             const lastUpdate = pkg.lastUpdated || pkg.startDate;
-            const daysSinceUpdate = Math.floor((now - lastUpdate) / (1000 * 60 * 60 * 24));
+            const daysSinceUpdate = Math.max(1, Math.floor((now - lastUpdate) / (1000 * 60 * 60 * 24)));
             
-            if (daysSinceUpdate > 0) {
-                // Calculate new earnings
-                const newEarnings = pkg.dailyIncome * daysSinceUpdate;
-                
-                // Update package
+            // Calculate maximum possible earnings based on package duration
+            const totalDays = pkg.packageType === 1 ? 12 : 20;
+            const maxEarnings = pkg.dailyIncome * totalDays;
+            const potentialEarnings = pkg.dailyIncome * daysSinceUpdate;
+            
+            // Ensure we don't exceed maximum earnings
+            const newEarnings = Math.min(
+                potentialEarnings,
+                maxEarnings - (pkg.totalEarnings || 0)
+            );
+            
+            if (newEarnings > 0) {
+                // Update package with atomic operation
                 await Package.findByIdAndUpdate(pkg._id, {
-                    $inc: { totalEarnings: newEarnings },
+                    $inc: { totalEarnings: parseFloat(newEarnings.toFixed(2)) },
                     lastUpdated: now
                 });
                 
@@ -562,87 +559,239 @@ exports.updatePackageEarnings = async (req, res) => {
             }
         }
         
+        // Process matured packages
+        await processMaturedPackages();
+        
         if (res) {
             res.json({
+                success: true,
                 message: `Updated earnings for ${updatedCount} packages`,
-                updatedCount
+                updatedCount,
+                timestamp: now
             });
         }
     } catch (error) {
         console.error('Error updating package earnings:', error);
         if (res) {
-            res.status(500).json({ message: 'Error updating package earnings' });
+            res.status(500).json({ 
+                success: false,
+                message: 'Error updating package earnings',
+                error: process.env.NODE_ENV === 'development' ? error.message : undefined
+            });
         }
     }
 };
 
+// Helper function to process matured packages
+async function processMaturedPackages() {
+    try {
+        const now = new Date();
+        
+        // Find packages that have matured but haven't been processed
+        const maturedPackages = await Package.find({
+            status: 'active',
+            endDate: { $lte: now },
+            $or: [
+                { claimed: { $exists: false } },
+                { claimed: false }
+            ]
+        });
+        
+        for (const pkg of maturedPackages) {
+            try {
+                // Ensure we have the latest package data
+                const freshPkg = await Package.findById(pkg._id);
+                if (!freshPkg || freshPkg.claimed) continue;
+                
+                // Calculate final earnings
+                const totalDays = freshPkg.packageType === 1 ? 12 : 20;
+                const totalEarned = freshPkg.dailyIncome * totalDays;
+                
+                // Mark as matured but not claimed
+                freshPkg.status = 'completed';
+                freshPkg.totalEarnings = totalEarned;
+                freshPkg.lastUpdated = now;
+                
+                await freshPkg.save();
+                
+                console.log(`Marked package ${freshPkg._id} as matured`);
+            } catch (pkgError) {
+                console.error(`Error processing package ${pkg._id}:`, pkgError);
+                // Continue with next package even if one fails
+            }
+        }
+        
+        return {
+            success: true,
+            processed: maturedPackages.length,
+            timestamp: now
+        };
+    } catch (error) {
+        console.error('Error in processMaturedPackages:', error);
+        throw error;
+    }
+}
+
 // Add new endpoint to claim matured package
 exports.claimPackage = async (req, res) => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    
     try {
         const { packageId } = req.body;
         const now = new Date();
 
-        // Find the package
+        if (!packageId) {
+            return res.status(400).json({ message: 'Package ID is required' });
+        }
+
+        // Find the package with session for transaction
         const pkg = await Package.findOne({
             _id: packageId,
             user: req.user._id,
             status: 'active'
-        });
+        }).session(session);
 
         if (!pkg) {
-            return res.status(404).json({ message: 'Package not found' });
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(404).json({ message: 'Package not found or already claimed' });
         }
 
         const endDate = new Date(pkg.endDate);
         if (now < endDate) {
-            return res.status(400).json({ message: 'Package has not matured yet' });
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(400).json({ 
+                message: 'Package has not matured yet',
+                maturityDate: endDate
+            });
         }
 
         if (pkg.claimed) {
+            await session.abortTransaction();
+            session.endSession();
             return res.status(400).json({ message: 'Package has already been claimed' });
         }
 
-        // Calculate total earnings
+        // Calculate total interest earned (without principal)
         const totalDays = pkg.packageType === 1 ? 12 : 20;
-        const totalEarnings = pkg.amount + (pkg.dailyIncome * totalDays);
+        const interestEarned = parseFloat((pkg.dailyIncome * totalDays).toFixed(2));
+
+        // Get user within the transaction
+        const user = await User.findById(req.user._id).session(session);
+        if (!user) {
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(404).json({ message: 'User not found' });
+        }
 
         // Update package status
         pkg.claimed = true;
         pkg.claimedAt = now;
-        await pkg.save();
+        await pkg.save({ session });
 
-        // Update user sharedEarnings (not wallet)
-        const user = await User.findById(req.user._id);
-        user.sharedEarnings = (user.sharedEarnings || 0) + totalEarnings;
-        await user.save();
+        // Add only the interest to sharedEarnings
+        user.sharedEarnings = parseFloat(((user.sharedEarnings || 0) + interestEarned).toFixed(2));
+        await user.save({ session });
 
         // Create transaction record
-        await SharedCapitalTransaction.create({
+        await SharedCapitalTransaction.create([{
             user: req.user._id,
             type: 'earning',
-            amount: totalEarnings,
+            amount: interestEarned,
             package: `Package ${pkg.packageType}`,
             status: 'completed',
-            description: `Claimed earnings from Package ${pkg.packageType} (₱${pkg.amount.toLocaleString()} + ₱${(pkg.dailyIncome * totalDays).toLocaleString()} earnings)`,
+            description: `Earned ₱${interestEarned.toFixed(2)} from Package ${pkg.packageType}`,
             createdAt: now
-        });
+        }], { session });
 
-        // Notify via WebSocket
-        if (global.io) {
-            global.io.emit('earnings_update', {
-                type: 'earnings_update',
-                agentId: req.user._id,
-                earnings: await calculateUserEarnings(req.user._id)
-            });
+        // Commit the transaction
+        await session.commitTransaction();
+        session.endSession();
+
+        // Notify via WebSocket (outside transaction)
+        try {
+            if (global.io) {
+                const earnings = await calculateUserEarnings(req.user._id);
+                global.io.emit('earnings_update', {
+                    type: 'earnings_update',
+                    agentId: req.user._id,
+                    earnings
+                });
+            }
+        } catch (wsError) {
+            console.error('WebSocket notification error:', wsError);
+            // Don't fail the request if WebSocket notification fails
         }
 
         res.json({
+            success: true,
             message: 'Package claimed successfully',
-            amount: totalEarnings
+            amount: interestEarned,
+            packageType: pkg.packageType,
+            claimDate: now
         });
     } catch (error) {
         console.error('Error claiming package:', error);
-        res.status(500).json({ message: 'Error claiming package' });
+        
+        // Only abort if session is still active
+        if (session.inTransaction()) {
+            await session.abortTransaction();
+        }
+        
+        // Ensure session is always ended
+        if (session.inTransaction()) {
+            session.endSession();
+        }
+
+        // More specific error messages
+        if (error.name === 'ValidationError') {
+            return res.status(400).json({ 
+                success: false,
+                message: 'Validation error',
+                error: error.message 
+            });
+        }
+
+        res.status(500).json({ 
+            success: false,
+            message: 'Failed to claim package',
+            error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+        });
+    }
+};
+
+// Change password
+exports.changePassword = async (req, res) => {
+    try {
+        const { currentPassword, newPassword } = req.body;
+        const userId = req.user._id;
+
+        // Find user by ID
+        const user = await User.findById(userId).select('+password');
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Verify current password
+        const isMatch = await bcrypt.compare(currentPassword, user.password);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Current password is incorrect' });
+        }
+
+        // Hash new password
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+
+        // Update password
+        user.password = hashedPassword;
+        await user.save();
+
+        res.json({ message: 'Password updated successfully' });
+    } catch (error) {
+        console.error('Error changing password:', error);
+        res.status(500).json({ message: 'Error changing password' });
     }
 };
 
@@ -682,5 +831,3 @@ exports.getActivePackages = async (req, res) => {
         res.status(500).json({ message: 'Error fetching active packages' });
     }
 };
-
-module.exports = exports;

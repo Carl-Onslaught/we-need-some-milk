@@ -1,10 +1,18 @@
 const User = require('../models/User');
 const Transaction = require('../models/Transaction');
+const { getSettings } = require('../utils/settingsService');
 
-// Constants
-const CLICK_REWARD = 0.20; // ₱0.20 per click
-const MAX_DAILY_EARNINGS = 10; // ₱10 max per day
-const MAX_CLICKS = Math.floor(MAX_DAILY_EARNINGS / CLICK_REWARD); // 50 clicks
+// These values are fetched from Settings at runtime (cached).
+let CLICK_REWARD = 0.20;
+let MAX_DAILY_EARNINGS = 10;
+let MAX_CLICKS = 50;
+
+(async () => {
+  const settings = await getSettings();
+  CLICK_REWARD = settings.clickReward;
+  MAX_DAILY_EARNINGS = settings.dailyClickCap;
+  MAX_CLICKS = Math.floor(MAX_DAILY_EARNINGS / CLICK_REWARD);
+})();
 
 // Helper function to check if daily clicks should be reset
 const shouldResetDailyClicks = (lastReset) => {

@@ -17,11 +17,19 @@ const userRoutes = require('./routes/user');
 const paymentRoutes = require('./routes/paymentRoutes');
 const packageRoutes = require('./routes/package');
 const { MONGO_OPTIONS } = require('./config');
+const { schedulePackageUpdates } = require('./utils/scheduler');
+const logger = require('./utils/logger');
 
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '.env') });
 
-console.log('Starting server...');
+logger.info('Starting server...');
+
+// Initialize scheduled tasks
+if (process.env.NODE_ENV !== 'test') {
+    schedulePackageUpdates();
+    logger.info('Scheduled tasks initialized');
+}
 
 // Create Express app and HTTP server
 const app = express();
@@ -30,7 +38,10 @@ const server = require('http').createServer(app);
 // Initialize Socket.IO with CORS
 const io = require('socket.io')(server, {
   cors: {
-    origin: [`https://${process.env.DOMAIN_NAME}`],
+    origin: [
+      'http://localhost:5173',
+      'https://your-production-domain.com' // TODO: Change this to your actual frontend domain before deploying
+    ],
     methods: ['GET', 'POST'],
     credentials: true,
     allowedHeaders: ['Content-Type', 'Authorization']
@@ -44,6 +55,9 @@ const io = require('socket.io')(server, {
   upgradeTimeout: 30000,
   maxHttpBufferSize: 1e8
 });
+
+// Make io available globally for use in controllers
+global.io = io;
 
 // Handle Socket.IO connections
 io.on('connection', (socket) => {
@@ -69,30 +83,14 @@ console.log('Express app and WebSocket server created.');
 
 // Middleware
 app.use(cors({
-  origin: function(origin, callback) {
-    // Allow requests with no origin (like mobile apps or curl requests)
-    if (!origin) return callback(null, true);
-    
-    // Allow all origins in development
-    if (process.env.NODE_ENV === 'development') {
-      return callback(null, true);
-    }
-    
-    // In production, you would check against a whitelist
-    callback(null, true);
-  },
+  origin: [
+    'http://localhost:5173',
+    'https://your-production-domain.com' // TODO: Change this to your actual frontend domain before deploying
+  ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With']
 }));
-
-// Add headers to allow credentials
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Credentials', 'true');
-  res.header('Access-Control-Allow-Origin', req.headers.origin || '*');
-  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-  next();
-});
 
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));

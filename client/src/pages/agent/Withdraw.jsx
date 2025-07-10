@@ -7,6 +7,7 @@ import {
   Card,
   CardBody,
   VStack,
+  HStack,
   Button,
   useToast,
   Input,
@@ -14,14 +15,25 @@ import {
   FormLabel,
   Select,
   Divider,
+  Table,
+  Thead,
+  Tbody,
+  Tr,
+  Th,
+  Td,
+  Badge,
+  IconButton,
+  Flex,
+  Spinner,
 } from '@chakra-ui/react';
+import { ChevronLeftIcon, ChevronRightIcon } from '@chakra-ui/icons';
 import { useState, useEffect } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
 import axios from 'axios';
 import io from 'socket.io-client';
 import AgentLayout from '../../components/AgentLayout';
 import { FaUsers, FaChartLine, FaWallet } from 'react-icons/fa';
-import { BASE_URL } from '../../config';
+import { API_URL } from '../../config';
 
 export default function Withdraw() {
   const { user } = useAuth();
@@ -33,6 +45,9 @@ export default function Withdraw() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isClaimingPackages, setIsClaimingPackages] = useState(false);
   const [withdrawals, setWithdrawals] = useState([]);
+  const [statusFilter, setStatusFilter] = useState('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage] = useState(10);
   const [stats, setStats] = useState({
     wallet: 0,
     directReferral: 0,
@@ -51,7 +66,7 @@ export default function Withdraw() {
     fetchStats();
 
     // Connect to WebSocket server with improved reconnection logic
-    const socket = io(BASE_URL, {
+    const socket = io(API_URL.replace(/\/api$/, ''), {
       transports: ['polling', 'websocket'],
       reconnection: true,
       reconnectionAttempts: Infinity, // Keep trying to reconnect forever
@@ -126,7 +141,8 @@ export default function Withdraw() {
           wallet: data.updatedBalances.wallet || 0,
           directReferral: data.updatedBalances.referralEarnings?.direct || 0,
           indirectReferral: data.updatedBalances.referralEarnings?.indirect || 0,
-          totalClicks: data.updatedBalances.clickEarnings || 0
+          totalClicks: data.updatedBalances.clickEarnings || 0,
+          sharedEarnings: data.updatedBalances.sharedEarnings !== undefined ? data.updatedBalances.sharedEarnings : prev.sharedEarnings
         }));
         
         // Refresh withdrawals list and stats
@@ -164,7 +180,7 @@ export default function Withdraw() {
 
   const fetchWithdrawals = async () => {
     try {
-      const { data } = await axios.get('/api/agent/withdrawals');
+      const { data } = await axios.get('/agent/withdrawals');
       setWithdrawals(data);
     } catch (error) {
       toast({
@@ -178,7 +194,7 @@ export default function Withdraw() {
 
   const fetchStats = async () => {
     try {
-      const response = await axios.get('/api/agent/earnings');
+      const response = await axios.get('/agent/earnings');
       console.log('Updated stats:', response.data);
       setStats(response.data);
     } catch (error) {
@@ -250,7 +266,7 @@ export default function Withdraw() {
           source
         });
         
-        const response = await axios.post('/api/agent/withdraw', {
+        const response = await axios.post('/agent/withdraw', {
           amount: parseFloat(amount),
           method,
           accountNumber,
@@ -298,7 +314,7 @@ export default function Withdraw() {
   const handleClaimPackages = async () => {
     try {
       setIsClaimingPackages(true);
-      const response = await axios.post('/api/agent/claim-packages');
+      const response = await axios.post('/agent/claim-packages');
       
       toast({
         title: 'Success',
@@ -392,49 +408,6 @@ export default function Withdraw() {
             </CardBody>
           </Card>
         </SimpleGrid>
-
-        {/* Pending Matured Packages */}
-        {stats.pendingEarnings > 0 && (
-          <Card 
-            bg="#1E2528" 
-            borderWidth="1px"
-            borderColor="gray.700"
-            boxShadow="lg"
-            transition="all 0.3s"
-            _hover={{ 
-              transform: 'translateY(-2px)',
-              borderColor: '#FDB137',
-              boxShadow: '0 0 20px rgba(253, 177, 55, 0.1)'
-            }}
-            mb={8}
-          >
-            <CardBody>
-              <VStack align="start" spacing={4}>
-                <Box>
-                  <Text color="gray.400" mb={2}>Pending Matured Packages</Text>
-                  <Heading size="lg" color="white">
-                    ₱{stats.pendingEarnings.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 2})}
-                  </Heading>
-                </Box>
-                <Button
-                  onClick={handleClaimPackages}
-                  bg="#FDB137"
-                  color="#181E20"
-                  isLoading={isClaimingPackages}
-                  loadingText="Claiming"
-                  w="full"
-                  _hover={{
-                    transform: 'scale(0.95)',
-                    bg: '#BD5301',
-                  }}
-                  transition="all 0.2s"
-                >
-                  Claim Matured Packages
-                </Button>
-              </VStack>
-            </CardBody>
-          </Card>
-        )}
 
         {/* Withdrawal Form */}
         <Card 
@@ -578,47 +551,174 @@ export default function Withdraw() {
         >
           <CardBody>
             <VStack spacing={4} align="stretch">
-              <Heading size="md" color="white">Withdrawal History</Heading>
+              <Flex justify="space-between" align="center">
+                <Heading size="md" color="white">Withdrawal History</Heading>
+                <Select
+                  value={statusFilter}
+                  onChange={e => {
+                    setStatusFilter(e.target.value);
+                    setCurrentPage(1); // Reset to first page when filter changes
+                  }}
+                  maxW="200px"
+                  bg="#181E20"
+                  color="#FDB137"
+                  borderColor="#181E20"
+                  _hover={{ borderColor: '#FDB137', bg: '#181E20', color: '#FDB137' }}
+                  _focus={{ borderColor: '#FDB137', boxShadow: '0 0 0 1px #FDB137', bg: '#181E20', color: '#FDB137' }}
+                >
+                  <option value="all">All Transactions</option>
+                  <option value="pending">Pending</option>
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                </Select>
+              </Flex>
+              
               <Divider borderColor="gray.700" />
-              {withdrawals.length > 0 ? (
-                withdrawals.map((withdrawal, index) => (
-                  <Box 
-                    key={index} 
-                    p={4} 
-                    bg="#181E20" 
-                    borderRadius="md"
-                    transition="all 0.2s"
-                    _hover={{
-                      transform: 'translateX(4px)',
-                      borderColor: '#FDB137',
-                    }}
-                  >
-                    <VStack align="start" spacing={1}>
-                      <Text fontWeight="bold" color="white">₱{withdrawal.amount.toLocaleString()}</Text>
-                      <Text fontSize="sm" color="gray.400">
-                        {withdrawal.method.toUpperCase()} • {new Date(withdrawal.createdAt).toLocaleDateString()}
-                      </Text>
-                      <Text
-                        fontSize="sm"
-                        color={
-                          withdrawal.status === 'completed'
-                            ? 'green.400'
-                            : withdrawal.status === 'pending'
-                            ? '#FDB137'
-                            : 'red.400'
-                        }
-                        textTransform="uppercase"
-                        fontWeight="bold"
+              
+              <Box overflowX="auto">
+                <Table variant="simple" colorScheme="gray">
+                  <Thead>
+                    <Tr>
+                      <Th color="gray.400">AMOUNT</Th>
+                      <Th color="gray.400">METHOD</Th>
+                      <Th color="gray.400">ACCOUNT</Th>
+                      <Th color="gray.400">DATE</Th>
+                      <Th color="gray.400" textAlign="center">STATUS</Th>
+                    </Tr>
+                  </Thead>
+                  <Tbody>
+                    {withdrawals.filter(w => {
+                      if (statusFilter === 'all') return true;
+                      if (statusFilter === 'approved') return w.status === 'approved' || w.status === 'completed';
+                      return w.status === statusFilter;
+                    }).length > 0 ? (
+                      withdrawals
+                        .filter(w => {
+                          if (statusFilter === 'all') return true;
+                          if (statusFilter === 'approved') return w.status === 'approved' || w.status === 'completed';
+                          return w.status === statusFilter;
+                        })
+                        .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                        .slice((currentPage - 1) * itemsPerPage, currentPage * itemsPerPage)
+                        .map((withdrawal, index) => (
+                          <Tr key={withdrawal._id} _hover={{ bg: '#2A3336' }}>
+                            <Td color="white" fontWeight="bold">
+                              ₱{withdrawal.amount.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                            </Td>
+                            <Td color="gray.300" textTransform="capitalize">
+                              {withdrawal.method}
+                            </Td>
+                            <Td color="gray.300">
+                              {withdrawal.accountNumber} ({withdrawal.accountName})
+                            </Td>
+                            <Td color="gray.400" fontSize="sm">
+                              {new Date(withdrawal.createdAt).toLocaleString()}
+                            </Td>
+                            <Td textAlign="center">
+                              <Badge
+                                colorScheme={
+                                  withdrawal.status === 'completed' || withdrawal.status === 'approved'
+                                    ? 'green'
+                                    : withdrawal.status === 'pending'
+                                    ? 'yellow'
+                                    : 'red'
+                                }
+                                px={3}
+                                py={1}
+                                borderRadius="full"
+                                textTransform="uppercase"
+                                fontSize="xs"
+                              >
+                                {withdrawal.status === 'completed' || withdrawal.status === 'approved'
+                                  ? 'Approved'
+                                  : withdrawal.status === 'pending'
+                                  ? 'Pending'
+                                  : 'Rejected'}
+                              </Badge>
+                            </Td>
+                          </Tr>
+                        ))
+                    ) : (
+                      <Tr>
+                        <Td colSpan={5} textAlign="center" py={6} color="gray.400">
+                          No withdrawal history found
+                        </Td>
+                      </Tr>
+                    )}
+                  </Tbody>
+                </Table>
+              </Box>
+
+              {/* Pagination */}
+              {withdrawals.filter(w => {
+                if (statusFilter === 'all') return true;
+                if (statusFilter === 'approved') return w.status === 'approved' || w.status === 'completed';
+                return w.status === statusFilter;
+              }).length > itemsPerPage && (
+                <Flex justify="flex-end" mt={4}>
+                  <HStack spacing={2}>
+                    <IconButton
+                      icon={<ChevronLeftIcon />}
+                      onClick={() => setCurrentPage(p => Math.max(1, p - 1))}
+                      isDisabled={currentPage === 1}
+                      size="sm"
+                      bg="#181E20"
+                      color="#FDB137"
+                      _hover={{ bg: '#2A3336' }}
+                      aria-label="Previous page"
+                    />
+                    {Array.from({
+                      length: Math.ceil(
+                        withdrawals.filter(w => {
+                          if (statusFilter === 'all') return true;
+                          if (statusFilter === 'approved') return w.status === 'approved' || w.status === 'completed';
+                          return w.status === statusFilter;
+                        }).length / itemsPerPage
+                      )
+                    }).map((_, i) => (
+                      <Button
+                        key={i}
+                        size="sm"
+                        onClick={() => setCurrentPage(i + 1)}
+                        bg={currentPage === i + 1 ? '#FDB137' : '#181E20'}
+                        color={currentPage === i + 1 ? '#181E20' : '#FDB137'}
+                        _hover={{ bg: currentPage === i + 1 ? '#BD5301' : '#2A3336' }}
                       >
-                        {withdrawal.status}
-                      </Text>
-                    </VStack>
-                  </Box>
-                ))
-              ) : (
-                <Text color="gray.400" textAlign="center" py={4}>
-                  No withdrawal history yet
-                </Text>
+                        {i + 1}
+                      </Button>
+                    ))}
+                    <IconButton
+                      icon={<ChevronRightIcon />}
+                      onClick={() => setCurrentPage(p => 
+                        Math.min(
+                          p + 1, 
+                          Math.ceil(
+                            withdrawals.filter(w => {
+                              if (statusFilter === 'all') return true;
+                              if (statusFilter === 'approved') return w.status === 'approved' || w.status === 'completed';
+                              return w.status === statusFilter;
+                            }).length / itemsPerPage
+                          )
+                        )
+                      )}
+                      isDisabled={
+                        currentPage >= 
+                        Math.ceil(
+                          withdrawals.filter(w => {
+                            if (statusFilter === 'all') return true;
+                            if (statusFilter === 'approved') return w.status === 'approved' || w.status === 'completed';
+                            return w.status === statusFilter;
+                          }).length / itemsPerPage
+                        )
+                      }
+                      size="sm"
+                      bg="#181E20"
+                      color="#FDB137"
+                      _hover={{ bg: '#2A3336' }}
+                      aria-label="Next page"
+                    />
+                  </HStack>
+                </Flex>
               )}
             </VStack>
           </CardBody>

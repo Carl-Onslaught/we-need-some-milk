@@ -39,7 +39,7 @@ const LoadSharedCapital = () => {
     // Fetch total sent points
     const fetchTotalSent = async () => {
       try {
-        const res = await axios.get('/api/admin/load-capital/total-sent');
+        const res = await axios.get('/admin/load-capital/total-sent');
         setTotalSent(res.data.totalSent);
       } catch (err) {
         setTotalSent('Error');
@@ -51,7 +51,7 @@ const LoadSharedCapital = () => {
 
   const fetchHistory = async () => {
     try {
-      const res = await axios.get('/api/admin/shared-capital/history');
+      const res = await axios.get('/admin/shared-capital/history');
       setHistory(res.data.transactions || []);
     } catch (err) {
       setHistory([]);
@@ -81,7 +81,7 @@ const LoadSharedCapital = () => {
       }
 
       // Make API request
-      await axios.post('/api/admin/load-capital', {
+      await axios.post('/admin/load-capital', {
         username: formData.username,
         amount: parseFloat(formData.amount)
       });
@@ -111,7 +111,7 @@ const LoadSharedCapital = () => {
 
   const handleRevert = async (txId) => {
     try {
-      await axios.post(`/api/admin/shared-capital/revert/${txId}`);
+      await axios.post(`/admin/shared-capital/revert/${txId}`);
       toast({
         title: 'Reverted',
         description: 'Load reverted and agent wallet updated.',

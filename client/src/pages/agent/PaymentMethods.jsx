@@ -21,7 +21,7 @@ export default function PaymentMethods() {
   useEffect(() => {
     const fetchMethods = async () => {
       try {
-        const res = await axios.get('/api/payment/methods');
+        const res = await axios.get('/payment/methods');
         setMethods(res.data || []);
       } catch (err) {
         setMethods([]);

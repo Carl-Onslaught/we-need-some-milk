@@ -24,7 +24,7 @@ export default function PendingRegistrations() {
 
   const fetchPendingUsers = async () => {
     try {
-      const response = await axios.get('/api/admin/pending-registrations');
+      const response = await axios.get('/admin/pending-registrations');
       setPendingUsers(response.data);
     } catch (error) {
       console.error('Error fetching pending registrations:', error);
@@ -41,7 +41,7 @@ export default function PendingRegistrations() {
   const handleApproval = async (userId, action) => {
     setIsLoading(true);
     try {
-      await axios.post(`/api/admin/approve-registration/${userId}`, { action });
+      await axios.post(`/admin/approve-registration/${userId}`, { action });
       toast({
         title: 'Success',
         description: `User ${action === 'approve' ? 'approved' : 'rejected'} successfully`,

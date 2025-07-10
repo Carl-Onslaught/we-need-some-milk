@@ -28,12 +28,20 @@ import {
   Tooltip,
   Spinner,
   Flex,
-  Select
+  Select,
+  IconButton
 } from '@chakra-ui/react';
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import AdminLayout from '../../components/AdminLayout';
-import { FaSearch, FaMoneyBillWave, FaFilter, FaCheckCircle, FaTimesCircle } from 'react-icons/fa';
+import { 
+  FaSearch, 
+  FaFilter, 
+  FaCheckCircle, 
+  FaTimesCircle, 
+  FaChevronLeft, 
+  FaChevronRight 
+} from 'react-icons/fa';
 
 export default function SharedWithdrawal() {
   const [withdrawals, setWithdrawals] = useState([]);
@@ -83,7 +91,8 @@ export default function SharedWithdrawal() {
 
   const fetchPendingWithdrawals = async () => {
     try {
-      const response = await axios.get('/api/admin/sharedWithdrawals');
+      const response = await axios.get('/admin/withdrawals/shared');
+      console.log('Fetched shared withdrawals:', response.data);
       setWithdrawals(response.data);
     } catch (error) {
       toast({
@@ -99,7 +108,7 @@ export default function SharedWithdrawal() {
     setProcessingId(withdrawalId);
     setLoading(true);
     try {
-      const response = await axios.post(`/api/admin/sharedWithdrawals/${withdrawalId}/approve`);
+      const response = await axios.post(`/admin/withdrawals/shared/${withdrawalId}/approve`);
       toast({
         title: 'Success',
         description: 'Withdrawal approved and moved to history',
@@ -122,11 +131,11 @@ export default function SharedWithdrawal() {
     }
   };
 
-  const rejectWithdrawal = async (withdrawalId) => {
+  const rejectWithdrawal = async (withdrawalId, reason) => {
     setProcessingId(withdrawalId);
     setLoading(true);
     try {
-      const response = await axios.post(`/api/admin/sharedWithdrawals/${withdrawalId}/reject`);
+      const response = await axios.post(`/admin/withdrawals/shared/${withdrawalId}/reject`, { reason });
       toast({
         title: 'Success',
         description: 'Withdrawal rejected and moved to history',
@@ -155,23 +164,73 @@ export default function SharedWithdrawal() {
 
 
 
-  const getTotalAmount = (status) => {
+  const getTotalAmount = () => {
     return withdrawals
-      .filter(w => status === 'all' || w.status === status)
+      .filter(w => w.status === 'approved' || w.status === 'completed')
       .reduce((sum, w) => sum + w.amount, 0);
   };
 
   return (
     <AdminLayout>
-      <VStack spacing={8} align="stretch">
+      <VStack spacing={6} align="stretch" px={{ base: 2, md: 8 }}>
         <Box>
-          <Heading size="lg" color="hsl(220, 14%, 90%)">
-            Shared Capital Withdrawal
+          <Heading size="lg" color="hsl(220, 14%, 90%)" textAlign="left">
+            Shared Capital Withdrawals
           </Heading>
-          <Text color="hsl(220, 14%, 70%)">
-            Manage pending claims from Package 1 and Package 2 investments
+          <Text color="hsl(220, 14%, 70%)" textAlign="left">
+            Manage and process shared capital withdrawal requests
           </Text>
         </Box>
+
+        {/* Summary Cards */}
+        <Flex gap={4} flexWrap="wrap" justify="flex-start" align="stretch" mb={2}>
+          <Card 
+            flex={1} 
+            minW="250px" 
+            bg="#242C2E" 
+            borderColor="#181E20" 
+            borderWidth="1px"
+            boxShadow="dark-lg"
+            p={0}
+          >
+            <CardBody px={6} py={4}>
+              <Stat>
+                <StatLabel color="hsl(220, 14%, 70%)">Total Withdrawals</StatLabel>
+                <StatNumber fontSize="2xl" fontWeight="bold" color="#FDB137">
+                  ₱{getTotalAmount().toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                </StatNumber>
+                <StatHelpText color="hsl(220, 14%, 70%)">
+                  {withdrawals.length} requests
+                </StatHelpText>
+              </Stat>
+            </CardBody>
+          </Card>
+
+          <Card 
+            flex={1} 
+            minW="250px" 
+            bg="#242C2E" 
+            borderColor="#181E20" 
+            borderWidth="1px"
+            boxShadow="dark-lg"
+            p={0}
+          >
+            <CardBody px={6} py={4}>
+              <Stat>
+                <StatLabel color="hsl(220, 14%, 70%)">Pending Approval</StatLabel>
+                <StatNumber fontSize="2xl" fontWeight="bold" color="yellow.400">
+                  {withdrawals.filter(w => w.status === 'pending').length}
+                </StatNumber>
+                <StatHelpText color="hsl(220, 14%, 70%)">
+                  ₱{withdrawals
+                    .filter(w => w.status === 'pending')
+                    .reduce((sum, w) => sum + (w.amount || 0), 0)
+                    .toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                </StatHelpText>
+              </Stat>
+            </CardBody>
+          </Card>
+        </Flex>
 
         <Card 
           bg="#242C2E" 
@@ -179,125 +238,169 @@ export default function SharedWithdrawal() {
           borderWidth="1px"
           boxShadow="dark-lg"
         >
-        <CardBody>
+          <CardBody>
             <VStack spacing={6} align="stretch">
-              <HStack justify="space-between" align="center">
-                <Stat>
-                  <StatLabel color="hsl(220, 14%, 70%)">Total Withdrawals</StatLabel>
-                  <StatNumber fontSize="4xl" fontWeight="bold" color="#FDB137">
-                  ₱{getTotalAmount('all').toFixed(2)}
-                </StatNumber>
-                  <StatHelpText color="hsl(220, 14%, 70%)">
-                    {filteredWithdrawals.length} requests
-                  </StatHelpText>
-                </Stat>
-
-                <HStack spacing={4}>
+              <HStack spacing={4} width="full" flexWrap={{ base: "wrap", md: "nowrap" }}>
+                <FormControl maxW={{ base: "full", md: "300px" }}>
                   <InputGroup>
                     <InputLeftElement pointerEvents="none">
                       <FaSearch color="#FDB137" />
                     </InputLeftElement>
-            <Input
+                    <Input
+                      id="search-username"
+                      name="searchUsername"
                       placeholder="Search by username"
-              value={searchEmail}
-              onChange={(e) => setSearchEmail(e.target.value)}
-                      bg="#181E20"
-                      color="white"
+                      value={searchEmail}
+                      onChange={(e) => setSearchEmail(e.target.value)}
+                      bg="#242C2E"
+                      color="hsl(220, 14%, 90%)"
                       borderColor="#181E20"
+                      _placeholder={{ color: 'hsl(220, 14%, 50%)' }}
                       _hover={{ borderColor: "#FDB137" }}
-                      _focus={{ borderColor: "#FDB137", boxShadow: "0 0 0 1px #FDB137" }}
+                      _focus={{ 
+                        borderColor: "#FDB137", 
+                        boxShadow: "0 0 0 1px #FDB137",
+                        bg: '#242C2E',
+                        color: 'hsl(220, 14%, 90%)'
+                      }}
                     />
                   </InputGroup>
+                </FormControl>
 
-                  <Select
-                    value={filter}
-                    onChange={(e) => setFilter(e.target.value)}
-                    maxW="200px"
-                    bg="#181E20"
-                    color="white"
-                    borderColor="#181E20"
-                    _hover={{ borderColor: "#FDB137" }}
-                    _focus={{ borderColor: "#FDB137", boxShadow: "0 0 0 1px #FDB137" }}
-                  >
-                    <option value="all">All Status</option>
-                    <option value="pending">Pending</option>
-                    <option value="completed">Completed</option>
-                    <option value="rejected">Rejected</option>
-                  </Select>
-                </HStack>
+                <FormControl maxW={{ base: "full", md: "200px" }}>
+                  <HStack spacing={2}>
+                    <Icon as={FaFilter} color="#FDB137" />
+                    <Select
+                      id="status-filter"
+                      name="statusFilter"
+                      value={filter}
+                      onChange={(e) => setFilter(e.target.value)}
+                      bg="black"
+                      borderColor="#181E20"
+                      color="#FDB137"
+                      _hover={{ borderColor: '#FDB137' }}
+                      _focus={{ 
+                        borderColor: '#FDB137', 
+                        boxShadow: '0 0 0 1px #FDB137',
+                        bg: 'black',
+                        color: '#FDB137'
+                      }}
+                      sx={{
+                        '> option': {
+                          backgroundColor: 'black',
+                          color: '#FDB137',
+                          _hover: {
+                            backgroundColor: '#2A3336 !important',
+                          },
+                        },
+                        '&:focus': {
+                          bg: 'black',
+                          color: '#FDB137'
+                        }
+                      }}
+                    >
+                      <option value="all">All Status</option>
+                      <option value="pending">Pending</option>
+                      <option value="approved">Approved</option>
+                      <option value="rejected">Rejected</option>
+                    </Select>
+                  </HStack>
+                </FormControl>
               </HStack>
 
-              <Box overflowX="auto" bg="#242C2E" borderRadius="lg" p={4}>
-                <Table variant="simple">
+              <Box overflowX="auto" borderRadius="md" borderWidth="1px" borderColor="#181E20">
+                <Table variant="simple" colorScheme="gray">
                   <Thead>
-                    <Tr>
-                      <Th color="#FDB137">USERNAME</Th>
-                      <Th color="#FDB137">PACKAGE</Th>
-                      <Th color="#FDB137">AMOUNT</Th>
-                      <Th color="#FDB137">PAYMENT DETAILS</Th>
-                      <Th color="#FDB137">REQUEST DATE</Th>
-                      <Th color="#FDB137">STATUS</Th>
-                      <Th color="#FDB137">ACTIONS</Th>
+                    <Tr bgColor="#181E20">
+                      <Th color="hsl(220, 14%, 90%)" textAlign="left" px={4} py={3}>USER</Th>
+                      <Th color="hsl(220, 14%, 90%)" textAlign="left" px={4} py={3}>PACKAGE</Th>
+                      <Th color="hsl(220, 14%, 90%)" textAlign="left" px={4} py={3}>AMOUNT</Th>
+                      <Th color="hsl(220, 14%, 90%)" textAlign="left" px={4} py={3}>PAYMENT</Th>
+                      <Th color="hsl(220, 14%, 90%)" textAlign="left" px={4} py={3}>DATE</Th>
+                      <Th color="hsl(220, 14%, 90%)" textAlign="center" px={4} py={3}>STATUS</Th>
+                      <Th color="hsl(220, 14%, 90%)" textAlign="center" px={4} py={3}>ACTIONS</Th>
                     </Tr>
                   </Thead>
               <Tbody>
-                    {paginatedWithdrawals.length === 0 ? (
+                    {loading ? (
                       <Tr>
-                        <Td colSpan={7} textAlign="center" py={8} color="#FDB137" bg="#242C2E">
+                        <Td colSpan={7} textAlign="center" py={8}>
+                          <Spinner size="lg" color="#FDB137" />
+                          <Text mt={2} color="hsl(220, 14%, 70%)">Loading withdrawals...</Text>
+                        </Td>
+                      </Tr>
+                    ) : paginatedWithdrawals.length === 0 ? (
+                      <Tr>
+                        <Td colSpan={7} textAlign="center" py={8} color="hsl(220, 14%, 70%)" bg="#242C2E">
                           No withdrawal requests found
                         </Td>
                       </Tr>
                     ) : (
                       paginatedWithdrawals.map((withdrawal) => (
-                        <Tr key={withdrawal._id} _hover={{ bg: "#181E20" }} bg="#242C2E">
-                          <Td color="white">{withdrawal.agentId?.username || 'Unknown User'}</Td>
-                          <Td color="white">
-                            <Badge 
-                              colorScheme={withdrawal.package === 1 ? 'blue' : 'purple'}
-                              variant="subtle"
-                            >
-                              Package {withdrawal.package || 1}
-                            </Badge>
-                          </Td>
-                          <Td color="white">₱{withdrawal.amount.toFixed(2)}</Td>
-                          <Td>
-                            <VStack align="start" spacing={1}>
-                              <Text color="white">{withdrawal.method}</Text>
+                        <Tr key={withdrawal._id} _hover={{ bg: "#2A3336" }} bg="#242C2E">
+                          <Td color="hsl(220, 14%, 90%)" verticalAlign="middle" px={4} py={3}>
+                            <VStack align="start" spacing={0}>
+                              <Text fontWeight="bold" fontSize="md" color="#FDB137">
+                                {withdrawal.agentId?.username || 'Unknown User'}
+                              </Text>
                               <Text fontSize="sm" color="hsl(220, 14%, 70%)">
-                                {withdrawal.accountNumber}
+                                {withdrawal.agentId?.email || 'N/A'}
                               </Text>
                             </VStack>
                           </Td>
-                          <Td color="white">
-                            {new Date(withdrawal.createdAt).toLocaleDateString()}
+                          <Td verticalAlign="middle" px={4} py={3}>
+                            <Badge 
+                              colorScheme={withdrawal.package === 1 ? 'blue' : 'purple'}
+                              fontSize="xs"
+                              px={2}
+                              py={1}
+                              borderRadius="md"
+                            >
+                              {withdrawal.package === 1 ? '12 Days' : '20 Days'}
+                            </Badge>
                           </Td>
-                          <Td>
+                          <Td color="#FDB137" fontWeight="bold" verticalAlign="middle" px={4} py={3}>
+                            ₱{withdrawal.amount?.toLocaleString(undefined, { minimumFractionDigits: 2 })}
+                          </Td>
+                          <Td verticalAlign="middle" px={4} py={3}>
+                            <VStack align="start" spacing={0}>
+                              <Text color="hsl(220, 14%, 90%)" fontSize="sm">
+                                {withdrawal.method || 'N/A'}
+                              </Text>
+                              <Text fontSize="xs" color="hsl(220, 14%, 70%)">
+                                {withdrawal.accountNumber || 'N/A'}
+                              </Text>
+                            </VStack>
+                          </Td>
+                          <Td color="hsl(220, 14%, 80%)" fontSize="sm" verticalAlign="middle" px={4} py={3}>
+                            {new Date(withdrawal.createdAt).toLocaleString()}
+                          </Td>
+                          <Td verticalAlign="middle" px={4} py={3}>
                             <Badge
                               colorScheme={getStatusColor(withdrawal.status)}
                               px={2}
                               py={1}
-                              borderRadius="full"
-                              textTransform="capitalize"
-                              fontSize="sm"
+                              borderRadius="md"
+                              textTransform="uppercase"
+                              fontSize="xs"
+                              width="100%"
+                              textAlign="center"
                             >
                               {withdrawal.status}
                             </Badge>
                           </Td>
-                          <Td>
+                          <Td verticalAlign="middle" px={4} py={3}>
                             {withdrawal.status === 'pending' ? (
-                              <HStack spacing={2}>
+                              <HStack spacing={2} justify="center">
                                 <Tooltip label="Approve Withdrawal" hasArrow>
                                   <Button
                                     size="sm"
+                                    colorScheme="green"
                                     leftIcon={<FaCheckCircle />}
                                     isLoading={loading && processingId === withdrawal._id}
                                     onClick={() => approveWithdrawal(withdrawal._id)}
-                                    bg="#FDB137"
-                                    color="#181E20"
-                                    _hover={{
-                                      bg: '#BD5301',
-                                      color: 'white'
-                                    }}
+                                    _hover={{ transform: 'translateY(-1px)' }}
+                                    transition="all 0.2s"
                                   >
                                     Approve
                                   </Button>
@@ -305,22 +408,26 @@ export default function SharedWithdrawal() {
                                 <Tooltip label="Reject Withdrawal" hasArrow>
                                   <Button
                                     size="sm"
+                                    variant="outline"
+                                    colorScheme="red"
                                     leftIcon={<FaTimesCircle />}
                                     isLoading={loading && processingId === withdrawal._id}
                                     onClick={() => rejectWithdrawal(withdrawal._id)}
-                                    bg="#FDB137"
-                                    color="#181E20"
-                                    _hover={{
-                                      bg: '#BD5301',
-                                      color: 'white'
-                                    }}
+                                    _hover={{ transform: 'translateY(-1px)' }}
+                                    transition="all 0.2s"
                                   >
                                     Reject
                                   </Button>
                                 </Tooltip>
                               </HStack>
                             ) : (
-                              <Text color="hsl(220, 14%, 70%)">-</Text>
+                              <Tooltip label={`Withdrawal ${withdrawal.status}`} hasArrow>
+                                <Box textAlign="center">
+                                  <Text color="hsl(220, 14%, 70%)" fontSize="sm">
+                                    {withdrawal.status === 'approved' ? 'Approved' : 'Rejected'}
+                                  </Text>
+                                </Box>
+                              </Tooltip>
                             )}
                           </Td>
                         </Tr>

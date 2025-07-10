@@ -42,11 +42,11 @@ const SidebarContent = ({ onClose, ...rest }) => {
     { name: 'Pending Registration', icon: FaUsers, href: '/admin/pending-registration' },
     { name: 'Load Shared Capital', icon: FaMoneyBillWave, href: '/admin/load-shared-capital' },
     { name: 'Earnings & Withdrawals', icon: FaMoneyBillWave, href: '/admin/earnings-withdrawals' },
-    { name: 'Earnings History', icon: FaHistory, href: '/admin/earning-history' },
     { name: 'Shared Capital Withdrawal', icon: FaExchangeAlt, href: '/admin/shared-withdrawal' },
-    { name: 'Shared Capital Withdrawal History', icon: FaClipboardList, href: '/admin/shared-history' },
     { name: 'Settings', icon: FaCog, href: '/admin/settings' },
   ];
+
+  const isMobile = typeof window !== 'undefined' && window.innerWidth < 768;
 
   return (
     <Box
@@ -74,45 +74,73 @@ const SidebarContent = ({ onClose, ...rest }) => {
       </Flex>
       <VStack spacing={2} align="stretch" height="calc(100vh - 80px)" overflowY="auto">
         {LinkItems.map((link) => (
-          <NavItem key={link.name} icon={link.icon} href={link.href}>
+          <NavItem
+            key={link.name}
+            icon={link.icon}
+            href={link.href}
+            onClose={onClose}
+            isMobile={isMobile}
+          >
             {link.name}
           </NavItem>
         ))}
-        <Spacer />
-        <Box px={4} pb={4}>
-          <Button
-            leftIcon={<FiLogOut />}
-            bg="transparent"
-            color="white"
-            width="full"
-            display="flex"
-            alignItems="center"
-            justifyContent="flex-start"
-            fontWeight="normal"
-            borderRadius="lg"
-            p={3}
-            _hover={{
-              bg: 'red.600',
-              color: 'white',
-            }}
-            transition="all 0.2s"
-            onClick={handleLogout}
-          >
-            Logout
-          </Button>
-        </Box>
+        <NavItem
+          icon={FiLogOut}
+          onClick={handleLogout}
+          asButton
+          onClose={onClose}
+          isMobile={isMobile}
+        >
+          Logout
+        </NavItem>
       </VStack>
     </Box>
   );
 };
 
-const NavItem = ({ icon, children, href, ...rest }) => {
+const NavItem = ({ icon, children, href, onClick, asButton, onClose, isMobile, ...rest }) => {
+  const handleNav = (e) => {
+    if (isMobile && onClose) onClose();
+    if (onClick) onClick(e);
+  };
+  if (asButton) {
+    return (
+      <Flex
+        align="center"
+        p="4"
+        mx="4"
+        borderRadius="lg"
+        role="group"
+        cursor="pointer"
+        color="white"
+        transition="all 0.2s"
+        _hover={{
+          bg: 'red.600',
+          color: 'white',
+        }}
+        onClick={handleNav}
+        style={{ userSelect: 'none' }}
+        {...rest}
+      >
+        {icon && (
+          <Icon
+            mr="4"
+            fontSize="16"
+            as={icon}
+            color="#FDB137"
+          />
+        )}
+        {children}
+      </Flex>
+    );
+  }
   return (
     <Link
       as={RouterLink}
       to={href}
       style={{ textDecoration: 'none' }}
       _focus={{ boxShadow: 'none' }}
+      onClick={handleNav}
     >
       <Flex
         align="center"

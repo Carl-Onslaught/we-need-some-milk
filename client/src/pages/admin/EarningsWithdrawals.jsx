@@ -32,7 +32,7 @@ import AdminLayout from '../../components/AdminLayout';
 import axios from 'axios';
 
 export default function EarningsWithdrawals() {
-  const [earnings, setEarnings] = useState({
+  const [withdrawals, setWithdrawals] = useState({
     directIndirect: [],
     clickEarnings: []
   });
@@ -40,37 +40,30 @@ export default function EarningsWithdrawals() {
   const toast = useToast();
 
   useEffect(() => {
-    fetchEarnings();
+    fetchWithdrawals();
   }, []);
 
-  const fetchEarnings = async () => {
+  const fetchWithdrawals = async () => {
+    setIsLoading(true);
     try {
-      // Fetch direct and indirect referral earnings, and click earnings
-      const [directRes, indirectRes, clicksRes] = await Promise.all([
-        axios.get('/api/admin/earnings/direct-referral', { withCredentials: true }),
-        axios.get('/api/admin/earnings/indirect-referral', { withCredentials: true }),
-        axios.get('/api/admin/earnings/clicks', { withCredentials: true })
+      // Fetch withdrawal requests by source
+      const [directRes, clickRes] = await Promise.all([
+        axios.get('/admin/withdrawals/by-source?source=direct_indirect', { withCredentials: true }),
+        axios.get('/admin/withdrawals/by-source?source=click_earnings', { withCredentials: true })
       ]);
-
-      // Merge direct and indirect referral data
-      const directIndirect = [
-        ...Array.isArray(directRes.data) ? directRes.data : [],
-        ...Array.isArray(indirectRes.data) ? indirectRes.data : []
-      ];
-
-      setEarnings({
-        directIndirect,
-        clickEarnings: Array.isArray(clicksRes.data) ? clicksRes.data : []
+      setWithdrawals({
+        directIndirect: Array.isArray(directRes.data) ? directRes.data : [],
+        clickEarnings: Array.isArray(clickRes.data) ? clickRes.data : []
       });
     } catch (error) {
       toast({
         title: 'Error',
-        description: error.response?.data?.message || 'Failed to fetch earnings data. Please try again.',
+        description: error.response?.data?.message || 'Failed to fetch withdrawal requests. Please try again.',
         status: 'error',
         duration: 5000,
         isClosable: true,
       });
-      setEarnings({
+      setWithdrawals({
         directIndirect: [],
         clickEarnings: []
       });
@@ -80,26 +73,72 @@ export default function EarningsWithdrawals() {
   };
 
   const handleRefresh = () => {
-    setIsLoading(true);
-    fetchEarnings();
+    fetchWithdrawals();
   };
 
-  const TransactionsTable = ({ data }) => {
-    const [filter, setFilter] = useState('all');
-    const [search, setSearch] = useState('');
+  const handleApprove = async (withdrawalId) => {
+    try {
+      await axios.post(`/admin/withdrawals/${withdrawalId}/approve`);
+      toast({
+        title: 'Success',
+        description: 'Withdrawal approved.',
+        status: 'success',
+        duration: 3000,
+      });
+      setWithdrawals(prev => ({
+        ...prev,
+        directIndirect: prev.directIndirect.filter(w => w._id !== withdrawalId),
+        clickEarnings: prev.clickEarnings.filter(w => w._id !== withdrawalId)
+      }));
+      fetchWithdrawals();
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error.response?.data?.message || 'Failed to approve withdrawal.',
+        status: 'error',
+        duration: 3000,
+      });
+    }
+  };
+
+  const handleReject = async (withdrawalId) => {
+    try {
+      await axios.post(`/admin/withdrawals/${withdrawalId}/reject`);
+      toast({
+        title: 'Success',
+        description: 'Withdrawal rejected.',
+        status: 'success',
+        duration: 3000,
+      });
+      setWithdrawals(prev => ({
+        ...prev,
+        directIndirect: prev.directIndirect.filter(w => w._id !== withdrawalId),
+        clickEarnings: prev.clickEarnings.filter(w => w._id !== withdrawalId)
+      }));
+      fetchWithdrawals();
+    } catch (error) {
+      toast({
+        title: 'Error',
+        description: error.response?.data?.message || 'Failed to reject withdrawal.',
+        status: 'error',
+        duration: 3000,
+      });
+    }
+  };
+
+  const WithdrawalsTable = ({ data }) => {
+    const [filter, setFilter] = useState('pending');
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 10;
 
     const filteredData = data.filter(item => {
       const matchesFilter = filter === 'all' || item.status === filter;
-      const matchesSearch = search === '' || 
-        item.user?.username?.toLowerCase().includes(search.toLowerCase());
-      return matchesFilter && matchesSearch;
+      return matchesFilter;
     });
 
     useEffect(() => {
       setCurrentPage(1);
-    }, [filter, search]);
+    }, [filter]);
 
     const totalPages = Math.ceil(filteredData.length / itemsPerPage);
     const paginatedData = filteredData.slice(
@@ -117,36 +156,22 @@ export default function EarningsWithdrawals() {
 
     return (
       <VStack spacing={4} align="stretch">
-        {data.length > 0 && (
-          <HStack spacing={4}>
-            <Input
-              placeholder="Search by username"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              maxW="300px"
-              bg="#242C2E"
-              color="white"
-              borderColor="#181E20"
-              _hover={{ borderColor: "#FDB137" }}
-              _focus={{ borderColor: "#FDB137", boxShadow: "0 0 0 1px #FDB137" }}
-            />
-            <Select
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              maxW="200px"
-              bg="#242C2E"
-              color="white"
-              borderColor="#181E20"
-              _hover={{ borderColor: "#FDB137" }}
-              _focus={{ borderColor: "#FDB137", boxShadow: "0 0 0 1px #FDB137" }}
-            >
-              <option value="all">All Status</option>
-              <option value="completed">Completed</option>
-              <option value="pending">Pending</option>
-              <option value="failed">Failed</option>
-            </Select>
-          </HStack>
-        )}
+        <HStack spacing={4}>
+          <Select
+            value={filter}
+            onChange={(e) => setFilter(e.target.value)}
+            maxW="200px"
+            bg="#181E20"
+            color="#FDB137"
+            borderColor="#FDB137"
+            _hover={{ borderColor: '#FDB137', bg: '#181E20', color: '#FDB137' }}
+            _focus={{ borderColor: '#FDB137', boxShadow: '0 0 0 1px #FDB137', bg: '#181E20', color: '#FDB137' }}
+          >
+            <option style={{ color: '#FDB137', background: '#181E20' }} value="pending">Pending</option>
+            <option style={{ color: '#FDB137', background: '#181E20' }} value="approved">Approved</option>
+            <option style={{ color: '#FDB137', background: '#181E20' }} value="rejected">Rejected</option>
+          </Select>
+        </HStack>
         <Box overflowX="auto" bg="#242C2E" borderRadius="lg" p={4}>
           <Table variant="simple">
             <Thead>
@@ -156,45 +181,64 @@ export default function EarningsWithdrawals() {
                 <Th color="#FDB137">STATUS</Th>
                 <Th color="#FDB137">PAYMENT METHOD</Th>
                 <Th color="#FDB137">DATE</Th>
+                <Th color="#FDB137">ACTIONS</Th>
               </Tr>
             </Thead>
             <Tbody>
               {paginatedData.length === 0 ? (
                 <Tr>
                   <Td colSpan={5} textAlign="center" color="#FDB137">
-                    No transactions found
+                    No withdrawal requests found
                   </Td>
                 </Tr>
               ) : (
                 paginatedData.map((item) => (
-                  <Tr key={item._id} _hover={{ bg: "#162520" }} bg="#22332F">
+                  <Tr key={item._id} _hover={{ bg: "#162520" }} bg="#242C2E">
                     <Td>
-                      <Text color="white">{item.user?.username}</Text>
-                      <Text fontSize="sm" color="#A7EFC5">{item.user?.email}</Text>
+                      <Text color="white">{item.agentId?.username}</Text>
+                      <Text fontSize="sm" color="#A7EFC5">{item.agentId?.email}</Text>
                     </Td>
                     <Td color="white">₱{item.amount?.toFixed(2)}</Td>
                     <Td>
                       <Badge
                         colorScheme={
                           item.status === 'completed' ? 'green' :
-                          item.status === 'pending' ? 'yellow' : 'red'
+                          item.status === 'pending' ? 'yellow' :
+                          item.status === 'approved' ? 'blue' : 'red'
                         }
                       >
                         {item.status.toUpperCase()}
                       </Badge>
                     </Td>
                     <Td>
-                      {item.withdrawal ? (
-                        <Box>
-                          <Text color="white">{item.withdrawal.method}</Text>
-                          <Text fontSize="sm" color="#FDB137">{item.withdrawal.accountNumber}</Text>
-                        </Box>
-                      ) : (
-                        <Text color="#FDB137">-</Text>
-                      )}
+                      <VStack align="start" spacing={1}>
+                        <Text color="white">{item.method?.toUpperCase() || '-'}</Text>
+                        <Text fontSize="sm" color="#FDB137">{item.accountNumber || ''}</Text>
+                        <Text fontSize="sm" color="#FDB137">{item.accountName || ''}</Text>
+                      </VStack>
                     </Td>
                     <Td color="white">
                       {new Date(item.createdAt).toLocaleDateString()}
+                    </Td>
+                    <Td>
+                      {item.status === 'pending' && (
+                        <HStack spacing={2}>
+                          <Button
+                            size="sm"
+                            colorScheme="green"
+                            onClick={() => handleApprove(item._id)}
+                          >
+                            Approve
+                          </Button>
+                          <Button
+                            size="sm"
+                            colorScheme="red"
+                            onClick={() => handleReject(item._id)}
+                          >
+                            Reject
+                          </Button>
+                        </HStack>
+                      )}
                     </Td>
                   </Tr>
                 ))
@@ -223,8 +267,8 @@ export default function EarningsWithdrawals() {
                 onClick={() => setCurrentPage(i + 1)}
                 variant={currentPage === i + 1 ? 'solid' : 'ghost'}
                 bg="#FDB137"
-              color="#181E20"
-              _hover={{ bg: '#BD5301', color: 'white' }}
+                color="#181E20"
+                _hover={{ bg: '#BD5301', color: 'white' }}
               >
                 {i + 1}
               </Button>
@@ -253,7 +297,7 @@ export default function EarningsWithdrawals() {
           <HStack justify="space-between" align="center">
             <VStack align="start" spacing={1}>
               <Heading size="lg" color="white">Earnings & Withdrawals</Heading>
-              <Text color="hsl(220, 14%, 70%)">View and manage all earnings and withdrawal transactions</Text>
+              <Text color="hsl(220, 14%, 70%)">View and manage all agent withdrawal requests by source</Text>
             </VStack>
             <Tooltip label="Refresh data" hasArrow>
               <IconButton
@@ -269,27 +313,15 @@ export default function EarningsWithdrawals() {
           </HStack>
           <Tabs variant="line">
             <TabList borderBottomColor="#181E20">
-              <Tab color="#E0E0E0" _selected={{ color: 'white', borderColor: '#FDB137', bg: '#242C2E' }}>Direct/Indirect</Tab>
+              <Tab color="#E0E0E0" _selected={{ color: 'white', borderColor: '#FDB137', bg: '#242C2E' }}>Referral Earnings (Direct/Indirect)</Tab>
               <Tab color="#E0E0E0" _selected={{ color: 'white', borderColor: '#FDB137', bg: '#242C2E' }}>Click Earnings</Tab>
             </TabList>
             <TabPanels>
               <TabPanel p={0}>
-                <Box mb={2} p={4} bg="#242C2E" borderRadius="md" borderWidth="1px" borderColor="#181E20">
-                  <Text color="#FDB137" fontWeight="bold">
-                    Total Commission Balance: ₱
-                    {earnings.directIndirect.reduce((sum, item) => sum + (item.amount || 0), 0).toFixed(2)}
-                  </Text>
-                </Box>
-                <TransactionsTable data={earnings.directIndirect} />
+                <WithdrawalsTable data={withdrawals.directIndirect} />
               </TabPanel>
               <TabPanel p={0}>
-                <Box mb={2} p={4} bg="#242C2E" borderRadius="md" borderWidth="1px" borderColor="#181E20">
-                  <Text color="#FDB137" fontWeight="bold">
-                    Total Commission Balance: ₱
-                    {earnings.clickEarnings.reduce((sum, item) => sum + (item.amount || 0), 0).toFixed(2)}
-                  </Text>
-                </Box>
-                <TransactionsTable data={earnings.clickEarnings} />
+                <WithdrawalsTable data={withdrawals.clickEarnings} />
               </TabPanel>
             </TabPanels>
           </Tabs>

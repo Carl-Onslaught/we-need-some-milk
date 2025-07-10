@@ -3,8 +3,10 @@ const protocol = window.location.protocol;
 const hostname = window.location.hostname;
 const port = 5001; // Server port
 
-export const API_URL = import.meta.env.VITE_API_URL || 'https://wealth-click-website.onrender.com/api';
-export const BASE_URL = 'https://wealth-click-website.onrender.com';
+export const API_URL = import.meta.env.VITE_API_URL;
+if (!API_URL) {
+  throw new Error('VITE_API_URL is not set! Please create a .env file in the client directory with VITE_API_URL=http://localhost:5001/api');
+}
 
 // For development, allow both localhost and network access
 if (process.env.NODE_ENV === 'development') {

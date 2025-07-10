@@ -16,15 +16,23 @@ const packageSchema = new mongoose.Schema({
 }, { _id: false });
 
 const settingsSchema = new mongoose.Schema({
+    // Amount earned per click in pesos
     clickReward: {
         type: Number,
         required: true,
-        default: 1
+        default: 0.20
     },
+    // Maximum click earnings a user can accrue per day (in pesos)
+    dailyClickCap: {
+        type: Number,
+        required: true,
+        default: 10
+    },
+    // Direct registration referral bonus in pesos (10% of registration fee)
     referralBonus: {
         type: Number,
         required: true,
-        default: 50
+        default: 10
     },
     minimumWithdrawal: {
         type: Number,
@@ -35,6 +43,17 @@ const settingsSchema = new mongoose.Schema({
         type: Number,
         required: true,
         default: 0.5
+    },
+    // Referral percentages for shared-capital purchases
+    sharedCapReferralRates: {
+        type: Map,
+        of: Number,
+        default: {
+            direct: 0.05,
+            level2: 0.02,
+            level3: 0.02,
+            level4: 0.01
+        }
     },
     packages: {
         type: Map,

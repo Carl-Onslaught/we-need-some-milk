@@ -29,7 +29,7 @@ import axios from 'axios';
 const EarningHistory = () => {
   const [withdrawals, setWithdrawals] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [filter, setFilter] = useState('all');
+  const [filter, setFilter] = useState('pending');
   const [search, setSearch] = useState('');
   const toast = useToast();
   const [currentPage, setCurrentPage] = useState(1);
@@ -44,7 +44,7 @@ const EarningHistory = () => {
 
   const fetchWithdrawals = async () => {
     try {
-      const response = await axios.get('/api/admin/earnings/withdrawals');
+      const response = await axios.get('/admin/earnings/withdrawals');
       setWithdrawals(response.data);
     } catch (error) {
       toast({
@@ -61,7 +61,7 @@ const EarningHistory = () => {
 
   const handleWithdrawalAction = async (id, action) => {
     try {
-      await axios.post(`/api/admin/withdrawals/${id}/${action}`);
+      await axios.post(`/admin/withdrawals/${id}/${action}`);
       toast({
         title: 'Success',
         description: `Withdrawal ${action}ed successfully`,
@@ -95,12 +95,11 @@ const EarningHistory = () => {
   };
 
   const filteredWithdrawals = withdrawals.filter(w => {
-    // Only show approved/completed withdrawals
-    const isApproved = w.status === 'approved' || w.status === 'completed';
+    const matchesStatus = filter === 'all' || w.status === filter;
     const matchesSearch = search === '' || 
       w.user.username.toLowerCase().includes(search.toLowerCase()) ||
       w.user.email.toLowerCase().includes(search.toLowerCase());
-    return isApproved && matchesSearch;
+    return matchesStatus && matchesSearch;
   });
 
   // Pagination logic
@@ -140,16 +139,15 @@ const EarningHistory = () => {
                 value={filter}
                 onChange={(e) => setFilter(e.target.value)}
                 maxW="200px"
-                bg="#181E20"
-                color="white"
-                borderColor="#181E20"
-                _hover={{ borderColor: "#FDB137" }}
-                _focus={{ borderColor: "#FDB137", boxShadow: "0 0 0 1px #FDB137" }}
+                bg="#FDB137"
+                color="#181E20"
+                borderColor="#FDB137"
+                _hover={{ borderColor: '#FDB137', bg: '#181E20', color: '#FDB137' }}
+                _focus={{ borderColor: '#FDB137', boxShadow: '0 0 0 1px #FDB137', bg: '#181E20', color: '#FDB137' }}
               >
-                <option value="all">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="approved">Approved</option>
-                <option value="rejected">Rejected</option>
+                <option style={{ color: '#181E20', background: '#FDB137' }} value="pending">Pending</option>
+                <option style={{ color: '#181E20', background: '#FDB137' }} value="approved">Approved</option>
+                <option style={{ color: '#181E20', background: '#FDB137' }} value="rejected">Rejected</option>
               </Select>
             </HStack>
 
@@ -210,7 +208,15 @@ const EarningHistory = () => {
                         <Td color="white">
                           {new Date(withdrawal.createdAt).toLocaleDateString()}
                         </Td>
-                        <Td color="white">{withdrawal.source === 'direct_indirect' ? 'Direct/Indirect' : withdrawal.source === 'click_earnings' ? 'Click Earnings' : '-'}</Td>
+                        <Td color="white">{
+                          withdrawal.source === 'direct_indirect'
+                            ? 'Referral Earnings (Direct/Indirect)'
+                            : withdrawal.source === 'click_earnings'
+                            ? 'Click Earnings'
+                            : withdrawal.source === 'shared_capital'
+                            ? 'Shared Capital'
+                            : '-'
+                        }</Td>
                         <Td>
                           {withdrawal.status === 'pending' && (
                             <HStack spacing={2}>

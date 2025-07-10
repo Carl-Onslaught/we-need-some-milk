@@ -65,7 +65,7 @@ export default function Settings() {
 
   const fetchSettings = async () => {
     try {
-      const response = await axios.get('/api/admin/settings');
+      const response = await axios.get('/admin/settings');
       const fetchedSettings = response.data;
       setSettings({
         ...fetchedSettings,
@@ -90,7 +90,7 @@ export default function Settings() {
     setSaving(true);
 
     try {
-      await axios.put('/api/admin/settings', settings);
+      await axios.put('/admin/settings', settings);
       
       toast({
         title: 'Success',
