@@ -56,7 +56,6 @@ export default function Settings() {
   });
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [newPaymentMethod, setNewPaymentMethod] = useState('');
   const toast = useToast();
 
   useEffect(() => {
@@ -130,28 +129,6 @@ export default function Settings() {
           [field]: parseFloat(value) || 0
         }
       }
-    }));
-  };
-
-  const emptyPaymentMethod = { name: '', accountName: '', accountNumber: '', qr: '', details: '' };
-
-  const handleAddPaymentMethod = () => {
-    setSettings(prev => ({
-      ...prev,
-      paymentMethods: [...prev.paymentMethods, { 
-        name: 'New Method',
-        accountName: 'Default Account',
-        accountNumber: '0000000000',
-        qr: '',
-        details: ''
-      }]
-    }));
-  };
-
-  const handleRemovePaymentMethod = (idx) => {
-    setSettings(prev => ({
-      ...prev,
-      paymentMethods: prev.paymentMethods.filter((_, i) => i !== idx)
     }));
   };
 
@@ -379,7 +356,16 @@ export default function Settings() {
                     Payment Methods
                   </Heading>
                   <VStack spacing={4} align="stretch">
-                    <Button onClick={handleAddPaymentMethod} leftIcon={<FaPlus />} bg="#FDB137" color="#181E20" _hover={{ bg: '#BD5301', color: 'white' }} _active={{ bg: '#FDB137', color: '#181E20' }} alignSelf="flex-start">
+                    <Button onClick={() => setSettings(prev => ({
+                      ...prev,
+                      paymentMethods: [...prev.paymentMethods, { 
+                        name: 'New Method',
+                        accountName: 'Default Account',
+                        accountNumber: '0000000000',
+                        qr: '',
+                        details: ''
+                      }]
+                    }))} leftIcon={<FaPlus />} bg="#FDB137" color="#181E20" _hover={{ bg: '#BD5301', color: 'white' }} _active={{ bg: '#FDB137', color: '#181E20' }} alignSelf="flex-start">
                       Add Payment Method
                     </Button>
                     <SimpleGrid columns={{ base: 1, md: 2, lg: 3 }} spacing={4}>
@@ -394,7 +380,10 @@ export default function Settings() {
                                 bg="transparent"
                                 color="#FDB137"
                                 _hover={{ bg: '#BD5301', color: 'white' }}
-                                onClick={() => handleRemovePaymentMethod(idx)}
+                                onClick={() => setSettings(prev => ({
+                                  ...prev,
+                                  paymentMethods: prev.paymentMethods.filter((_, i) => i !== idx)
+                                }))}
                                 aria-label="Remove payment method"
                               />
                             </HStack>

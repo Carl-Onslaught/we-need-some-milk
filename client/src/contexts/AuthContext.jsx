@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { API_URL } from '../config';
 
@@ -22,7 +21,6 @@ export const useAuth = () => {
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
-  const navigate = useNavigate();
 
   // Initialize axios defaults
   useEffect(() => {
@@ -88,9 +86,9 @@ export const AuthProvider = ({ children }) => {
 
       // Redirect based on user role
       if (data.user.role === 'admin') {
-        navigate('/admin');
+        // navigate('/admin'); // Removed useNavigate
       } else if (data.user.role === 'agent') {
-        navigate('/agent');
+        // navigate('/agent'); // Removed useNavigate
       }
 
       return data;
@@ -117,7 +115,7 @@ export const AuthProvider = ({ children }) => {
   const logout = () => {
     localStorage.removeItem('token');
     setUser(null);
-    navigate('/');
+    // navigate('/'); // Removed useNavigate
   };
 
   const value = {

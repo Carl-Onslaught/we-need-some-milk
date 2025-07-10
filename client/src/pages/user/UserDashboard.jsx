@@ -9,13 +9,11 @@ import {
   StatLabel,
   StatNumber,
   StatHelpText,
-  useColorModeValue,
 } from '@chakra-ui/react';
 import { useAuth } from '../../contexts/AuthContext';
 
 function UserDashboard() {
   const { user } = useAuth();
-  const bgColor = useColorModeValue('white', 'gray.700');
 
   return (
     <Container maxW="container.xl" py={8}>
@@ -26,7 +24,7 @@ function UserDashboard() {
         </Box>
 
         <SimpleGrid columns={{ base: 1, md: 3 }} spacing={6}>
-          <Box p={6} bg={bgColor} borderRadius="lg" boxShadow="sm">
+          <Box p={6} bg="white" borderRadius="lg" boxShadow="sm">
             <Stat>
               <StatLabel>Balance</StatLabel>
               <StatNumber>₱{user?.balance || 0}</StatNumber>
@@ -34,7 +32,7 @@ function UserDashboard() {
             </Stat>
           </Box>
 
-          <Box p={6} bg={bgColor} borderRadius="lg" boxShadow="sm">
+          <Box p={6} bg="white" borderRadius="lg" boxShadow="sm">
             <Stat>
               <StatLabel>Referral Code</StatLabel>
               <StatNumber fontSize="2xl">{user?.referralCode || 'N/A'}</StatNumber>
@@ -42,7 +40,7 @@ function UserDashboard() {
             </Stat>
           </Box>
 
-          <Box p={6} bg={bgColor} borderRadius="lg" boxShadow="sm">
+          <Box p={6} bg="white" borderRadius="lg" boxShadow="sm">
             <Stat>
               <StatLabel>Referral Earnings</StatLabel>
               <StatNumber>₱{user?.referralEarnings?.total || 0}</StatNumber>

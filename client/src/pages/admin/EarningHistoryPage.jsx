@@ -1,4 +1,3 @@
-import { Box, Container, Heading, Text, VStack } from '@chakra-ui/react';
 import AdminLayout from '../../components/AdminLayout';
 import EarningHistory from '../../components/admin/EarningHistory';
 
