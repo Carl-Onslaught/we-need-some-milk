@@ -131,6 +131,7 @@ services:
       - ../certbot/www:/var/www
       - ../certbot/conf/live:/etc/letsencrypt/live
       - ../certbot/conf/archive:/etc/letsencrypt/archive
+    command: ["nginx", "-g", "daemon off;"]
     networks:
       - wc_net
 
