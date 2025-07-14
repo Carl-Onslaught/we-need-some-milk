@@ -40,7 +40,7 @@ const io = require('socket.io')(server, {
   cors: {
     origin: [
       'http://localhost:5173',
-      'https://your-production-domain.com' // TODO: Change this to your actual frontend domain before deploying
+      `https://${process.env.DOMAIN_NAME}` // TODO: Change this to your actual frontend domain before deploying
     ],
     methods: ['GET', 'POST'],
     credentials: true,
@@ -85,7 +85,7 @@ console.log('Express app and WebSocket server created.');
 app.use(cors({
   origin: [
     'http://localhost:5173',
-    'https://your-production-domain.com' // TODO: Change this to your actual frontend domain before deploying
+    `https://${process.env.DOMAIN_NAME}` // TODO: Change this to your actual frontend domain before deploying
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
