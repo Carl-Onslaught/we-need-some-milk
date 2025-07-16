@@ -7,6 +7,7 @@ const User = require('../models/User');
 const Package = require('../models/Package');
 const SharedCapitalTransaction = require('../models/sharedCapitalTransaction');
 const Transaction = require('../models/Transaction');
+const { getSettings } = require('../utils/settingsService');
 
 // Protected routes - require authentication
 router.use(auth);
@@ -106,26 +107,22 @@ router.post('/packages/activate', auth, async (req, res) => {
       return res.status(400).json({ message: 'Insufficient balance' });
     }
 
-    // Package configurations
-    const packageConfigs = {
-      1: { // Package 1
-        minimum: 100,
-        duration: 12, // days
-        incomeRate: 0.20, // 20%
-        dailyIncomeRate: 0.20 / 12 // Daily rate for 12 days
-      },
-      2: { // Package 2
-        minimum: 500,
-        duration: 20, // days
-        incomeRate: 0.50, // 50%
-        dailyIncomeRate: 0.50 / 20 // Daily rate for 20 days
-      }
-    };
+    // Fetch dynamic package configurations from Settings
+    const settings = await getSettings();
+    const packagesMap = settings.packages instanceof Map ? Object.fromEntries(settings.packages) : settings.packages;
+    const pkgKey = `package${packageId}`;
+    const pkgSettings = packagesMap[pkgKey];
 
-    const packageConfig = packageConfigs[packageId];
-    if (!packageConfig) {
+    if (!pkgSettings) {
       return res.status(400).json({ message: 'Invalid package ID' });
     }
+
+    const packageConfig = {
+      minimum: pkgSettings.amount,
+      duration: pkgSettings.duration,
+      incomeRate: pkgSettings.income / 100,
+      dailyIncomeRate: (pkgSettings.income / 100) / pkgSettings.duration
+    };
 
     // Validate minimum amount
     if (amount < packageConfig.minimum) {

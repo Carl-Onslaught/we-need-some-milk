@@ -100,21 +100,8 @@ const PendingRegistrations = () => {
     }
   };
 
-  const filteredRegistrations = pendingRegistrations.filter(reg => {
-    const searchValue = searchTerm.toLowerCase();
-    switch (searchField) {
-      case 'username':
-        return reg.username.toLowerCase().includes(searchValue);
-      case 'email':
-        return reg.email.toLowerCase().includes(searchValue);
-      case 'referrer':
-        return reg.referrer?.toLowerCase().includes(searchValue);
-      case 'date':
-        return new Date(reg.createdAt).toLocaleDateString().includes(searchValue);
-      default:
-        return true;
-    }
-  });
+  const filteredRegistrations = pendingRegistrations; // filtering disabled
+
 
   const paginatedRegistrations = filteredRegistrations.slice(
     (currentPage - 1) * 10,
@@ -129,8 +116,8 @@ const PendingRegistrations = () => {
             Pending Registrations
           </Heading>
           
-          <Flex mb={6} gap={4} direction={{ base: 'column', md: 'row' }}>
-            <Select
+
+            {/* <Select
               value={searchField}
               onChange={(e) => setSearchField(e.target.value)}
               bg="#242C2E"
@@ -160,9 +147,7 @@ const PendingRegistrations = () => {
                 _hover={{ borderColor: '#FDB137' }}
                 _focus={{ borderColor: '#FDB137', boxShadow: '0 0 0 1px #FDB137' }}
               />
-            </InputGroup>
-          </Flex>
-
+            */} 
           <Text color="#E0E0E0" mb={4}>
             Found {filteredRegistrations.length} results
           </Text>

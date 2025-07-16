@@ -38,7 +38,6 @@ import {
   FaSearch, 
   FaFilter, 
   FaCheckCircle, 
-  FaTimesCircle, 
   FaChevronLeft, 
   FaChevronRight 
 } from 'react-icons/fa';
@@ -46,18 +45,17 @@ import {
 export default function SharedWithdrawal() {
   const [withdrawals, setWithdrawals] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [searchEmail, setSearchEmail] = useState('');
-  const [filter, setFilter] = useState('all');
+
+  const [filter, setFilter] = useState('pending');
   const [processingId, setProcessingId] = useState(null);
   const toast = useToast();
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const filteredWithdrawals = withdrawals.filter(withdrawal => {
-    // Only show pending withdrawals
-    const matchesSearch = !searchEmail || 
-      (withdrawal.agentId?.username || '').toLowerCase().includes(searchEmail.toLowerCase());
-    return matchesSearch;
+  const filteredWithdrawals = withdrawals.filter(w => {
+    if (filter === 'pending') return w.status === 'pending';
+    if (filter === 'approved') return w.status === 'approved' || w.status === 'completed';
+    return true;
   });
 
   // Calculate paginated withdrawals
@@ -70,7 +68,7 @@ export default function SharedWithdrawal() {
   // Reset to first page when filter/search changes
   useEffect(() => {
     setCurrentPage(1);
-  }, [filter, searchEmail]);
+  }, [filter]);
 
   const getStatusColor = (status) => {
     switch (status) {
@@ -131,37 +129,9 @@ export default function SharedWithdrawal() {
     }
   };
 
-  const rejectWithdrawal = async (withdrawalId, reason) => {
-    setProcessingId(withdrawalId);
-    setLoading(true);
-    try {
-      const response = await axios.post(`/admin/withdrawals/shared/${withdrawalId}/reject`, { reason });
-      toast({
-        title: 'Success',
-        description: 'Withdrawal rejected and moved to history',
-        status: 'success',
-        duration: 3000,
-      });
-      // Remove the rejected withdrawal from the list
-      setWithdrawals(withdrawals.filter(w => w._id !== withdrawalId));
-      fetchPendingWithdrawals();
-    } catch (error) {
-      toast({
-        title: 'Error rejecting withdrawal',
-        description: error.response?.data?.message || 'Something went wrong',
-        status: 'error',
-        duration: 3000,
-      });
-    } finally {
-      setLoading(false);
-      setProcessingId(null);
-    }
-  };
-
   useEffect(() => {
     fetchPendingWithdrawals();
   }, []);
-
 
 
   const getTotalAmount = () => {
@@ -241,31 +211,6 @@ export default function SharedWithdrawal() {
           <CardBody>
             <VStack spacing={6} align="stretch">
               <HStack spacing={4} width="full" flexWrap={{ base: "wrap", md: "nowrap" }}>
-                <FormControl maxW={{ base: "full", md: "300px" }}>
-                  <InputGroup>
-                    <InputLeftElement pointerEvents="none">
-                      <FaSearch color="#FDB137" />
-                    </InputLeftElement>
-                    <Input
-                      id="search-username"
-                      name="searchUsername"
-                      placeholder="Search by username"
-                      value={searchEmail}
-                      onChange={(e) => setSearchEmail(e.target.value)}
-                      bg="#242C2E"
-                      color="hsl(220, 14%, 90%)"
-                      borderColor="#181E20"
-                      _placeholder={{ color: 'hsl(220, 14%, 50%)' }}
-                      _hover={{ borderColor: "#FDB137" }}
-                      _focus={{ 
-                        borderColor: "#FDB137", 
-                        boxShadow: "0 0 0 1px #FDB137",
-                        bg: '#242C2E',
-                        color: 'hsl(220, 14%, 90%)'
-                      }}
-                    />
-                  </InputGroup>
-                </FormControl>
 
                 <FormControl maxW={{ base: "full", md: "200px" }}>
                   <HStack spacing={2}>
@@ -299,10 +244,10 @@ export default function SharedWithdrawal() {
                         }
                       }}
                     >
-                      <option value="all">All Status</option>
+                      
                       <option value="pending">Pending</option>
                       <option value="approved">Approved</option>
-                      <option value="rejected">Rejected</option>
+                      
                     </Select>
                   </HStack>
                 </FormControl>
@@ -391,43 +336,20 @@ export default function SharedWithdrawal() {
                           </Td>
                           <Td verticalAlign="middle" px={4} py={3}>
                             {withdrawal.status === 'pending' ? (
-                              <HStack spacing={2} justify="center">
-                                <Tooltip label="Approve Withdrawal" hasArrow>
-                                  <Button
+                              <Button
                                     size="sm"
                                     colorScheme="green"
                                     leftIcon={<FaCheckCircle />}
                                     isLoading={loading && processingId === withdrawal._id}
                                     onClick={() => approveWithdrawal(withdrawal._id)}
                                     _hover={{ transform: 'translateY(-1px)' }}
-                                    transition="all 0.2s"
                                   >
                                     Approve
                                   </Button>
-                                </Tooltip>
-                                <Tooltip label="Reject Withdrawal" hasArrow>
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    colorScheme="red"
-                                    leftIcon={<FaTimesCircle />}
-                                    isLoading={loading && processingId === withdrawal._id}
-                                    onClick={() => rejectWithdrawal(withdrawal._id)}
-                                    _hover={{ transform: 'translateY(-1px)' }}
-                                    transition="all 0.2s"
-                                  >
-                                    Reject
-                                  </Button>
-                                </Tooltip>
-                              </HStack>
                             ) : (
-                              <Tooltip label={`Withdrawal ${withdrawal.status}`} hasArrow>
-                                <Box textAlign="center">
-                                  <Text color="hsl(220, 14%, 70%)" fontSize="sm">
-                                    {withdrawal.status === 'approved' ? 'Approved' : 'Rejected'}
-                                  </Text>
-                                </Box>
-                              </Tooltip>
+                              <Text color="hsl(220, 14%, 70%)" fontSize="sm">
+                                {withdrawal.status === 'approved' ? 'Approved' : 'Rejected'}
+                              </Text>
                             )}
                           </Td>
                         </Tr>

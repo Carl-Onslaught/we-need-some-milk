@@ -6,6 +6,7 @@ const Agent = require('../models/Agent');
 const Package = require('../models/Package');
 const catchAsync = require('../utils/catchAsync');
 const SharedCapitalTransaction = require('../models/sharedCapitalTransaction');
+const mongoose = require('mongoose');
 
 // Get agent's earnings and stats
 exports.getEarnings = async (req, res) => {
@@ -674,9 +675,10 @@ exports.claimPackage = async (req, res) => {
             return res.status(400).json({ message: 'Package has already been claimed' });
         }
 
-        // Calculate total interest earned (without principal)
+        // Calculate total earnings = principal + interest
         const totalDays = pkg.packageType === 1 ? 12 : 20;
         const interestEarned = parseFloat((pkg.dailyIncome * totalDays).toFixed(2));
+        const totalEarnings = parseFloat((pkg.amount + interestEarned).toFixed(2));
 
         // Get user within the transaction
         const user = await User.findById(req.user._id).session(session);
@@ -691,18 +693,18 @@ exports.claimPackage = async (req, res) => {
         pkg.claimedAt = now;
         await pkg.save({ session });
 
-        // Add only the interest to sharedEarnings
-        user.sharedEarnings = parseFloat(((user.sharedEarnings || 0) + interestEarned).toFixed(2));
+        // Credit principal + interest to Shared Capital Earnings
+        user.sharedEarnings = parseFloat(((user.sharedEarnings || 0) + totalEarnings).toFixed(2));
         await user.save({ session });
 
         // Create transaction record
         await SharedCapitalTransaction.create([{
             user: req.user._id,
             type: 'earning',
-            amount: interestEarned,
+            amount: totalEarnings,
             package: `Package ${pkg.packageType}`,
             status: 'completed',
-            description: `Earned ₱${interestEarned.toFixed(2)} from Package ${pkg.packageType}`,
+            description: `Claimed Package ${pkg.packageType}: principal ₱${pkg.amount.toLocaleString()} + interest ₱${interestEarned.toLocaleString()}`,
             createdAt: now
         }], { session });
 
@@ -728,7 +730,9 @@ exports.claimPackage = async (req, res) => {
         res.json({
             success: true,
             message: 'Package claimed successfully',
-            amount: interestEarned,
+            total: totalEarnings,
+            principal: pkg.amount,
+            interest: interestEarned,
             packageType: pkg.packageType,
             claimDate: now
         });

@@ -22,7 +22,7 @@ import {
   Image,
 } from '@chakra-ui/react';
 import { FaPercent, FaMoneyBill, FaPlus, FaTrash } from 'react-icons/fa';
-import axios from 'axios';
+import api from '../../services/api';
 import AdminLayout from '../../components/AdminLayout';
 import { useAuth } from '../../contexts/AuthContext';
 
@@ -64,7 +64,7 @@ export default function Settings() {
 
   const fetchSettings = async () => {
     try {
-      const response = await axios.get('/admin/settings');
+      const response = await api.get('/admin/settings');
       const fetchedSettings = response.data;
       setSettings({
         ...fetchedSettings,
@@ -89,7 +89,7 @@ export default function Settings() {
     setSaving(true);
 
     try {
-      await axios.put('/admin/settings', settings);
+      await api.put('/admin/settings', settings);
       
       toast({
         title: 'Success',

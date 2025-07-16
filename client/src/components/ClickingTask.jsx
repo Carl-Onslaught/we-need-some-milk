@@ -39,7 +39,7 @@ const ClickingTask = ({ onEarn, dailyClicks = 0, dailyEarnings = 0, maxClicks = 
           display="flex"
           justifyContent="center"
         >
-          <GoldCoin onEarn={onEarn} />
+          <GoldCoin onEarn={onEarn} dailyClicks={dailyClicks} maxClicks={maxClicks} />
         </Box>
         
         <VStack spacing={1} mt={2}>

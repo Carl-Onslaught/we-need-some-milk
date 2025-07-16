@@ -2,17 +2,14 @@ const User = require('../models/User');
 const Transaction = require('../models/Transaction');
 const { getSettings } = require('../utils/settingsService');
 
-// These values are fetched from Settings at runtime (cached).
-let CLICK_REWARD = 0.20;
-let MAX_DAILY_EARNINGS = 10;
-let MAX_CLICKS = 50;
-
-(async () => {
+// Helper to obtain latest settings (cached inside settingsService for 60s)
+async function loadRuntimeSettings() {
   const settings = await getSettings();
-  CLICK_REWARD = settings.clickReward;
-  MAX_DAILY_EARNINGS = settings.dailyClickCap;
-  MAX_CLICKS = Math.floor(MAX_DAILY_EARNINGS / CLICK_REWARD);
-})();
+  const CLICK_REWARD = settings.clickReward;
+  const MAX_DAILY_EARNINGS = settings.dailyClickCap;
+  const MAX_CLICKS = Math.floor(MAX_DAILY_EARNINGS / CLICK_REWARD);
+  return { CLICK_REWARD, MAX_DAILY_EARNINGS, MAX_CLICKS };
+}
 
 // Helper function to check if daily clicks should be reset
 const shouldResetDailyClicks = (lastReset) => {
@@ -25,6 +22,8 @@ const shouldResetDailyClicks = (lastReset) => {
 
 // Record a click
 exports.recordClick = async (req, res) => {
+  // always use latest settings
+  const { CLICK_REWARD, MAX_CLICKS } = await loadRuntimeSettings();
   try {
     const user = req.user;
 
@@ -65,10 +64,13 @@ exports.recordClick = async (req, res) => {
       transaction.save()
     ]);
 
+    const dailyEarnings = user.dailyClicks.count * CLICK_REWARD;
     res.json({
       message: 'Click recorded successfully',
       reward: CLICK_REWARD,
       dailyClicks: user.dailyClicks.count,
+      clicks: user.dailyClicks.count, // backward-compat
+      dailyEarnings,
       maxClicks: MAX_CLICKS,
       balance: user.balance
     });
@@ -80,6 +82,7 @@ exports.recordClick = async (req, res) => {
 
 // Get click statistics
 exports.getClickStats = async (req, res) => {
+  const { MAX_CLICKS, MAX_DAILY_EARNINGS } = await loadRuntimeSettings();
   try {
     const user = req.user;
 

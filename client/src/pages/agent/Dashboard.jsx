@@ -180,6 +180,8 @@ export default function Dashboard() {
   const [isLoading, setIsLoading] = useState(true);
   const [dailyClicks, setDailyClicks] = useState(0);
   const [dailyEarnings, setDailyEarnings] = useState(0);
+  const [maxClicks, setMaxClicks] = useState(50);
+  const [maxReward, setMaxReward] = useState(10);
   const toast = useToast();
 
   useEffect(() => {
@@ -187,6 +189,20 @@ export default function Dashboard() {
   }, []);
 
   const fetchData = async () => {
+    // also fetch public settings
+    let settings;
+    try {
+      const resSettings = await axios.get('/settings'); // new public endpoint
+      settings = resSettings.data;
+      if (settings) {
+        const clickReward = settings.clickReward || 0.2;
+        const dailyCap = settings.dailyClickCap || 10;
+        setMaxReward(clickReward * dailyCap);
+        setMaxClicks(dailyCap);
+      }
+    } catch (err) {
+      console.error('Could not fetch settings', err);
+    }
     try {
       setIsLoading(true);
       const [statsRes, packagesRes, userRes] = await Promise.all([
@@ -282,7 +298,7 @@ export default function Dashboard() {
       
       toast({
         title: 'Package Claimed',
-        description: `Successfully claimed ₱${response.data.amount.toLocaleString()}`,
+        description: `Claimed ₱${response.data.total.toLocaleString()} (₱${response.data.principal.toLocaleString()} principal + ₱${response.data.interest.toLocaleString()} interest)`,
         status: 'success',
         duration: 5000,
         isClosable: true,
@@ -311,6 +327,8 @@ export default function Dashboard() {
             onEarn={handleClick}
             dailyClicks={dailyClicks}
             dailyEarnings={dailyEarnings}
+            maxClicks={maxClicks}
+            maxReward={maxReward}
           />
         </Box>
 

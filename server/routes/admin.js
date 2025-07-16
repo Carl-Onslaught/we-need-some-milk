@@ -34,6 +34,10 @@ router.post('/activate-all-users', async (req, res) => {
 router.use(auth);
 router.use(adminAuth);
 
+// Settings management
+router.get('/settings', adminController.getSettings);
+router.put('/settings', adminController.updateSettings);
+
 // Dashboard stats
 router.get('/stats', adminController.getDashboardStats);
 

@@ -5105,3 +5105,133 @@
 2025-07-09T10:20:39.171Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
 2025-07-09T10:20:39.806Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
 2025-07-09T10:21:09.444Z - Error getting total points sent in shared capital: TypeError: Cannot read properties of undefined (reading 'totalPoints')
+2025-07-15T08:19:43.084Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:19:43.276Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:19:48.369Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:19:48.584Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:19:53.561Z - Unhandled Rejection at: [object Promise] reason: MongooseError: Operation `settings.findOne()` buffering timed out after 10000ms
+2025-07-15T08:19:53.751Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:19:53.936Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:19:59.049Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:19:59.149Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:20:04.504Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:20:04.924Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:20:09.733Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:20:09.750Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:20:14.753Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:20:14.769Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:20:19.771Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:20:19.780Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:20:42.618Z - MongoDB connection error: MongooseServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:20:42.652Z - MongoDB connection error: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:20:47.638Z - MongoDB connection error: MongooseServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:20:47.652Z - MongoDB connection error: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:20:47.668Z - Unhandled Rejection at: [object Promise] reason: MongooseError: Operation `settings.findOne()` buffering timed out after 10000ms
+2025-07-15T08:20:52.654Z - MongoDB connection error: MongooseServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:20:52.677Z - MongoDB connection error: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:20:57.678Z - MongoDB connection error: MongooseServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:20:57.704Z - MongoDB connection error: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:02.921Z - MongoDB connection error: MongooseServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:03.271Z - MongoDB connection error: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:07.793Z - MongoDB connection error: MongooseServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:07.818Z - MongoDB connection error: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:12.830Z - MongoDB connection error: MongooseServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:12.875Z - MongoDB connection error: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:17.837Z - MongoDB connection error: MongooseServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:17.844Z - MongoDB connection error: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:22.876Z - MongoDB connection error: MongooseServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:22.892Z - MongoDB connection error: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:27.875Z - MongoDB connection error: MongooseServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:27.893Z - MongoDB connection error: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:32.929Z - MongoDB connection error: MongooseServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:32.979Z - MongoDB connection error: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:38.094Z - MongoDB connection error: MongooseServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:38.346Z - MongoDB connection error: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:42.997Z - MongoDB connection error: MongooseServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:43.012Z - MongoDB connection error: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:48.255Z - MongoDB connection error: MongooseServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:48.408Z - MongoDB connection error: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:53.198Z - MongoDB connection error: MongooseServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:53.317Z - MongoDB connection error: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:58.330Z - MongoDB connection error: MongooseServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:21:58.482Z - MongoDB connection error: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:22:03.316Z - MongoDB connection error: MongooseServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:22:03.373Z - MongoDB connection error: MongoServerSelectionError: connect ECONNREFUSED ::1:27017, connect ECONNREFUSED 127.0.0.1:27017
+2025-07-15T08:22:31.400Z - MongoDB connection error: MongooseServerSelectionError: getaddrinfo ENOTFOUND wc_db
+2025-07-15T08:22:31.436Z - MongoDB connection error: MongoServerSelectionError: getaddrinfo ENOTFOUND wc_db
+2025-07-15T08:22:36.419Z - MongoDB connection error: MongooseServerSelectionError: getaddrinfo ENOTFOUND wc_db
+2025-07-15T08:22:36.432Z - MongoDB connection error: MongoServerSelectionError: getaddrinfo ENOTFOUND wc_db
+2025-07-15T08:22:36.456Z - Unhandled Rejection at: [object Promise] reason: MongooseError: Operation `settings.findOne()` buffering timed out after 10000ms
+2025-07-15T08:22:41.442Z - MongoDB connection error: MongooseServerSelectionError: getaddrinfo ENOTFOUND wc_db
+2025-07-15T08:22:41.461Z - MongoDB connection error: MongoServerSelectionError: getaddrinfo ENOTFOUND wc_db
+2025-07-15T08:22:46.653Z - MongoDB connection error: MongooseServerSelectionError: getaddrinfo ENOTFOUND wc_db
+2025-07-15T08:22:46.719Z - MongoDB connection error: MongoServerSelectionError: getaddrinfo ENOTFOUND wc_db
+2025-07-15T08:22:51.484Z - MongoDB connection error: MongooseServerSelectionError: getaddrinfo ENOTFOUND wc_db
+2025-07-15T08:22:51.512Z - MongoDB connection error: MongoServerSelectionError: getaddrinfo ENOTFOUND wc_db
+2025-07-15T08:22:56.495Z - MongoDB connection error: MongooseServerSelectionError: getaddrinfo ENOTFOUND wc_db
+2025-07-15T08:22:56.507Z - MongoDB connection error: MongoServerSelectionError: getaddrinfo ENOTFOUND wc_db
+2025-07-15T08:23:01.612Z - MongoDB connection error: MongooseServerSelectionError: getaddrinfo ENOTFOUND wc_db
+2025-07-15T08:23:01.662Z - MongoDB connection error: MongoServerSelectionError: getaddrinfo ENOTFOUND wc_db
+2025-07-15T08:23:06.606Z - MongoDB connection error: MongooseServerSelectionError: getaddrinfo ENOTFOUND wc_db
+2025-07-15T08:23:06.612Z - MongoDB connection error: MongoServerSelectionError: getaddrinfo ENOTFOUND wc_db
+2025-07-15T08:23:11.617Z - MongoDB connection error: MongooseServerSelectionError: getaddrinfo ENOTFOUND wc_db
+2025-07-15T08:23:11.628Z - MongoDB connection error: MongoServerSelectionError: getaddrinfo ENOTFOUND wc_db
+2025-07-15T08:23:16.644Z - MongoDB connection error: MongooseServerSelectionError: getaddrinfo ENOTFOUND wc_db
+2025-07-15T08:23:16.661Z - MongoDB connection error: MongoServerSelectionError: getaddrinfo ENOTFOUND wc_db
+2025-07-15T08:24:00.860Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:24:00.891Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:24:05.905Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:24:05.910Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:24:10.938Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:24:10.950Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:24:10.959Z - Unhandled Rejection at: [object Promise] reason: MongooseError: Operation `settings.findOne()` buffering timed out after 10000ms
+2025-07-15T08:24:15.958Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:24:15.965Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:24:20.978Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:24:20.989Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:24:26.000Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:24:26.025Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:24:31.181Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:24:31.291Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-15T08:30:08.602Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-15T08:30:08.626Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-15T08:30:09.128Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-15T08:30:09.143Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-15T08:30:09.992Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-15T08:30:10.012Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-15T08:30:10.470Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-15T08:30:10.485Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-15T08:30:11.263Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-15T08:30:11.289Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-15T08:30:11.751Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-15T08:30:11.784Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-15T08:30:12.346Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-15T08:30:12.365Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-15T08:30:12.976Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-15T08:30:13.109Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-15T08:30:13.597Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-15T08:30:13.612Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-15T08:30:14.097Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-15T08:30:14.113Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-15T09:58:01.816Z - Unhandled Rejection at: [object Promise] reason: ReferenceError: mongoose is not defined
+2025-07-15T10:43:13.108Z - Error in submitWithdrawal: ValidationError: method: `others` is not a valid enum value for path `method`.
+2025-07-15T12:30:43.692Z - Unhandled Rejection at: [object Promise] reason: ReferenceError: mongoose is not defined
+2025-07-15T12:36:13.084Z - Unhandled Rejection at: [object Promise] reason: ReferenceError: mongoose is not defined
+2025-07-15T12:36:14.616Z - Unhandled Rejection at: [object Promise] reason: ReferenceError: mongoose is not defined
+2025-07-15T12:36:16.995Z - Unhandled Rejection at: [object Promise] reason: ReferenceError: mongoose is not defined
+2025-07-15T12:36:17.394Z - Unhandled Rejection at: [object Promise] reason: ReferenceError: mongoose is not defined
+2025-07-15T12:36:17.597Z - Unhandled Rejection at: [object Promise] reason: ReferenceError: mongoose is not defined
+2025-07-15T12:36:17.747Z - Unhandled Rejection at: [object Promise] reason: ReferenceError: mongoose is not defined
+2025-07-15T12:44:23.609Z - WebSocket notification error: ReferenceError: calculateUserEarnings is not defined
+2025-07-15T12:44:53.310Z - WebSocket notification error: ReferenceError: calculateUserEarnings is not defined
+2025-07-15T12:47:06.752Z - WebSocket notification error: ReferenceError: calculateUserEarnings is not defined
+2025-07-16T13:16:52.832Z - MongoDB connection error: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-16T13:16:53.034Z - MongoDB connection error: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-16T13:17:46.491Z - MongoDB connection error: Error: querySrv ETIMEOUT _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-16T13:17:46.495Z - MongoDB connection error: Error: querySrv ETIMEOUT _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-16T13:18:30.949Z - MongoDB connection error: Error: querySrv ETIMEOUT _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-16T13:18:30.953Z - MongoDB connection error: Error: querySrv ETIMEOUT _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-16T13:19:10.358Z - MongoDB connection error: Error: querySrv ETIMEOUT _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-16T13:19:10.362Z - MongoDB connection error: Error: querySrv ETIMEOUT _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-16T13:20:03.770Z - MongoDB connection error: Error: querySrv ETIMEOUT _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-16T13:20:03.777Z - MongoDB connection error: Error: querySrv ETIMEOUT _mongodb._tcp.cluster0.o7yokb3.mongodb.net

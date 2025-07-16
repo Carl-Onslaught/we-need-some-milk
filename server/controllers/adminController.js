@@ -419,7 +419,7 @@ exports.getSettings = async (req, res) => {
 
 exports.updateSettings = async (req, res) => {
     try {
-        const { clickReward, dailyClickCap, referralBonus, minimumWithdrawal, sharedEarningPercentage, sharedCapReferralRates, paymentMethods } = req.body;
+        const { clickReward, dailyClickCap, referralBonus, minimumWithdrawal, sharedEarningPercentage, sharedCapReferralRates, packages, paymentMethods } = req.body;
         
         // Validate payment methods
         if (paymentMethods && !Array.isArray(paymentMethods)) {
@@ -445,6 +445,7 @@ exports.updateSettings = async (req, res) => {
                 minimumWithdrawal,
                 sharedEarningPercentage,
                 sharedCapReferralRates,
+                packages,
                 paymentMethods
             },
             { new: true, upsert: true }

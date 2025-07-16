@@ -1,12 +1,14 @@
 import React, { useState, useRef, useEffect } from 'react';
+import { Box, useToast } from '@chakra-ui/react';
 import './GoldCoin.css';
 
 // Import sound files
 const clickSoundUrl = new URL('/sounds/click.mp3', import.meta.url).href;
 const coinSoundUrl = new URL('/sounds/coin.mp3', import.meta.url).href;
 
-const GoldCoin = ({ onEarn }) => {
+const GoldCoin = ({ onEarn, dailyClicks, maxClicks }) => {
   const [isAnimating, setIsAnimating] = useState(false);
+  const toast = useToast();
   const [coins, setCoins] = useState([]);
   const coinSound = useRef(null);
   const clickSound = useRef(null);
@@ -51,7 +53,19 @@ const GoldCoin = ({ onEarn }) => {
     };
   }, []);
 
-  const handleClick = async (e) => {
+  const handleCoinClick = async () => {
+    // Check if user has reached daily limit
+    if (dailyClicks >= maxClicks) {
+      toast({
+        title: "Daily Limit Reached",
+        description: "You've reached your daily limit for click tasks.",
+        status: "warning",
+        duration: 5000,
+        isClosable: true,
+      });
+      return;
+    }
+
     if (isAnimating || !goldCoinAreaRef.current) {
       return;
     }
@@ -123,7 +137,7 @@ const GoldCoin = ({ onEarn }) => {
 
   return (
     <>
-      <div className="gold-coin-area" ref={goldCoinAreaRef} onClick={handleClick}>
+      <div className="gold-coin-area" ref={goldCoinAreaRef} onClick={handleCoinClick}>
         <div className={`gold-coin ${isAnimating ? 'pulse' : ''}`}>
           <div className="coin-content">
             <div className="coin-text">

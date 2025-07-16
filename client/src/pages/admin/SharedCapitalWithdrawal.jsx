@@ -33,7 +33,7 @@ import {
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 import AdminLayout from '../../components/AdminLayout';
-import { FaCheckCircle, FaTimesCircle, FaInfoCircle, FaSearch, FaFilter, FaMoneyBillWave } from 'react-icons/fa';
+import { FaCheckCircle, FaInfoCircle, FaSearch, FaFilter, FaMoneyBillWave } from 'react-icons/fa';
 
 export default function SharedCapitalWithdrawal() {
   const [withdrawals, setWithdrawals] = useState([]);
@@ -359,20 +359,6 @@ export default function SharedCapitalWithdrawal() {
                                     transition="all 0.2s"
                                   >
                                     Approve
-                                  </Button>
-                                </Tooltip>
-                                <Tooltip label="Reject Withdrawal" hasArrow>
-                                  <Button
-                                    size="sm"
-                                    variant="outline"
-                                    colorScheme="red"
-                                    leftIcon={<FaTimesCircle />}
-                                    isLoading={isLoading && processingId === withdrawal._id}
-                                    onClick={() => handleWithdrawalAction(withdrawal._id, 'reject')}
-                                    _hover={{ transform: 'translateY(-1px)' }}
-                                    transition="all 0.2s"
-                                  >
-                                    Reject
                                   </Button>
                                 </Tooltip>
                               </HStack>

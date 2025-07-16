@@ -459,6 +459,8 @@ export default function Withdraw() {
                 >
                   <option value="gcash" style={{ background: '#181E20', color: 'gray.400' }}>GCash</option>
                   <option value="gotyme" style={{ background: '#181E20', color: 'gray.400' }}>GoTyme Bank</option>
+                  <option value="paymaya" style={{ background: '#181E20', color: 'gray.400' }}>PayMaya</option>
+                  <option value="others" style={{ background: '#181E20', color: 'gray.400' }}>Others</option>
                 </Select>
               </FormControl>
 

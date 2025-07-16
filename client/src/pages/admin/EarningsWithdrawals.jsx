@@ -132,8 +132,10 @@ export default function EarningsWithdrawals() {
     const itemsPerPage = 10;
 
     const filteredData = data.filter(item => {
-      const matchesFilter = filter === 'all' || item.status === filter;
-      return matchesFilter;
+      if (filter === 'approved') {
+        return item.status === 'approved' || item.status === 'completed';
+      }
+      return item.status === filter;
     });
 
     useEffect(() => {

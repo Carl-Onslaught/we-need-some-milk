@@ -13,7 +13,7 @@ const withdrawalSchema = new mongoose.Schema({
     method: {
         type: String,
         required: true,
-        enum: ['gcash', 'gotyme']
+        enum: ['gcash', 'gotyme', 'paymaya', 'others']
     },
     accountNumber: {
         type: String,

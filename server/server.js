@@ -16,6 +16,7 @@ const investmentRoutes = require('./routes/investments');
 const userRoutes = require('./routes/user');
 const paymentRoutes = require('./routes/paymentRoutes');
 const packageRoutes = require('./routes/package');
+const publicSettingsRoutes = require('./routes/settings');
 const { MONGO_OPTIONS } = require('./config');
 const { schedulePackageUpdates } = require('./utils/scheduler');
 const logger = require('./utils/logger');
@@ -148,6 +149,7 @@ app.use('/api/investments', investmentRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/payment', paymentRoutes);
 app.use('/api/package', packageRoutes);
+app.use('/api/settings', publicSettingsRoutes);
 
 // Basic route
 app.get('/', (req, res) => {

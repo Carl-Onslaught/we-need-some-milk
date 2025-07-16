@@ -2,6 +2,7 @@ import {
   Box,
   VStack,
   Heading,
+  Image,
   Icon,
   Button,
   Link,
@@ -17,7 +18,8 @@ import {
   Spacer
 } from '@chakra-ui/react';
 import { Link as RouterLink, useLocation, useNavigate } from 'react-router-dom';
-import { FaChartLine, FaUsers, FaWallet, FaCog, FaCreditCard } from 'react-icons/fa';
+import { FaChartLine, FaUsers, FaWallet, FaCog, FaCreditCard, FaFacebook } from 'react-icons/fa';
+import Logo2 from '../assets/images/Logo2.png';
 import { FiLogOut, FiMenu, FiX } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -33,9 +35,12 @@ const SidebarContent = ({ onClose = null }) => {
   return (
     <VStack spacing={4} align="stretch" bg="#181E20" p={4} h="full">
       <Flex alignItems="center" justify="space-between" mb={6}>
-        <Heading size="lg" color="white" letterSpacing="tight">
-          AGENT
-        </Heading>
+        <Flex align="center" gap={2}>
+          <Image src={Logo2} boxSize="28px" alt="logo" />
+          <Heading size="lg" color="white" letterSpacing="tight">
+            AGENT
+          </Heading>
+        </Flex>
         {onClose && (
           <IconButton
             display={{ base: 'flex', md: 'none' }}
@@ -135,6 +140,7 @@ const SidebarButton = ({ icon, children, to, onClick, asButton }) => {
 };
 
 export default function AgentLayout({ children }) {
+  const { user } = useAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
 
   return (
@@ -205,6 +211,29 @@ export default function AgentLayout({ children }) {
         bg="#181E20"
         minH="100vh"
       >
+        {/* Account Heading */}
+        <Flex mb={8} justify={{ base: 'center', md: 'flex-end' }} align="center" flexWrap="wrap" gap={4}
+          >
+          <Heading color="white" size="md" mb={1} fontFamily="'Montserrat', sans-serif">
+            Hello, {user?.username || ''}
+          </Heading>
+          <Link
+            href="https://www.facebook.com/groups/849872732994941/?ref=share&mibextid=NSMWBT"
+            isExternal
+            style={{ textDecoration: 'none' }}
+          >
+            <Button
+              size="sm" leftIcon={<Icon as={FaFacebook} boxSize={3} />}
+              bg="#1877F2"
+              color="white"
+              _hover={{ bg: '#145DBF' }}
+              _active={{ bg: '#0E4A99' }}
+            >
+              Facebook Group
+            </Button>
+          </Link>
+          <Image src={Logo2} boxSize="56px" ml={2} alt="logo" />
+        </Flex>
         {children}
       </Box>
     </Box>
