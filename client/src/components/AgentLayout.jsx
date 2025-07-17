@@ -142,6 +142,10 @@ const SidebarButton = ({ icon, children, to, onClick, asButton }) => {
 export default function AgentLayout({ children }) {
   const { user } = useAuth();
   const { isOpen, onOpen, onClose } = useDisclosure();
+  const location = useLocation();
+
+  // Only show heading on /agent (dashboard)
+  const showHeading = location.pathname === '/agent';
 
   return (
     <Box minH="100vh" bg="#181E20" position="relative">
@@ -211,29 +215,30 @@ export default function AgentLayout({ children }) {
         bg="#181E20"
         minH="100vh"
       >
-        {/* Account Heading */}
-        <Flex mb={8} justify={{ base: 'center', md: 'flex-end' }} align="center" flexWrap="wrap" gap={4}
-          >
-          <Heading color="white" size="md" mb={1} fontFamily="'Montserrat', sans-serif">
-            Hello, {user?.username || ''}
-          </Heading>
-          <Link
-            href="https://www.facebook.com/groups/849872732994941/?ref=share&mibextid=NSMWBT"
-            isExternal
-            style={{ textDecoration: 'none' }}
-          >
-            <Button
-              size="sm" leftIcon={<Icon as={FaFacebook} boxSize={3} />}
-              bg="#1877F2"
-              color="white"
-              _hover={{ bg: '#145DBF' }}
-              _active={{ bg: '#0E4A99' }}
+        {/* Account Heading - only on dashboard */}
+        {showHeading && (
+          <Flex mb={8} justify={{ base: 'center', md: 'flex-end' }} align="center" flexWrap="wrap" gap={4}>
+            <Heading color="white" size="md" mb={1} fontFamily="'Montserrat', sans-serif">
+              Hello, {user?.username || ''}
+            </Heading>
+            <Link
+              href="https://www.facebook.com/groups/849872732994941/?ref=share&mibextid=NSMWBT"
+              isExternal
+              style={{ textDecoration: 'none' }}
             >
-              Facebook Group
-            </Button>
-          </Link>
-          <Image src={Logo2} boxSize="56px" ml={2} alt="logo" />
-        </Flex>
+              <Button
+                size="sm" leftIcon={<Icon as={FaFacebook} boxSize={3} />}
+                bg="#1877F2"
+                color="white"
+                _hover={{ bg: '#145DBF' }}
+                _active={{ bg: '#0E4A99' }}
+              >
+                Facebook Group
+              </Button>
+            </Link>
+            <Image src={Logo2} boxSize="56px" ml={2} alt="logo" />
+          </Flex>
+        )}
         {children}
       </Box>
     </Box>
