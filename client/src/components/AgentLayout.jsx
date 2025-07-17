@@ -24,7 +24,7 @@ import { FiLogOut, FiMenu, FiX } from 'react-icons/fi';
 import { useAuth } from '../contexts/AuthContext';
 
 const SidebarContent = ({ onClose = null }) => {
-  const { logout } = useAuth();
+  const { logout, user } = useAuth();
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -51,6 +51,28 @@ const SidebarContent = ({ onClose = null }) => {
           />
         )}
       </Flex>
+      {/* User greeting and Facebook button below AGENT */}
+      <Box mb={2}>
+        <Heading color="white" size="sm" fontFamily="'Montserrat', sans-serif" mb={1}>
+          Hello, {user?.username || ''}
+        </Heading>
+        <Link
+          href="https://www.facebook.com/groups/849872732994941/?ref=share&mibextid=NSMWBT"
+          isExternal
+          style={{ textDecoration: 'none' }}
+        >
+          <Button
+            size="sm" leftIcon={<Icon as={FaFacebook} boxSize={3} />}
+            bg="#1877F2"
+            color="white"
+            _hover={{ bg: '#145DBF' }}
+            _active={{ bg: '#0E4A99' }}
+            w="full"
+          >
+            Facebook Group
+          </Button>
+        </Link>
+      </Box>
       
       <SidebarButton icon={FaChartLine} to="/agent">
         Dashboard
@@ -180,7 +202,7 @@ export default function AgentLayout({ children }) {
 
   return (
     <Box minH="100vh" bg="#181E20" position="relative">
-      {/* Mobile nav - Hamburger Menu + Heading */}
+      {/* Mobile nav - Hamburger Menu + Logo in right corner */}
       <Flex
         display={{ base: 'flex', md: 'none' }}
         alignItems="center"
@@ -191,6 +213,7 @@ export default function AgentLayout({ children }) {
         zIndex={20}
         borderBottom="1px"
         borderColor="gray.700"
+        justifyContent="space-between"
       >
         <IconButton
           onClick={onOpen}
@@ -205,8 +228,8 @@ export default function AgentLayout({ children }) {
             bg: '#1E2528',
           }}
         />
-        {/* Only show heading in top bar on dashboard */}
-        {showHeading && MobileTopBarHeading}
+        <Box flex={1} />
+        <Image src={Logo2} alt="logo" boxSize={{ base: '40px', md: '56px' }} maxW="56px" maxH="56px" ml={2} mr={1} />
       </Flex>
 
       {/* Sidebar - desktop */}
@@ -248,37 +271,7 @@ export default function AgentLayout({ children }) {
         bg="#181E20"
         minH="100vh"
       >
-        {/* Account Heading - only on dashboard, only on desktop */}
-        {showHeading && (
-          <Box mb={8} display={{ base: 'none', md: 'block' }}>
-            <Flex
-              direction={{ base: 'column', md: 'row' }}
-              align={{ base: 'flex-start', md: 'center' }}
-              justify={{ base: 'flex-start', md: 'flex-end' }}
-              gap={4}
-            >
-              <Heading color="white" size="md" mb={{ base: 1, md: 0 }} fontFamily="'Montserrat', sans-serif">
-                Hello, {user?.username || ''}
-              </Heading>
-              <Link
-                href="https://www.facebook.com/groups/849872732994941/?ref=share&mibextid=NSMWBT"
-                isExternal
-                style={{ textDecoration: 'none' }}
-              >
-                <Button
-                  size="sm" leftIcon={<Icon as={FaFacebook} boxSize={3} />}
-                  bg="#1877F2"
-                  color="white"
-                  _hover={{ bg: '#145DBF' }}
-                  _active={{ bg: '#0E4A99' }}
-                >
-                  Facebook Group
-                </Button>
-              </Link>
-              <Image src={Logo2} boxSize="56px" ml={{ base: 0, md: 2 }} alt="logo" />
-            </Flex>
-          </Box>
-        )}
+        {/* Remove heading and Facebook button from content area and top bar */}
         {children}
       </Box>
     </Box>
