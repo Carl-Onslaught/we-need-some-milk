@@ -35,8 +35,8 @@ const SidebarContent = ({ onClose = null }) => {
   return (
     <VStack spacing={4} align="stretch" bg="#181E20" p={4} h="full">
       <Flex alignItems="center" justify="space-between" mb={6}>
-        <Heading size="lg" color="white" letterSpacing="tight">
-          AGENT
+        <Heading size="lg" color="white" fontFamily="'Montserrat', sans-serif" letterSpacing="tight">
+          Hello, {user?.username || ''}!
         </Heading>
         {onClose && (
           <IconButton
@@ -51,25 +51,27 @@ const SidebarContent = ({ onClose = null }) => {
           />
         )}
       </Flex>
-      {/* User greeting and Facebook button below AGENT */}
       <Box mb={2}>
-        <Heading color="white" size="sm" fontFamily="'Montserrat', sans-serif" mb={1}>
-          Hello, {user?.username || ''}
-        </Heading>
         <Link
           href="https://www.facebook.com/groups/849872732994941/?ref=share&mibextid=NSMWBT"
           isExternal
           style={{ textDecoration: 'none' }}
         >
           <Button
-            size="sm" leftIcon={<Icon as={FaFacebook} boxSize={3} />}
+            size="xs"
+            leftIcon={<Icon as={FaFacebook} boxSize={3} />}
             bg="#1877F2"
             color="white"
             _hover={{ bg: '#145DBF' }}
             _active={{ bg: '#0E4A99' }}
-            w="full"
+            borderRadius="full"
+            px={3}
+            h="28px"
+            fontWeight="bold"
+            fontSize="xs"
+            style={{ display: 'inline-flex' }}
           >
-            Facebook Group
+            FB Group
           </Button>
         </Link>
       </Box>
@@ -229,7 +231,7 @@ export default function AgentLayout({ children }) {
           }}
         />
         <Box flex={1} />
-        <Image src={Logo2} alt="logo" boxSize={{ base: '40px', md: '56px' }} maxW="56px" maxH="56px" ml={2} mr={1} />
+        <Image src={Logo2} alt="logo" boxSize={{ base: '70px', md: '90px' }} width={{ base: '90px', md: '110px' }} height={{ base: '48px', md: '56px' }} maxW="110px" maxH="56px" ml={2} mr={1} />
       </Flex>
 
       {/* Sidebar - desktop */}
