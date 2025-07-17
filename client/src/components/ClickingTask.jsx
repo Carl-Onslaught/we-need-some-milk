@@ -30,7 +30,7 @@ const ClickingTask = ({ onEarn, dailyClicks = 0, dailyEarnings = 0, maxClicks = 
         >
           Click the gold coin to earn daily rewards! 💰
           <Text as="span" display="block" fontSize={{ base: "sm", md: "md" }} color="hsl(220, 14%, 70%)" mt={2}>
-            Complete {maxClicks} clicks to earn up to ₱{maxReward.toFixed(2)} per day
+            Complete 50 clicks to earn up to ₱10.00 per day
           </Text>
         </Text>
 

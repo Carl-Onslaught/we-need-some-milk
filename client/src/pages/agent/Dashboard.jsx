@@ -189,20 +189,9 @@ export default function Dashboard() {
   }, []);
 
   const fetchData = async () => {
-    // also fetch public settings
-    let settings;
-    try {
-      const resSettings = await axios.get('/settings'); // new public endpoint
-      settings = resSettings.data;
-      if (settings) {
-        const clickReward = settings.clickReward || 0.2;
-        const dailyCap = settings.dailyClickCap || 10;
-        setMaxReward(clickReward * dailyCap);
-        setMaxClicks(dailyCap);
-      }
-    } catch (err) {
-      console.error('Could not fetch settings', err);
-    }
+    // always use 50 clicks and ₱10.00 per day
+    setMaxClicks(50);
+    setMaxReward(10);
     try {
       setIsLoading(true);
       const [statsRes, packagesRes, userRes] = await Promise.all([
