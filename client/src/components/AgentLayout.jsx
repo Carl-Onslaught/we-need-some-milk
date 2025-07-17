@@ -218,8 +218,13 @@ export default function AgentLayout({ children }) {
         {/* Account Heading - only on dashboard, now at the very top of content */}
         {showHeading && (
           <Box mb={8}>
-            <Flex justify={{ base: 'flex-start', md: 'flex-end' }} align="center" flexWrap="wrap" gap={4}>
-              <Heading color="white" size="md" mb={1} fontFamily="'Montserrat', sans-serif">
+            <Flex
+              direction={{ base: 'column', md: 'row' }}
+              align={{ base: 'flex-start', md: 'center' }}
+              justify={{ base: 'flex-start', md: 'flex-end' }}
+              gap={4}
+            >
+              <Heading color="white" size="md" mb={{ base: 1, md: 0 }} fontFamily="'Montserrat', sans-serif">
                 Hello, {user?.username || ''}
               </Heading>
               <Link
@@ -237,7 +242,7 @@ export default function AgentLayout({ children }) {
                   Facebook Group
                 </Button>
               </Link>
-              <Image src={Logo2} boxSize="56px" ml={2} alt="logo" />
+              <Image src={Logo2} boxSize="56px" ml={{ base: 0, md: 2 }} alt="logo" />
             </Flex>
           </Box>
         )}
