@@ -35,12 +35,9 @@ const SidebarContent = ({ onClose = null }) => {
   return (
     <VStack spacing={4} align="stretch" bg="#181E20" p={4} h="full">
       <Flex alignItems="center" justify="space-between" mb={6}>
-        <Flex align="center" gap={2}>
-          <Image src={Logo2} boxSize="28px" alt="logo" />
-          <Heading size="lg" color="white" letterSpacing="tight">
-            AGENT
-          </Heading>
-        </Flex>
+        <Heading size="lg" color="white" letterSpacing="tight">
+          AGENT
+        </Heading>
         {onClose && (
           <IconButton
             display={{ base: 'flex', md: 'none' }}
@@ -147,9 +144,43 @@ export default function AgentLayout({ children }) {
   // Only show heading on /agent (dashboard)
   const showHeading = location.pathname === '/agent';
 
+  // Responsive heading for mobile top bar
+  const MobileTopBarHeading = (
+    <Flex
+      display={{ base: 'flex', md: 'none' }}
+      flexDirection="column"
+      align="flex-start"
+      gap={2}
+      ml={3}
+      flex={1}
+    >
+      <Heading color="white" size="md" fontFamily="'Montserrat', sans-serif">
+        Hello, {user?.username || ''}
+      </Heading>
+      <Flex align="center" gap={2}>
+        <Link
+          href="https://www.facebook.com/groups/849872732994941/?ref=share&mibextid=NSMWBT"
+          isExternal
+          style={{ textDecoration: 'none' }}
+        >
+          <Button
+            size="sm" leftIcon={<Icon as={FaFacebook} boxSize={3} />}
+            bg="#1877F2"
+            color="white"
+            _hover={{ bg: '#145DBF' }}
+            _active={{ bg: '#0E4A99' }}
+          >
+            Facebook Group
+          </Button>
+        </Link>
+        <Image src={Logo2} boxSize="40px" alt="logo" />
+      </Flex>
+    </Flex>
+  );
+
   return (
     <Box minH="100vh" bg="#181E20" position="relative">
-      {/* Mobile nav - Hamburger Menu */}
+      {/* Mobile nav - Hamburger Menu + Heading */}
       <Flex
         display={{ base: 'flex', md: 'none' }}
         alignItems="center"
@@ -174,6 +205,8 @@ export default function AgentLayout({ children }) {
             bg: '#1E2528',
           }}
         />
+        {/* Only show heading in top bar on dashboard */}
+        {showHeading && MobileTopBarHeading}
       </Flex>
 
       {/* Sidebar - desktop */}
@@ -215,9 +248,9 @@ export default function AgentLayout({ children }) {
         bg="#181E20"
         minH="100vh"
       >
-        {/* Account Heading - only on dashboard, now at the very top of content */}
+        {/* Account Heading - only on dashboard, only on desktop */}
         {showHeading && (
-          <Box mb={8}>
+          <Box mb={8} display={{ base: 'none', md: 'block' }}>
             <Flex
               direction={{ base: 'column', md: 'row' }}
               align={{ base: 'flex-start', md: 'center' }}
