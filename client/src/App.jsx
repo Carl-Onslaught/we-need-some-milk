@@ -19,6 +19,7 @@ import SharedWithdrawal from './pages/admin/SharedWithdrawal';
 import SharedHistory from './pages/admin/SharedHistory';
 import AdminSettings from './pages/admin/Settings';
 import PaymentMethods from './pages/agent/PaymentMethods';
+import AllUsers from './pages/admin/AllUsers';
 
 // Theme customization
 const theme = extendTheme({
@@ -117,6 +118,14 @@ function AppRoutes() {
           element={
             <PrivateRoute>
               <AdminSettings />
+            </PrivateRoute>
+          }
+        />
+        <Route 
+          path="/admin/all-users" 
+          element={
+            <PrivateRoute>
+              <AllUsers />
             </PrivateRoute>
           }
         />

@@ -55,8 +55,9 @@ const PendingRegistrations = () => {
   };
 
   const handleApprove = async (userId) => {
+    console.log('Approving user:', userId);
     try {
-      await axios.post(`/admin/approve-registration/${userId}`, { action: 'approve' });
+      await axios.post(`/admin/registrations/${userId}/approve`);
       toast({
         title: 'Success',
         description: 'Registration approved successfully',
@@ -78,8 +79,9 @@ const PendingRegistrations = () => {
   };
 
   const handleReject = async (userId) => {
+    console.log('Rejecting user:', userId);
     try {
-      await axios.post(`/admin/approve-registration/${userId}`, { action: 'reject' });
+      await axios.post(`/admin/registrations/${userId}/reject`);
       toast({
         title: 'Success',
         description: 'Registration rejected successfully',

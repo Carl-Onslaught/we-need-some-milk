@@ -48,6 +48,7 @@ router.get('/referral', adminController.getReferralData);
 router.get('/users', adminController.getAllUsers);
 router.put('/users/role', adminController.updateUserRole);
 router.post('/users/:id/toggle-status', adminController.toggleUserStatus);
+router.post('/users/:id/reset-password', auth, isAdmin, adminController.adminResetUserPassword);
 
 // Registration management
 router.get('/registrations/pending', adminController.getPendingRegistrations);
@@ -262,59 +263,8 @@ router.get('/pending-registrations', auth, adminAuth, async (req, res) => {
 });
 
 // Approve or reject registration
-router.post('/approve-registration/:userId', auth, adminAuth, async (req, res) => {
-  try {
-    const { userId } = req.params;
-    const { action } = req.body;
-
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({ message: 'User not found' });
-    }
-
-    if (action === 'approve') {
-      user.status = 'approved';
-      user.isActive = true;
-      user.approvedAt = new Date();
-
-      // Create registration transaction
-      await new Transaction({
-        user: user._id,
-        type: 'registration',
-        amount: -100, // Registration fee
-        description: 'Registration fee',
-        status: 'completed'
-      }).save();
-
-      // Handle referral bonus if applicable
-      if (user.referrer) {
-        const referralAmount = 10; // 10% of registration fee
-        await new Transaction({
-          user: user.referrer,
-          type: 'referral',
-          amount: referralAmount,
-          description: 'Registration referral bonus',
-          status: 'completed',
-          relatedUser: user._id
-        }).save();
-
-        // Update referrer's earnings
-        await User.findByIdAndUpdate(user.referrer, {
-          $inc: { 'referralEarnings.direct': referralAmount }
-        });
-      }
-    } else if (action === 'reject') {
-      user.status = 'rejected';
-      user.rejectedAt = new Date();
-    }
-
-    await user.save();
-    res.json({ message: `Registration ${action}ed successfully` });
-  } catch (error) {
-    console.error('Error processing registration:', error);
-    res.status(500).json({ message: 'Error processing registration' });
-  }
-});
+router.post('/approve-registration/:userId', auth, adminAuth, adminController.approveRegistration);
+router.post('/reject-registration/:userId', auth, adminAuth, adminController.rejectRegistration);
 
 // Revert a shared capital load
 router.post('/shared-capital/revert/:id', async (req, res) => {

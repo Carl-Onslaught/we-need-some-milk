@@ -5235,3 +5235,419 @@
 2025-07-16T13:19:10.362Z - MongoDB connection error: Error: querySrv ETIMEOUT _mongodb._tcp.cluster0.o7yokb3.mongodb.net
 2025-07-16T13:20:03.770Z - MongoDB connection error: Error: querySrv ETIMEOUT _mongodb._tcp.cluster0.o7yokb3.mongodb.net
 2025-07-16T13:20:03.777Z - MongoDB connection error: Error: querySrv ETIMEOUT _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-20T11:15:48.358Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:15:48.388Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:15:53.380Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:15:53.391Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:15:58.402Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:15:58.406Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:03.421Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:03.433Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:08.437Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:08.445Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:13.449Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:13.465Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:18.457Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:18.475Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:23.483Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:23.498Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:28.492Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:28.498Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:33.509Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:33.515Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:38.529Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:38.533Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:43.548Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:43.553Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:48.561Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:48.566Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:53.581Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:53.587Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:58.592Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:16:58.598Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:17:03.610Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:17:03.615Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:17:08.629Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:17:08.638Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:17:13.646Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:17:13.654Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:17:18.662Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:17:18.668Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:17:23.681Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:17:23.690Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:17:28.899Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:17:28.966Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:17:34.133Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T11:17:34.335Z - MongoDB connection error: MongooseError: The `uri` parameter to `openUri()` must be a string, got "undefined". Make sure the first parameter to `mongoose.connect()` or `mongoose.createConnection()` is a string.
+2025-07-20T14:09:57.075Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:09:57.138Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:09:57.683Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:09:57.710Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:09:58.278Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:09:58.300Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:09:58.883Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:09:58.891Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:09:59.337Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:09:59.358Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:09:59.849Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:09:59.886Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:00.337Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:00.379Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:00.837Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:00.862Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:01.300Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:01.307Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:01.926Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:01.961Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:02.574Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:02.622Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:03.545Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:03.940Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:07.255Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:07.280Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:07.816Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:07.855Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:08.509Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:08.572Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:09.507Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:09.576Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:10.160Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:10.192Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:10.813Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:10.929Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:11.577Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:11.631Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:12.282Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:12.312Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:12.968Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:13.032Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:13.844Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:13.962Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:14.616Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:14.759Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:15.561Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:15.620Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:16.384Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:16.416Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:16.996Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:17.011Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:17.646Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:17.717Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:18.350Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:18.412Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:18.993Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:19.051Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:19.634Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:19.664Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:20.264Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:20.300Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:20.933Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:20.975Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:21.566Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:21.626Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:22.811Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:23.097Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:25.049Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:25.077Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:25.698Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:25.716Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:26.301Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:26.319Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:26.929Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:27.017Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:27.686Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:27.708Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:28.669Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:28.702Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:29.356Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:29.453Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:30.051Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:30.090Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:30.666Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:30.696Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:31.357Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:31.387Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:32.101Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:32.119Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:32.701Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:32.750Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:33.318Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:33.370Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:34.102Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:34.135Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:34.800Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:34.857Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:35.483Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:35.536Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:36.147Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:36.204Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:36.833Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:36.853Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:37.417Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:37.454Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:38.052Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:38.116Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:38.821Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:38.869Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:39.502Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:39.550Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:40.219Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:40.252Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:40.891Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:40.932Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:41.481Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:41.537Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:42.338Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:42.555Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:43.330Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:43.605Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:44.197Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:44.270Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:44.822Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:44.934Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:45.605Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:45.635Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:46.143Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:46.154Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:46.734Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:46.764Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:47.405Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:47.473Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:48.178Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:48.244Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:48.771Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:48.797Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:49.352Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:49.372Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:50.038Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:50.075Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:50.674Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:50.739Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:51.424Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:51.467Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:52.035Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:52.056Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:52.678Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:52.706Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:53.360Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:53.459Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:54.119Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:54.171Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:54.991Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:55.141Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:55.976Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:56.024Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:56.595Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:56.660Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:57.322Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:57.358Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:58.062Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:58.094Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:58.676Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:58.708Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:59.375Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:10:59.477Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:00.227Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:00.294Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:00.958Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:01.078Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:01.891Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:02.252Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:03.193Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:03.377Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:04.092Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:04.124Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:04.875Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:04.929Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:05.613Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:05.641Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:06.291Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:06.345Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:06.947Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:06.992Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:07.511Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:07.534Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:08.113Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:08.144Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:08.765Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:08.789Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:09.263Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:09.285Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:09.834Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:09.859Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:10.342Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:10.359Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:11.045Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:11.129Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:11.807Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:11.897Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:12.620Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:12.635Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:13.209Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:13.224Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:13.860Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:13.878Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:14.481Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:14.515Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:15.262Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:15.315Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:15.932Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:15.952Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:16.650Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:17.025Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:17.737Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:17.799Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:18.430Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:18.473Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:19.078Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:19.105Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:19.760Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:19.862Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:20.483Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:20.531Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:21.154Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:21.226Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:21.848Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:21.864Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:22.431Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:22.465Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:23.099Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:23.114Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:23.734Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:23.768Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:24.447Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:24.496Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:25.098Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:25.229Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:25.783Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:25.800Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:26.438Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:26.460Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:27.094Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:27.110Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:27.683Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:27.717Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:28.305Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:28.335Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:28.951Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:29.017Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:29.642Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:29.667Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:30.199Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:30.217Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:30.734Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:30.765Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:31.273Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:31.333Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:31.882Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:31.901Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:32.464Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:32.485Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:33.058Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:33.107Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:33.703Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:33.736Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:34.345Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:34.352Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:34.995Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:35.103Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:35.693Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:35.785Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:36.408Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:36.453Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:37.105Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:37.175Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:37.702Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:37.786Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:38.479Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:38.487Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:39.200Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:39.353Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:39.937Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:39.965Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:40.534Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:40.565Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:41.144Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:41.198Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:42.017Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:42.050Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:42.579Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:42.600Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:43.161Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:43.191Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:43.987Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:44.152Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:44.749Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:44.770Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:45.363Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:45.385Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:45.889Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:45.907Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:46.588Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:46.613Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:47.172Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:47.186Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:47.831Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:47.849Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:48.431Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:48.451Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:49.063Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:49.076Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:49.612Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:49.626Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:50.195Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:50.226Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:50.719Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:50.733Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:51.242Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:51.263Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:51.837Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:51.884Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:52.478Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:52.513Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:53.329Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:53.499Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:54.102Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:54.117Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:54.686Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:54.706Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:55.212Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:55.233Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:55.730Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:55.737Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:56.181Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:56.191Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:56.745Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:56.753Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:57.319Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:57.330Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:57.893Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:57.906Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:58.485Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:58.500Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:59.061Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:59.069Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:59.660Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:11:59.669Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:12:00.252Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:12:00.258Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:12:00.696Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:12:00.709Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:12:01.225Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:12:01.233Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:12:01.827Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:12:01.844Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:12:02.425Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:12:02.453Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:12:03.029Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:12:03.121Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:12:03.820Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T14:12:03.898Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-20T16:47:28.444Z - Admin reset user password error: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-19T12:23:07.333Z }" (type Object) at path "dailyClicks", email: Path `email` is required.
+2025-07-20T17:08:28.555Z - Toggle user status error: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-19T12:23:07.333Z }" (type Object) at path "dailyClicks", email: Path `email` is required.
+2025-07-20T17:18:27.306Z - Error processing registration: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-19T12:23:07.333Z }" (type Object) at path "dailyClicks"
+2025-07-20T17:18:31.214Z - Error processing registration: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-19T13:24:33.612Z }" (type Object) at path "dailyClicks", email: Path `email` is required.
+2025-07-20T17:20:28.039Z - Error processing registration: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-19T13:24:33.612Z }" (type Object) at path "dailyClicks", email: Path `email` is required.
+2025-07-20T17:23:41.487Z - Error processing registration: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-19T12:23:07.333Z }" (type Object) at path "dailyClicks"
+2025-07-20T17:23:45.618Z - Error processing registration: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-19T12:23:07.333Z }" (type Object) at path "dailyClicks"
+2025-07-20T17:24:01.200Z - Error processing registration: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-19T12:23:07.333Z }" (type Object) at path "dailyClicks"

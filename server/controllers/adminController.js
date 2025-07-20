@@ -5,6 +5,7 @@ const Settings = require('../models/Settings');
 const Withdrawal = require('../models/Withdrawal');
 const Package = require('../models/Package');
 const SharedCapitalTransaction = require('../models/sharedCapitalTransaction');
+const bcrypt = require('bcryptjs');
 
 exports.updateUserRole = async (req, res) => {
     try {
@@ -670,67 +671,45 @@ exports.getPendingRegistrations = async (req, res) => {
 };
 
 exports.approveRegistration = async (req, res) => {
-    try {
-        const { id } = req.params;
-
-        // First find the user to get their current data
-        const user = await User.findById(id);
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        // Update user status and activate them
-        user.status = 'approved';
-        user.approvedAt = new Date();
-        user.isActive = true;
-
-        // Save the updated user
-        await user.save();
-
-        // If user has a referrer, make sure they're active too
-        if (user.referrer) {
-            await User.findByIdAndUpdate(user.referrer, {
-                status: 'approved',
-                isActive: true,
-                approvedAt: new Date()
-            });
-        }
-
-        res.json({
-            message: 'Registration approved successfully',
-            user: user.toObject({ getters: true, versionKey: false })
-        });
-    } catch (error) {
-        console.error('Approve registration error:', error);
-        res.status(500).json({ message: 'Error approving registration' });
+  try {
+    const { id } = req.params;
+    // Only update the necessary fields to avoid validation errors
+    const result = await User.updateOne(
+      { _id: id },
+      { $set: { status: 'approved', isActive: true, approvedAt: new Date() } }
+    );
+    if (result.modifiedCount === 0 && result.nModified === 0) {
+      return res.status(404).json({ message: 'User not found or not updated.' });
     }
+    res.json({
+      message: 'Registration approved successfully',
+      userId: id
+    });
+  } catch (error) {
+    console.error('Approve registration error:', error);
+    res.status(500).json({ message: 'Error approving registration' });
+  }
 };
 
 exports.rejectRegistration = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const user = await User.findByIdAndUpdate(
-            id,
-            { 
-                status: 'rejected',
-                rejectedAt: new Date(),
-                isActive: false
-            },
-            { new: true }
-        ).select('-password');
-
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        res.json({
-            message: 'Registration rejected successfully',
-            user
-        });
-    } catch (error) {
-        console.error('Reject registration error:', error);
-        res.status(500).json({ message: 'Error rejecting registration' });
+  try {
+    const { id } = req.params;
+    // Only update the necessary fields to avoid validation errors
+    const result = await User.updateOne(
+      { _id: id },
+      { $set: { status: 'rejected', isActive: false, rejectedAt: new Date() } }
+    );
+    if (result.modifiedCount === 0 && result.nModified === 0) {
+      return res.status(404).json({ message: 'User not found or not updated.' });
     }
+    res.json({
+      message: 'Registration rejected successfully',
+      userId: id
+    });
+  } catch (error) {
+    console.error('Reject registration error:', error);
+    res.status(500).json({ message: 'Error rejecting registration' });
+  }
 };
 
 const generateReferralCode = async () => {
@@ -799,32 +778,33 @@ exports.getReferralData = async (req, res) => {
 };
 
 exports.toggleUserStatus = async (req, res) => {
-    try {
-        const { id } = req.params;
-        const user = await User.findById(id);
-        
-        if (!user) {
-            return res.status(404).json({ message: 'User not found' });
-        }
-
-        // Toggle the isActive status
-        user.isActive = !user.isActive;
-        await user.save();
-
-        res.json({
-            message: `User ${user.isActive ? 'activated' : 'deactivated'} successfully`,
-            user: {
-                _id: user._id,
-                username: user.username,
-                email: user.email,
-                role: user.role,
-                isActive: user.isActive
-            }
-        });
-    } catch (error) {
-        console.error('Toggle user status error:', error);
-        res.status(500).json({ message: 'Error toggling user status' });
+  try {
+    const { id } = req.params;
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
+    const newIsActive = !user.isActive;
+    const newStatus = newIsActive ? 'approved' : 'pending';
+    await User.updateOne(
+      { _id: id },
+      { $set: { isActive: newIsActive, status: newStatus } }
+    );
+    res.json({
+      message: `User ${newIsActive ? 'activated' : 'deactivated'} successfully`,
+      user: {
+        _id: user._id,
+        username: user.username,
+        email: user.email,
+        role: user.role,
+        isActive: newIsActive,
+        status: newStatus
+      }
+    });
+  } catch (error) {
+    console.error('Toggle user status error:', error);
+    res.status(500).json({ message: 'Error toggling user status' });
+  }
 };
 
 // Package requests management
@@ -961,4 +941,28 @@ exports.getWithdrawalsBySource = async (req, res) => {
         console.error('Error fetching withdrawals by source:', error);
         res.status(500).json({ message: 'Error fetching withdrawals by source' });
     }
+};
+
+// Admin reset user password
+exports.adminResetUserPassword = async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { newPassword } = req.body;
+    if (!newPassword || newPassword.length < 6) {
+      return res.status(400).json({ message: 'Password must be at least 6 characters.' });
+    }
+    const salt = await require('bcryptjs').genSalt(10);
+    const hashedPassword = await require('bcryptjs').hash(newPassword, salt);
+    const result = await User.updateOne(
+      { _id: id },
+      { $set: { password: hashedPassword } }
+    );
+    if (result.modifiedCount === 0 && result.nModified === 0) {
+      return res.status(404).json({ message: 'User not found or password not updated.' });
+    }
+    res.json({ message: 'Password reset successfully.' });
+  } catch (error) {
+    console.error('Admin reset user password error:', error);
+    res.status(500).json({ message: 'Error resetting password' });
+  }
 };

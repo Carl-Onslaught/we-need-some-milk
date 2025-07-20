@@ -43,6 +43,7 @@ const SidebarContent = ({ onClose, ...rest }) => {
     { name: 'Load Shared Capital', icon: FaMoneyBillWave, href: '/admin/load-shared-capital' },
     { name: 'Earnings & Withdrawals', icon: FaMoneyBillWave, href: '/admin/earnings-withdrawals' },
     { name: 'Shared Capital Withdrawal', icon: FaExchangeAlt, href: '/admin/shared-withdrawal' },
+    { name: 'All Users', icon: FaClipboardList, href: '/admin/all-users' },
     { name: 'Settings', icon: FaCog, href: '/admin/settings' },
   ];
 
