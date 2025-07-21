@@ -25,7 +25,6 @@ jobs:
           script: |
             cd ${{ vars.DEPLOY_PATH }}
             chmod +x deployment/backup.sh
-
             if docker ps -a --format "{{.Names}}" | tr -d "\r" | grep -Fx "${{vars.DOCKER_SERVICE_DB}}"; then
               echo "Backing up database from docker service: ${{ vars.DOCKER_SERVICE_DB }}..."
               export MONGODB_USER=${{ vars.MONGODB_USER }}
@@ -52,7 +51,6 @@ jobs:
         run: |
           touch .env
           touch client/.env
-
       - name: Add environment variables to .env
         run: |
           echo "PORT=${{vars.API_PORT}}" >> .env
@@ -81,7 +79,6 @@ jobs:
           echo "DOCKER_VOLUME_DB_CONFIG=${{vars.DOCKER_VOLUME_DB_CONFIG}}" >> .env
           echo "DOCKER_NETWORK=${{vars.DOCKER_NETWORK}}" >> .env
           chmod 644 .env  # Ensure it's readable
-
       - name: Create destination directory and set permissions
         uses: appleboy/ssh-action@master
         with:
@@ -94,7 +91,6 @@ jobs:
             sudo chmod 775 ${{ vars.DEPLOY_PATH }}
             sudo chown -R ${{ vars.DEPLOY_USER }}:${{ vars.DEPLOY_USER }} ${{ vars.DEPLOY_PATH }}
             sudo chmod -R u+w ${{ vars.DEPLOY_PATH }}
-
       - name: Deploy files to server
         id: deploy
         uses: burnett01/rsync-deployments@6.0.0
