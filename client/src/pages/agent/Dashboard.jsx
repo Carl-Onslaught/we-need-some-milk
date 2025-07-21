@@ -213,7 +213,10 @@ export default function Dashboard() {
       });
       setActivePackages(packagesWithDays);
       // Set daily clicks and earnings from user data
-      setDailyClicks(userRes.data.dailyClicks || 0);
+      const clicksValue = typeof userRes.data.dailyClicks === 'object'
+        ? userRes.data.dailyClicks?.count || 0
+        : userRes.data.dailyClicks || 0;
+      setDailyClicks(clicksValue);
       setDailyEarnings(userRes.data.dailyClickEarnings || 0);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
@@ -341,7 +344,7 @@ export default function Dashboard() {
           />
           <StatCard
             title="Total Clicks Earnings"
-            stat={`₱${stats.totalClicks.toLocaleString()}`}
+            stat={`₱${stats.totalClicks.toFixed(2)}`}
             icon={FaChartLine}
           />
           <StatCard

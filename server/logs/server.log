@@ -5661,3 +5661,102 @@
 2025-07-21T08:47:14.628Z - MongoDB connection error: MongooseServerSelectionError: Server selection timed out after 5000 ms
 2025-07-21T08:47:14.659Z - MongoDB connection error: MongoServerSelectionError: Server selection timed out after 5000 ms
 2025-07-21T09:19:15.646Z - Error loading shared capital: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 50, lastReset: 2025-07-19T12:23:07.333Z }" (type Object) at path "dailyClicks"
+2025-07-21T10:53:25.182Z - MongoDB connection error: MongoNetworkError: connection 1 to 159.143.88.194:27017 closed
+2025-07-21T10:53:25.191Z - MongoDB connection error: MongoNetworkError: connection 1 to 159.143.88.194:27017 closed
+2025-07-21T10:53:25.821Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:25.850Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:26.450Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:26.462Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:33.015Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:33.187Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:35.038Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:35.161Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:36.085Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:36.292Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:38.519Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:38.688Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:39.755Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:39.844Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:41.907Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:42.058Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:42.974Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:43.419Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:47.291Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:47.443Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:48.402Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:48.607Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:51.276Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:51.545Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:54.032Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:54.168Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:57.858Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:53:58.154Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:54:00.070Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:54:00.355Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:54:01.948Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:54:02.075Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:54:07.564Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:54:07.648Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:54:15.808Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:54:15.818Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:54:18.405Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:54:18.415Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:54:23.910Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:54:23.932Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:54:27.686Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:54:27.697Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:54:32.101Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:54:32.116Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:54:38.993Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:54:39.009Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:54:40.549Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:54:40.578Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:36.043Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:36.057Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:38.094Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:38.108Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:39.011Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:39.021Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:39.682Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:39.763Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:41.609Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:41.619Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:42.223Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:42.232Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:42.836Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:42.850Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:43.500Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:43.525Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:44.582Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:44.644Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:46.491Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:46.512Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:47.094Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:47.113Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:48.392Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:48.544Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:49.311Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:49.317Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:50.542Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:50.550Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:52.758Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:52.768Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:53.455Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:55:53.480Z - MongoDB connection error: MongoServerError: bad auth : authentication failed
+2025-07-21T10:59:07.758Z - Login error: TypeError: Cannot create property 'lastReset' on number '1'
+2025-07-21T10:59:46.881Z - Login error: TypeError: Cannot create property 'lastReset' on number '1'
+2025-07-21T11:00:14.114Z - Get all users error: TypeError: Cannot create property 'lastReset' on number '1'
+2025-07-21T11:00:20.378Z - Get earnings transactions error: TypeError: Cannot create property 'lastReset' on number '1'
+2025-07-21T11:00:26.252Z - Get earnings transactions error: TypeError: Cannot create property 'lastReset' on number '1'
+2025-07-21T11:00:27.054Z - Get all users error: TypeError: Cannot create property 'lastReset' on number '1'
+2025-07-21T11:00:45.387Z - Get all users error: TypeError: Cannot create property 'lastReset' on number '1'
+2025-07-21T11:01:07.148Z - Get earnings transactions error: TypeError: Cannot create property 'lastReset' on number '1'
+2025-07-21T11:01:16.551Z - Login error: TypeError: Cannot create property 'lastReset' on number '1'
+2025-07-21T11:05:46.039Z - Login error: TypeError: Cannot create property 'lastReset' on number '1'
+2025-07-21T11:15:22.624Z - MongoDB connection error: MongooseServerSelectionError: Could not connect to any servers in your MongoDB Atlas cluster. One common reason is that you're trying to access the database from an IP that isn't whitelisted. Make sure your current IP address is on your Atlas cluster's IP whitelist: https://www.mongodb.com/docs/atlas/security-whitelist/
+2025-07-21T11:15:22.701Z - MongoDB connection error: MongoServerSelectionError: Server selection timed out after 5000 ms
+2025-07-21T11:20:12.269Z - Login error: TypeError: Cannot create property 'lastReset' on number '1'
+2025-07-21T11:32:28.200Z - Login error: MongooseError: Operation `users.findOne()` buffering timed out after 10000ms
+2025-07-21T11:32:43.333Z - MongoDB connection error: MongoNetworkError: connection 1 to 159.143.88.194:27017 closed
+2025-07-21T11:32:43.340Z - MongoDB connection error: MongoNetworkError: connection 1 to 159.143.88.194:27017 closed
+2025-07-21T11:48:39.157Z - Error recording click: ValidationError: dailyClicks: Cast to Object failed for value "{ count: 1, lastReset: 2025-07-21T11:31:16.786Z }1" (type string) at path "dailyClicks"

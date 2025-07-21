@@ -250,9 +250,11 @@ router.get('/load-capital/total-sent', [auth, adminAuth], async (req, res) => {
 // Get pending registrations
 router.get('/pending-registrations', auth, adminAuth, async (req, res) => {
   try {
-    const pendingUsers = await User.find({ 
-      role: 'agent',
-      status: 'pending'
+    const pendingUsers = await User.find({
+      $or: [
+        { status: 'pending' },
+        { isActive: false }
+      ]
     }).select('-password');
 
     res.json(pendingUsers);
