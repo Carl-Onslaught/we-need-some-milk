@@ -56,8 +56,14 @@ const userSchema = new mongoose.Schema({
     default: 0
   },
   dailyClicks: {
-    type: Number,
-    default: 0
+    count: {
+      type: Number,
+      default: 0
+    },
+    lastReset: {
+      type: Date,
+      default: Date.now
+    }
   },
   dailyClickEarnings: {
     type: Number,
