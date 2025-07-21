@@ -5651,3 +5651,13 @@
 2025-07-20T17:23:41.487Z - Error processing registration: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-19T12:23:07.333Z }" (type Object) at path "dailyClicks"
 2025-07-20T17:23:45.618Z - Error processing registration: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-19T12:23:07.333Z }" (type Object) at path "dailyClicks"
 2025-07-20T17:24:01.200Z - Error processing registration: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-19T12:23:07.333Z }" (type Object) at path "dailyClicks"
+2025-07-20T18:09:41.108Z - Uncaught Exception: Error: listen EADDRINUSE: address already in use 0.0.0.0:5001
+2025-07-21T08:46:59.295Z - MongoDB connection error: MongooseServerSelectionError: Server selection timed out after 5000 ms
+2025-07-21T08:46:59.306Z - MongoDB connection error: MongoServerSelectionError: Server selection timed out after 5000 ms
+2025-07-21T08:47:04.371Z - MongoDB connection error: MongooseServerSelectionError: Server selection timed out after 5000 ms
+2025-07-21T08:47:04.382Z - MongoDB connection error: MongoServerSelectionError: Server selection timed out after 5000 ms
+2025-07-21T08:47:09.505Z - MongoDB connection error: MongooseServerSelectionError: Server selection timed out after 5000 ms
+2025-07-21T08:47:09.548Z - MongoDB connection error: MongoServerSelectionError: Server selection timed out after 5000 ms
+2025-07-21T08:47:14.628Z - MongoDB connection error: MongooseServerSelectionError: Server selection timed out after 5000 ms
+2025-07-21T08:47:14.659Z - MongoDB connection error: MongoServerSelectionError: Server selection timed out after 5000 ms
+2025-07-21T09:19:15.646Z - Error loading shared capital: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 50, lastReset: 2025-07-19T12:23:07.333Z }" (type Object) at path "dailyClicks"
