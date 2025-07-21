@@ -5760,3 +5760,19 @@
 2025-07-21T11:32:43.333Z - MongoDB connection error: MongoNetworkError: connection 1 to 159.143.88.194:27017 closed
 2025-07-21T11:32:43.340Z - MongoDB connection error: MongoNetworkError: connection 1 to 159.143.88.194:27017 closed
 2025-07-21T11:48:39.157Z - Error recording click: ValidationError: dailyClicks: Cast to Object failed for value "{ count: 1, lastReset: 2025-07-21T11:31:16.786Z }1" (type string) at path "dailyClicks"
+2025-07-21T13:35:27.380Z - MongoDB connection error: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-21T13:35:27.386Z - MongoDB connection error: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-21T13:35:59.751Z - MongoDB connection error: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-21T13:35:59.756Z - MongoDB connection error: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-21T13:36:35.038Z - MongoDB connection error: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-21T13:36:35.042Z - MongoDB connection error: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-21T13:37:13.405Z - MongoDB connection error: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-21T13:37:13.410Z - MongoDB connection error: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-21T13:37:48.715Z - MongoDB connection error: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-21T13:37:48.720Z - MongoDB connection error: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-21T13:38:20.004Z - MongoDB connection error: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-21T13:38:20.010Z - MongoDB connection error: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-21T13:38:53.373Z - MongoDB connection error: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-21T13:38:53.378Z - MongoDB connection error: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-21T13:39:26.715Z - MongoDB connection error: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-21T13:39:26.719Z - MongoDB connection error: Error: querySrv ECONNREFUSED _mongodb._tcp.cluster0.o7yokb3.mongodb.net
