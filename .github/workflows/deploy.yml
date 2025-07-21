@@ -124,5 +124,4 @@ jobs:
             cd ${{vars.DEPLOY_PATH}}
             bash ./startup.sh
             
-            echo "Restarting nginx service..."
-            docker exec -i ${{vars.DOCKER_SERVICE_NGINX}} sh -c "nginx -s reload"
+            # Nginx container starts fresh; no reload needed
