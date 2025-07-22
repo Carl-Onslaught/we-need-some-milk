@@ -23,6 +23,9 @@ export default function AllUsers() {
   const [resetLoading, setResetLoading] = useState(false);
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [deactivateLoadingId, setDeactivateLoadingId] = useState(null);
+  const [deleteLoadingId, setDeleteLoadingId] = useState(null);
+  const [deleteConfirmOpen, setDeleteConfirmOpen] = useState(false);
+  const [userToDelete, setUserToDelete] = useState(null);
 
   useEffect(() => {
     fetchUsers();
@@ -85,6 +88,28 @@ export default function AllUsers() {
       toast({ title: 'Error resetting password', status: 'error', duration: 2000, isClosable: true });
     }
     setActionLoading(false);
+  };
+
+  const handleDeleteUser = async (userId) => {
+    setDeleteLoadingId(userId);
+    try {
+      await axios.delete(`/admin/users/${userId}`);
+      toast({ title: 'User deleted successfully!', status: 'success', duration: 2000, isClosable: true });
+      fetchUsers();
+      setDeleteConfirmOpen(false);
+      setModalOpen(false);
+    } catch (err) {
+      toast({ title: 'Error deleting user', status: 'error', duration: 2000, isClosable: true });
+    }
+    setDeleteLoadingId(null);
+  };
+  const openDeleteConfirm = (user) => {
+    setUserToDelete(user);
+    setDeleteConfirmOpen(true);
+  };
+  const closeDeleteConfirm = () => {
+    setDeleteConfirmOpen(false);
+    setUserToDelete(null);
   };
 
   const openResetModal = (userId) => {
@@ -194,17 +219,17 @@ export default function AllUsers() {
                                   Reset
                                 </Button>
                               </Tooltip>
-                              <Tooltip label="Deactivate User" hasArrow>
+                              <Tooltip label="Delete User" hasArrow>
                                 <Button
                                   size="sm"
                                   colorScheme="red"
                                   variant="solid"
                                   _hover={{ bg: '#a30000', transform: 'scale(1.05)' }}
-                                  onClick={e => { e.stopPropagation(); handleDeactivate(user._id); }}
-                                  isLoading={deactivateLoadingId === user._id}
+                                  onClick={e => { e.stopPropagation(); openDeleteConfirm(user); }}
+                                  isLoading={deleteLoadingId === user._id}
                                   transition="all 0.2s"
                                 >
-                                  Deactivate
+                                  Delete
                                 </Button>
                               </Tooltip>
                             </HStack>
@@ -286,11 +311,11 @@ export default function AllUsers() {
               colorScheme="red"
               variant="solid"
               _hover={{ bg: '#a30000', transform: 'scale(1.05)' }}
-              onClick={() => handleDeactivate(selectedUser?._id)}
-              isLoading={deactivateLoadingId === selectedUser?._id}
+              onClick={() => openDeleteConfirm(selectedUser)}
+              isLoading={deleteLoadingId === selectedUser?._id}
               transition="all 0.2s"
             >
-              Deactivate
+              Delete
             </Button>
             <Button onClick={handleModalClose} ml={3} colorScheme="gray" variant="ghost">Close</Button>
           </ModalFooter>
@@ -342,6 +367,23 @@ export default function AllUsers() {
               Submit
             </Button>
             <Button onClick={closeResetModal} colorScheme="gray" variant="ghost" disabled={resetLoading}>Cancel</Button>
+          </ModalFooter>
+        </ModalContent>
+      </Modal>
+      {/* Delete Confirmation Modal */}
+      <Modal isOpen={deleteConfirmOpen} onClose={closeDeleteConfirm} isCentered>
+        <ModalOverlay />
+        <ModalContent bg={tableBg} color="white">
+          <ModalHeader color={accentColor}>Confirm Delete</ModalHeader>
+          <ModalCloseButton />
+          <ModalBody>
+            <Text>Are you sure you want to permanently delete user <b>{userToDelete?.username}</b>? This action cannot be undone.</Text>
+          </ModalBody>
+          <ModalFooter>
+            <Button colorScheme="red" mr={3} onClick={() => handleDeleteUser(userToDelete?._id)} isLoading={deleteLoadingId === userToDelete?._id}>
+              Delete
+            </Button>
+            <Button onClick={closeDeleteConfirm} colorScheme="gray" variant="ghost" disabled={deleteLoadingId === userToDelete?._id}>Cancel</Button>
           </ModalFooter>
         </ModalContent>
       </Modal>

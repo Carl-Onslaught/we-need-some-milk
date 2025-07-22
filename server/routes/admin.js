@@ -49,6 +49,7 @@ router.get('/users', adminController.getAllUsers);
 router.put('/users/role', adminController.updateUserRole);
 router.post('/users/:id/toggle-status', adminController.toggleUserStatus);
 router.post('/users/:id/reset-password', auth, isAdmin, adminController.adminResetUserPassword);
+router.delete('/users/:id', auth, isAdmin, adminController.deleteUser);
 
 // Registration management
 router.get('/registrations/pending', adminController.getPendingRegistrations);
