@@ -64,7 +64,7 @@ services:
         test: ["CMD-SHELL", "mongosh --quiet --eval 'db.adminCommand(\"ping\").ok' || exit 1"]
         interval: 10s
         timeout: 10s
-        retries: 4
+        retries: 2
     networks:
       - wc_net
     # dns:
