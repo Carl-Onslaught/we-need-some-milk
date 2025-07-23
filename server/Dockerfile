@@ -14,6 +14,8 @@ COPY . .
 # Set environment variables
 ENV HOST=0.0.0.0
 ENV PORT=5001
+# Set container timezone to Philippine Time
+ENV TZ=Asia/Manila
 
 # Expose the port your app runs on
 EXPOSE 5001
