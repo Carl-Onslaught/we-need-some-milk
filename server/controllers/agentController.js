@@ -336,6 +336,11 @@ exports.recordClick = async (req, res) => {
             return res.status(404).json({ message: 'User not found' });
         }
 
+        // Ensure dailyClicks is a number
+        if (typeof user.dailyClicks !== 'number') {
+          user.dailyClicks = 0;
+        }
+
         // Check if daily limit is reached
         const today = new Date();
         today.setHours(0, 0, 0, 0);
@@ -345,7 +350,7 @@ exports.recordClick = async (req, res) => {
 
         // Reset daily clicks if it's a new day
         if (isNewDay) {
-            user.dailyClicks = { count: 0, lastReset: new Date() };
+            user.dailyClicks = 0;
             user.dailyClickEarnings = 0;
         }
 
@@ -353,6 +358,7 @@ exports.recordClick = async (req, res) => {
         if (user.dailyClickEarnings >= 10) {
             return res.status(200).json({ 
                 message: 'Daily Click Limit Reached',
+                clicks: user.dailyClicks,
                 clicks: (typeof user.dailyClicks === 'object' ? user.dailyClicks.count : user.dailyClicks),
                 dailyEarnings: user.dailyClickEarnings,
                 totalEarnings: user.clickEarnings
@@ -374,11 +380,8 @@ exports.recordClick = async (req, res) => {
         }
 
         // Update click counts and earnings
-        const currentClicks = typeof user.dailyClicks === 'object' ? (user.dailyClicks.count || 0) : (user.dailyClicks || 0);
-        user.dailyClicks = {
-            count: currentClicks + 1,
-            lastReset: user.dailyClicks?.lastReset || new Date()
-        };
+        const currentClicks = typeof user.dailyClicks === 'number' ? user.dailyClicks : 0;
+        user.dailyClicks = currentClicks + 1;
         user.dailyClickEarnings = newDailyEarnings;
         user.clickEarnings = (user.clickEarnings || 0) + clickEarning;
         user.lastClick = new Date();

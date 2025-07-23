@@ -11,14 +11,13 @@ async function loadRuntimeSettings() {
   return { CLICK_REWARD, MAX_DAILY_EARNINGS, MAX_CLICKS };
 }
 
-// Helper function to check if daily clicks should be reset
-const shouldResetDailyClicks = (lastReset) => {
-  const now = new Date();
-  const last = new Date(lastReset);
-  return now.getDate() !== last.getDate() ||
-         now.getMonth() !== last.getMonth() ||
-         now.getFullYear() !== last.getFullYear();
-};
+// Helper: returns true if lastClick was before today (i.e. a new calendar day)
+function isNewDay(lastClick) {
+  if (!lastClick) return true;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return new Date(lastClick) < today;
+}
 
 // Record a click
 exports.recordClick = async (req, res) => {
@@ -26,35 +25,39 @@ exports.recordClick = async (req, res) => {
   const { CLICK_REWARD, MAX_CLICKS } = await loadRuntimeSettings();
   try {
     const user = req.user;
+    // Defensive fix: ensure dailyClicks is always a number
+    if (typeof user.dailyClicks !== 'number') {
+      user.dailyClicks = 0;
+    }
 
-    // Check if daily clicks should be reset
-    if (shouldResetDailyClicks(user.dailyClicks.lastReset)) {
-      user.dailyClicks.count = 0;
-      user.dailyClicks.lastReset = new Date();
+    // Reset daily clicks if this is a new day
+    if (isNewDay(user.lastClick)) {
+      user.dailyClicks = 0;
     }
 
     // Check if user has reached daily limit
-    if (user.dailyClicks.count >= MAX_CLICKS) {
+    if (user.dailyClicks >= MAX_CLICKS) {
       return res.status(400).json({
         message: 'Daily click limit reached',
-        dailyClicks: user.dailyClicks.count,
+        dailyClicks: user.dailyClicks,
         maxClicks: MAX_CLICKS
       });
     }
 
     // Record the click
-    user.dailyClicks.count += 1;
+    user.dailyClicks += 1;
     user.balance += CLICK_REWARD;
+    user.lastClick = new Date();
 
     // Create transaction record
     const transaction = new Transaction({
       user: user._id,
       type: 'click',
       amount: CLICK_REWARD,
-      description: `Reward for click #${user.dailyClicks.count}`,
+      description: `Reward for click #${user.dailyClicks}`,
       status: 'completed',
       metadata: {
-        clickNumber: user.dailyClicks.count
+        clickNumber: user.dailyClicks
       }
     });
 
@@ -64,12 +67,12 @@ exports.recordClick = async (req, res) => {
       transaction.save()
     ]);
 
-    const dailyEarnings = user.dailyClicks.count * CLICK_REWARD;
+    const dailyEarnings = user.dailyClicks * CLICK_REWARD;
     res.json({
       message: 'Click recorded successfully',
       reward: CLICK_REWARD,
-      dailyClicks: user.dailyClicks.count,
-      clicks: user.dailyClicks.count, // backward-compat
+      dailyClicks: user.dailyClicks,
+      clicks: user.dailyClicks, // backward-compat
       dailyEarnings,
       maxClicks: MAX_CLICKS,
       balance: user.balance
@@ -85,11 +88,14 @@ exports.getClickStats = async (req, res) => {
   const { MAX_CLICKS, MAX_DAILY_EARNINGS } = await loadRuntimeSettings();
   try {
     const user = req.user;
+    // Defensive fix: ensure dailyClicks is always a number
+    if (typeof user.dailyClicks !== 'number') {
+      user.dailyClicks = 0;
+    }
 
-    // Check if daily clicks should be reset
-    if (shouldResetDailyClicks(user.dailyClicks.lastReset)) {
-      user.dailyClicks.count = 0;
-      user.dailyClicks.lastReset = new Date();
+    // Reset daily clicks if new day
+    if (isNewDay(user.lastClick)) {
+      user.dailyClicks = 0;
       await user.save();
     }
 
@@ -114,9 +120,9 @@ exports.getClickStats = async (req, res) => {
     ]);
 
     res.json({
-      dailyClicks: user.dailyClicks.count,
+      dailyClicks: user.dailyClicks,
       maxClicks: MAX_CLICKS,
-      remainingClicks: MAX_CLICKS - user.dailyClicks.count,
+      remainingClicks: MAX_CLICKS - user.dailyClicks,
       todayEarnings: todayEarnings[0]?.total || 0,
       maxDailyEarnings: MAX_DAILY_EARNINGS
     });

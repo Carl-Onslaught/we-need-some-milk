@@ -120,6 +120,11 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: 'Invalid credentials' });
     }
 
+    // Defensive fix: ensure dailyClicks is always an object
+    if (typeof user.dailyClicks !== 'object' || user.dailyClicks === null) {
+      user.dailyClicks = { count: 0, lastReset: new Date() };
+    }
+
     // Fix legacy dailyClicks schema mismatch
     if (typeof user.dailyClicks === 'number') {
       console.log('Migrating legacy dailyClicks number to object');

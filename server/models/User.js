@@ -55,15 +55,10 @@ const userSchema = new mongoose.Schema({
     type: Number,
     default: 0
   },
+  // Daily click count (resets each calendar day based on lastClick field)
   dailyClicks: {
-    count: {
-      type: Number,
-      default: 0
-    },
-    lastReset: {
-      type: Date,
-      default: Date.now
-    }
+    type: Number,
+    default: 0
   },
   dailyClickEarnings: {
     type: Number,
