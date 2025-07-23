@@ -341,15 +341,12 @@ exports.recordClick = async (req, res) => {
           user.dailyClicks = 0;
         }
 
-        // Determine if it's a new day in Manila (UTC+8)
-        const MANILA_OFFSET_MIN = 8 * 60;
-        const now = Date.now();
-        const manilaNow = new Date(now + MANILA_OFFSET_MIN * 60 * 1000);
-        manilaNow.setUTCHours(0, 0, 0, 0);
-        const manilaMidnightUtc = manilaNow.getTime() - MANILA_OFFSET_MIN * 60 * 1000;
-
+        // Check if daily limit is reached
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+        
         const lastClick = user.lastClick ? new Date(user.lastClick) : null;
-        const isNewDay = !lastClick || lastClick.getTime() < manilaMidnightUtc;
+        const isNewDay = !lastClick || lastClick < today;
 
         // Reset daily clicks if it's a new day
         if (isNewDay) {
@@ -357,13 +354,12 @@ exports.recordClick = async (req, res) => {
             user.dailyClickEarnings = 0;
         }
 
-
-
         // Check if daily limit is reached (₱10 = 50 clicks)
         if (user.dailyClickEarnings >= 10) {
             return res.status(200).json({ 
                 message: 'Daily Click Limit Reached',
                 clicks: user.dailyClicks,
+                clicks: (typeof user.dailyClicks === 'object' ? user.dailyClicks.count : user.dailyClicks),
                 dailyEarnings: user.dailyClickEarnings,
                 totalEarnings: user.clickEarnings
             });

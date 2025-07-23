@@ -11,16 +11,12 @@ async function loadRuntimeSettings() {
   return { CLICK_REWARD, MAX_DAILY_EARNINGS, MAX_CLICKS };
 }
 
-// Helper: returns true if lastClick happened before *today 00:00* in Manila (UTC+8)
+// Helper: returns true if lastClick was before today (i.e. a new calendar day)
 function isNewDay(lastClick) {
   if (!lastClick) return true;
-  const now = Date.now();
-  // Calculate Manila midnight for the current date, independent of container TZ
-  const MANILA_OFFSET_MIN = 8 * 60; // UTC+8
-  const manilaNow = new Date(now + MANILA_OFFSET_MIN * 60 * 1000);
-  manilaNow.setUTCHours(0, 0, 0, 0); // set to 00:00 Manila of current day
-  const manilaMidnightUtc = manilaNow.getTime() - MANILA_OFFSET_MIN * 60 * 1000;
-  return new Date(lastClick).getTime() < manilaMidnightUtc;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  return new Date(lastClick) < today;
 }
 
 // Record a click
