@@ -16,9 +16,9 @@ const seedUsers = async () => {
 
     // Create admin user
     await User.create({
-      username: 'admin',
+      username: process.env.WC_SUPERADMIN_USERNAME,
       email: 'admin@wealthclicks.com',
-      password: 'admin123',
+      password: process.env.WC_SUPERADMIN_PASSWORD,
       role: 'admin',
       isActive: true,
       status: 'approved',
@@ -29,9 +29,9 @@ const seedUsers = async () => {
 
     // Create test agent user
     await User.create({
-      username: 'testagent',
+      username: process.env.WC_AGENT_USERNAME,
       email: 'agent@wealthclicks.com',
-      password: 'agent123',
+      password: process.env.WC_AGENT_PASSWORD,
       role: 'agent',
       isActive: true,
       status: 'approved',

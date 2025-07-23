@@ -78,6 +78,10 @@ jobs:
           echo "DOCKER_VOLUME_DB=${{vars.DOCKER_VOLUME_DB}}" >> .env
           echo "DOCKER_VOLUME_DB_CONFIG=${{vars.DOCKER_VOLUME_DB_CONFIG}}" >> .env
           echo "DOCKER_NETWORK=${{vars.DOCKER_NETWORK}}" >> .env
+          echo "WC_SUPERADMIN_USERNAME=${{vars.WC_SUPERADMIN_USERNAME}}" >> .env
+          echo "WC_SUPERADMIN_PASSWORD=${{secrets.WC_SUPERADMIN_PASSWORD}}" >> .env
+          echo "WC_AGENT_USERNAME=${{vars.WC_AGENT_USERNAME}}" >> .env
+          echo "WC_AGENT_PASSWORD=${{secrets.WC_AGENT_PASSWORD}}" >> .env
           chmod 644 .env  # Ensure it's readable
       - name: Create destination directory and set permissions
         uses: appleboy/ssh-action@master

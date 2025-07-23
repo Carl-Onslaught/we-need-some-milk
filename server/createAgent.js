@@ -11,13 +11,13 @@ async function createAgent() {
     console.log('Connected to MongoDB');
 
     // Delete existing agent if exists
-    await User.deleteMany({ username: 'agent' });
+    await User.deleteMany({ username: process.env.WC_AGENT_USERNAME });
 
     // Create new agent
     const agent = new User({
-      username: 'agent',
+      username: process.env.WC_AGENT_USERNAME,
       email: 'agent@wealthclicks.com',
-      password: 'agent123', // The pre-save hook will hash this
+      password: process.env.WC_AGENT_PASSWORD, // The pre-save hook will hash this
       role: 'agent',
       status: 'approved',
       approvedAt: new Date(),
@@ -28,8 +28,8 @@ async function createAgent() {
     console.log('Agent user created successfully!');
 
     // Verify the password
-    const savedAgent = await User.findOne({ username: 'agent' });
-    const isMatch = await bcrypt.compare('agent123', savedAgent.password);
+    const savedAgent = await User.findOne({ username: process.env.WC_AGENT_USERNAME });
+    const isMatch = await bcrypt.compare(process.env.WC_AGENT_PASSWORD, savedAgent.password);
     console.log('Password verification:', isMatch ? 'SUCCESS' : 'FAILED');
 
   } catch (error) {

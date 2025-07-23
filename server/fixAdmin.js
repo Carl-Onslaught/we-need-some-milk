@@ -16,9 +16,9 @@ async function fixAdmin() {
 
     // Create new admin with exact password
     const admin = new User({
-      username: 'WClickAdmin',
+      username: process.env.WC_SUPERADMIN_USERNAME,
       email: 'admin@wealthclicks.com',
-      password: 'Ridge1228', // The pre-save hook will hash this
+      password: process.env.WC_SUPERADMIN_PASSWORD, // The pre-save hook will hash this
       role: 'admin',
       status: 'approved',
       approvedAt: new Date(),
@@ -29,8 +29,8 @@ async function fixAdmin() {
     console.log('New admin user created successfully!');
 
     // Verify the password
-    const savedAdmin = await User.findOne({ username: 'WClickAdmin' });
-    const isMatch = await bcrypt.compare('Ridge1228', savedAdmin.password);
+    const savedAdmin = await User.findOne({ username: process.env.WC_SUPERADMIN_USERNAME });
+    const isMatch = await bcrypt.compare(process.env.WC_SUPERADMIN_PASSWORD, savedAdmin.password);
     console.log('Password verification:', isMatch ? 'SUCCESS' : 'FAILED');
 
   } catch (error) {

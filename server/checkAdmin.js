@@ -11,7 +11,7 @@ async function checkAdmin() {
     console.log('Connected to MongoDB');
 
     // Check for admin user
-    const admin = await User.findOne({ username: 'WClickAdmin' });
+    const admin = await User.findOne({ username: process.env.WC_SUPERADMIN_USERNAME });
     console.log('Admin user:', admin ? {
       username: admin.username,
       email: admin.email,
@@ -25,7 +25,7 @@ async function checkAdmin() {
     }
 
     // Verify password
-    const isMatch = await bcrypt.compare('Ridge1228', admin.password);
+    const isMatch = await bcrypt.compare(process.env.WC_SUPERADMIN_PASSWORD, admin.password);
     console.log('Password match:', isMatch);
 
     if (!admin.isActive) {
