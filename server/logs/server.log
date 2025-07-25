@@ -5894,3 +5894,11 @@
 2025-07-22T15:24:24.796Z - MongoDB connection error: Error: querySrv ETIMEOUT _mongodb._tcp.cluster0.o7yokb3.mongodb.net
 2025-07-22T15:25:41.079Z - MongoDB connection error: Error: querySrv ETIMEOUT _mongodb._tcp.cluster0.o7yokb3.mongodb.net
 2025-07-22T15:25:41.083Z - MongoDB connection error: Error: querySrv ETIMEOUT _mongodb._tcp.cluster0.o7yokb3.mongodb.net
+2025-07-25T10:45:38.421Z - Approve registration error: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-19T12:23:07.333Z }" (type Object) at path "dailyClicks"
+2025-07-25T10:49:13.034Z - Migration failed: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-25T10:49:13.024Z }" (type Object) at path "dailyClicks"
+2025-07-25T10:56:45.434Z - Migration failed: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-25T10:56:45.424Z }" (type Object) at path "dailyClicks"
+2025-07-25T11:09:41.452Z - Error activating package: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-19T12:23:07.333Z }" (type Object) at path "dailyClicks"
+2025-07-25T12:01:04.782Z - Migration failed: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-25T12:01:04.772Z }" (type Object) at path "dailyClicks"
+2025-07-25T13:01:47.384Z - Migration failed: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-25T13:01:47.370Z }" (type Object) at path "dailyClicks"
+2025-07-25T13:25:33.982Z - Migration failed: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-25T13:25:33.973Z }" (type Object) at path "dailyClicks"
+2025-07-25T13:33:08.895Z - Migration failed: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-25T13:33:08.875Z }" (type Object) at path "dailyClicks"

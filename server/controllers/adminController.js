@@ -684,22 +684,24 @@ exports.approveRegistration = async (req, res) => {
     // === Credit direct referral bonus to referrer ===
     const approvedUser = await User.findById(id).select('referrer');
     if (approvedUser && approvedUser.referrer) {
-      const referrer = await User.findById(approvedUser.referrer);
-      if (referrer) {
-        const bonus = 10; // ₱10 bonus
-        referrer.referralEarnings = referrer.referralEarnings || { direct: 0, indirect: 0 };
-        referrer.referralEarnings.direct = (referrer.referralEarnings.direct || 0) + bonus;
-        await referrer.save();
+      const bonus = 10; // ₱10 bonus
+      // atomically increment the referrer's direct referral earnings without loading the whole document
+      await User.updateOne(
+        { _id: approvedUser.referrer },
+        {
+          $inc: { 'referralEarnings.direct': bonus }
+        },
+        { runValidators: false }
+      );
 
-        await Transaction.create({
-          user: referrer._id,
-          type: 'referral',
-          amount: bonus,
-          referralType: 'direct',
-          description: 'Direct referral bonus from new agent activation',
-          status: 'completed'
-        });
-      }
+      await Transaction.create({
+        user: approvedUser.referrer,
+        type: 'referral',
+        amount: bonus,
+        referralType: 'direct',
+        description: 'Direct referral bonus from new agent activation',
+        status: 'completed'
+      });
     }
 
     res.json({

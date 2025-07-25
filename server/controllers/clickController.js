@@ -31,14 +31,17 @@ exports.recordClick = async (req, res) => {
     }
 
     // Reset daily clicks if this is a new day
+    let didReset = false;
     if (isNewDay(user.lastClick)) {
       user.dailyClicks = 0;
+      didReset = true;
     }
 
     // Check if user has reached daily limit
     if (user.dailyClicks >= MAX_CLICKS) {
+      if (didReset) await user.save(); // Save the reset if it happened
       return res.status(400).json({
-        message: 'Daily click limit reached',
+        message: 'Click limit reached',
         dailyClicks: user.dailyClicks,
         maxClicks: MAX_CLICKS
       });
@@ -94,9 +97,11 @@ exports.getClickStats = async (req, res) => {
     }
 
     // Reset daily clicks if new day
+    let didReset = false;
     if (isNewDay(user.lastClick)) {
       user.dailyClicks = 0;
-      await user.save();
+      didReset = true;
+      await user.save(); // Save the reset if it happened
     }
 
     // Get today's earnings from clicks
