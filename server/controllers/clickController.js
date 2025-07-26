@@ -21,7 +21,6 @@ function isNewDay(lastClick) {
 
 // Record a click
 exports.recordClick = async (req, res) => {
-  // always use latest settings
   const { CLICK_REWARD, MAX_CLICKS } = await loadRuntimeSettings();
   try {
     const user = req.user;
@@ -30,16 +29,14 @@ exports.recordClick = async (req, res) => {
       user.dailyClicks = 0;
     }
 
-    // Reset daily clicks if this is a new day
-    let didReset = false;
+    // Always reset daily clicks if this is a new day BEFORE checking the limit
     if (isNewDay(user.lastClick)) {
+      console.log('Resetting daily clicks for user:', user._id);
       user.dailyClicks = 0;
-      didReset = true;
     }
 
-    // Check if user has reached daily limit
+    // Now check if user has reached daily limit
     if (user.dailyClicks >= MAX_CLICKS) {
-      if (didReset) await user.save(); // Save the reset if it happened
       return res.status(400).json({
         message: 'Click limit reached',
         dailyClicks: user.dailyClicks,
@@ -97,10 +94,8 @@ exports.getClickStats = async (req, res) => {
     }
 
     // Reset daily clicks if new day
-    let didReset = false;
     if (isNewDay(user.lastClick)) {
       user.dailyClicks = 0;
-      didReset = true;
       await user.save(); // Save the reset if it happened
     }
 

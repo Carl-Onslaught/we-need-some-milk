@@ -5902,3 +5902,10 @@
 2025-07-25T13:01:47.384Z - Migration failed: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-25T13:01:47.370Z }" (type Object) at path "dailyClicks"
 2025-07-25T13:25:33.982Z - Migration failed: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-25T13:25:33.973Z }" (type Object) at path "dailyClicks"
 2025-07-25T13:33:08.895Z - Migration failed: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-25T13:33:08.875Z }" (type Object) at path "dailyClicks"
+2025-07-26T11:32:18.625Z - Uncaught Exception: Error: listen EADDRINUSE: address already in use 0.0.0.0:5001
+2025-07-26T11:33:49.860Z - Migration failed: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-26T11:33:49.843Z }" (type Object) at path "dailyClicks"
+2025-07-26T11:34:04.589Z - Migration failed: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-26T11:34:04.582Z }" (type Object) at path "dailyClicks"
+2025-07-26T12:12:03.866Z - Migration failed: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-26T12:12:03.842Z }" (type Object) at path "dailyClicks"
+2025-07-26T12:12:13.809Z - Migration failed: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-26T12:12:13.802Z }" (type Object) at path "dailyClicks"
+2025-07-26T12:26:31.895Z - Migration failed: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-26T12:26:31.872Z }" (type Object) at path "dailyClicks"
+2025-07-26T12:29:34.559Z - Migration failed: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-26T12:29:34.552Z }" (type Object) at path "dailyClicks"

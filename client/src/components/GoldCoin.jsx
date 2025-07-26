@@ -54,18 +54,6 @@ const GoldCoin = ({ onEarn, dailyClicks, maxClicks }) => {
   }, []);
 
   const handleCoinClick = async () => {
-    // Check if user has reached daily limit
-    if (dailyClicks >= maxClicks) {
-      toast({
-        title: "Click Limit Reached",
-        description: "You have reached your 50 clicks for today. Please come back tomorrow to earn more!",
-        status: "warning",
-        duration: 5000,
-        isClosable: true,
-      });
-      return;
-    }
-
     if (isAnimating || !goldCoinAreaRef.current) {
       return;
     }
