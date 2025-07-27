@@ -10,7 +10,7 @@ exports.createInvestment = async (req, res) => {
     const user = req.user;
 
     // Validate package type
-    if (![1, 2].includes(packageType)) {
+    if (![1, 2, 3].includes(packageType)) {
       return res.status(400).json({ message: 'Invalid package type' });
     }
 

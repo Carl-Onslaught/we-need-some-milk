@@ -7,8 +7,9 @@ A modern investment platform with clicking tasks, referral system, and shared ca
 - User Authentication (Login/Register)
 - Daily Clicking Tasks (₱0.20 per click, max ₱10 per day)
 - Investment Packages:
-  - Package 1: ₱100 investment, 12 days, 20% interest
-  - Package 2: ₱500 investment, 20 days, 50% interest
+  - Package 1: ₱100+ investment, 12 days, ₱1.667 daily for ₱100 (scales proportionally)
+  - Package 2: ₱500+ investment, 20 days, ₱12.5 daily for ₱500 (scales proportionally)
+  - Package 3: ₱1000+ investment, 30 days, ₱100 daily for ₱1000 (scales proportionally)
 - Multi-level Referral System:
   - Direct referral: 10% of registration fee
   - Investment referrals:

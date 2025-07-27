@@ -498,7 +498,7 @@ export default function Dashboard() {
           >
             Generate Passive Income Through Shared Capital
           </Heading>
-          <SimpleGrid columns={{ base: 1, sm: 2, md: 4 }} spacing={4}>
+          <SimpleGrid columns={{ base: 1, sm: 2, md: 3 }} spacing={4}>
             <SharedCapitalPackage
               packageNumber={1}
               minimum={100}
@@ -509,6 +509,12 @@ export default function Dashboard() {
               packageNumber={2}
               minimum={500}
               onEnter={(amount) => handlePackageEnter(amount, 2)}
+              walletBalance={stats.wallet}
+            />
+            <SharedCapitalPackage
+              packageNumber={3}
+              minimum={1000}
+              onEnter={(amount) => handlePackageEnter(amount, 3)}
               walletBalance={stats.wallet}
             />
           </SimpleGrid>

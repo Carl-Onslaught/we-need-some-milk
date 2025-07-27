@@ -58,12 +58,12 @@ router.post('/shared-capital', auth, async (req, res) => {
     const agentId = req.user.id;
 
     // Validate package ID
-    if (![1, 2].includes(packageId)) {
+    if (![1, 2, 3].includes(packageId)) {
       return res.status(400).json({ message: 'Invalid package ID' });
     }
 
     // Validate amount based on package
-    const minAmount = packageId === 1 ? 100 : 500;
+    const minAmount = packageId === 1 ? 100 : packageId === 2 ? 500 : 1000;
     if (amount < minAmount) {
       return res.status(400).json({ message: `Amount must be at least ₱${minAmount}` });
     }
@@ -134,8 +134,27 @@ router.post('/packages/activate', auth, async (req, res) => {
     const endDate = new Date();
     endDate.setDate(endDate.getDate() + packageConfig.duration);
 
-    // Calculate daily income (but don't show in total yet)
-    const dailyIncome = (amount * packageConfig.incomeRate) / packageConfig.duration;
+    // Calculate daily income for all packages
+    let dailyIncome;
+    if (packageId === 1) {
+      // Package 1: ₱100 investment → ₱1.667 daily → ₱120 total return (20% profit)
+      const baseAmount = 100;
+      const baseDaily = 1.667;
+      const multiplier = amount / baseAmount;
+      dailyIncome = baseDaily * multiplier;
+    } else if (packageId === 2) {
+      // Package 2: ₱500 investment → ₱12.5 daily → ₱750 total return (50% profit)
+      const baseAmount = 500;
+      const baseDaily = 12.5;
+      const multiplier = amount / baseAmount;
+      dailyIncome = baseDaily * multiplier;
+    } else if (packageId === 3) {
+      // Package 3: ₱1000 investment → ₱100 daily → ₱3000 total return (200% profit)
+      const baseAmount = 1000;
+      const baseDaily = 100;
+      const multiplier = amount / baseAmount;
+      dailyIncome = baseDaily * multiplier;
+    }
 
     // Deduct from wallet
     console.log('Wallet before deduction:', user.wallet, 'Amount to deduct:', amount);
@@ -296,8 +315,31 @@ router.post('/claim-packages', async (req, res) => {
         for (const pkg of packages) {
             const endDate = new Date(pkg.endDate);
             if (now >= endDate) {
-                const totalDays = pkg.packageType === 1 ? 12 : 20;
-                const totalEarnings = pkg.amount + (pkg.dailyIncome * totalDays);
+                            const totalDays = pkg.packageType === 1 ? 12 : pkg.packageType === 2 ? 20 : 30;
+            let totalEarnings;
+            
+            if (pkg.packageType === 1) {
+                // Package 1: Scale based on investment amount
+                // Base: ₱100 → ₱120 total return
+                const baseAmount = 100;
+                const baseTotal = 120;
+                const multiplier = pkg.amount / baseAmount;
+                totalEarnings = baseTotal * multiplier;
+            } else if (pkg.packageType === 2) {
+                // Package 2: Scale based on investment amount
+                // Base: ₱500 → ₱750 total return
+                const baseAmount = 500;
+                const baseTotal = 750;
+                const multiplier = pkg.amount / baseAmount;
+                totalEarnings = baseTotal * multiplier;
+            } else if (pkg.packageType === 3) {
+                // Package 3: Scale based on investment amount
+                // Base: ₱1000 → ₱3000 total return
+                const baseAmount = 1000;
+                const baseTotal = 3000;
+                const multiplier = pkg.amount / baseAmount;
+                totalEarnings = baseTotal * multiplier;
+            }
                 
                 // Update package
                 pkg.claimed = true;

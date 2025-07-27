@@ -9,7 +9,7 @@ const packageSchema = new mongoose.Schema({
   packageType: {
     type: Number,
     required: true,
-    enum: [1, 2] // 1 for 12 days, 2 for 20 days
+    enum: [1, 2, 3] // 1 for 12 days, 2 for 20 days, 3 for 30 days
   },
   amount: {
     type: Number,

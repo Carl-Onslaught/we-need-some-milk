@@ -9,7 +9,7 @@ const packageRequestSchema = new mongoose.Schema({
   packageId: {
     type: Number,
     required: true,
-    enum: [1, 2]
+    enum: [1, 2, 3]
   },
   amount: {
     type: Number,

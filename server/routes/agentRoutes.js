@@ -15,12 +15,12 @@ router.post('/shared-capital', auth, async (req, res) => {
     const agentId = req.user.id;
 
     // Validate package ID
-    if (![1, 2].includes(packageId)) {
+    if (![1, 2, 3].includes(packageId)) {
       return res.status(400).json({ message: 'Invalid package ID' });
     }
 
     // Validate amount based on package
-    const minAmount = packageId === 1 ? 100 : 500;
+    const minAmount = packageId === 1 ? 100 : packageId === 2 ? 500 : 1000;
     if (amount < minAmount) {
       return res.status(400).json({ message: `Amount must be at least ₱${minAmount}` });
     }

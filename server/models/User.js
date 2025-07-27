@@ -76,7 +76,7 @@ const userSchema = new mongoose.Schema({
   investments: [{
     package: {
       type: Number,
-      enum: [1, 2]  // 1 for Package 1, 2 for Package 2
+      enum: [1, 2, 3]  // 1 for Package 1, 2 for Package 2, 3 for Package 3
     },
     amount: Number,
     startDate: Date,

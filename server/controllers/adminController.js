@@ -193,7 +193,7 @@ exports.loadSharedCapital = async (req, res) => {
             package: packageType,
             status: 'active',
             startDate: new Date(),
-            endDate: new Date(Date.now() + (packageType === 1 ? 12 : 20) * 24 * 60 * 60 * 1000)
+            endDate: new Date(Date.now() + (packageType === 1 ? 12 : packageType === 2 ? 20 : 30) * 24 * 60 * 60 * 1000)
         }).save();
 
         res.json({ message: 'Shared capital loaded successfully' });

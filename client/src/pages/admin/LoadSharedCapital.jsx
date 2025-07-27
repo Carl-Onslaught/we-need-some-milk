@@ -92,9 +92,11 @@ export default function LoadSharedCapital() {
   const getPackageDetails = (type) => {
     switch (type) {
       case '1':
-        return { duration: '12 Days', income: '20% total (≈1.67% daily)' };
+        return { duration: '12 Days', income: '₱1.667 daily for ₱100 (scales proportionally)' };
       case '2':
-        return { duration: '20 Days', income: '50% total (2.5% daily)' };
+        return { duration: '20 Days', income: '₱12.5 daily for ₱500 (scales proportionally)' };
+      case '3':
+        return { duration: '30 Days', income: '₱100 daily for ₱1000 (scales proportionally)' };
       default:
         return { duration: 'N/A', income: 'N/A' };
     }

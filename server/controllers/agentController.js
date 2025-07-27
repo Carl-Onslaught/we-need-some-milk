@@ -31,7 +31,7 @@ exports.getEarnings = async (req, res) => {
         for (const pkg of packages) {
             const startDate = new Date(pkg.startDate);
             const endDate = new Date(pkg.endDate);
-            const totalDays = pkg.packageType === 1 ? 12 : 20;
+            const totalDays = pkg.packageType === 1 ? 12 : pkg.packageType === 2 ? 20 : 30;
             
             // Only include claimed packages in sharedEarnings
             if (pkg.claimed) {
@@ -546,7 +546,7 @@ exports.updatePackageEarnings = async (req, res) => {
             const daysSinceUpdate = Math.max(1, Math.floor((now - lastUpdate) / (1000 * 60 * 60 * 24)));
             
             // Calculate maximum possible earnings based on package duration
-            const totalDays = pkg.packageType === 1 ? 12 : 20;
+            const totalDays = pkg.packageType === 1 ? 12 : pkg.packageType === 2 ? 20 : 30;
             const maxEarnings = pkg.dailyIncome * totalDays;
             const potentialEarnings = pkg.dailyIncome * daysSinceUpdate;
             
@@ -612,7 +612,7 @@ async function processMaturedPackages() {
                 if (!freshPkg || freshPkg.claimed) continue;
                 
                 // Calculate final earnings
-                const totalDays = freshPkg.packageType === 1 ? 12 : 20;
+                const totalDays = freshPkg.packageType === 1 ? 12 : freshPkg.packageType === 2 ? 20 : 30;
                 const totalEarned = freshPkg.dailyIncome * totalDays;
                 
                 // Mark as matured but not claimed
@@ -683,9 +683,40 @@ exports.claimPackage = async (req, res) => {
         }
 
         // Calculate total earnings = principal + interest
-        const totalDays = pkg.packageType === 1 ? 12 : 20;
-        const interestEarned = parseFloat((pkg.dailyIncome * totalDays).toFixed(2));
-        const totalEarnings = parseFloat((pkg.amount + interestEarned).toFixed(2));
+        const totalDays = pkg.packageType === 1 ? 12 : pkg.packageType === 2 ? 20 : 30;
+        let interestEarned, totalEarnings;
+        
+        if (pkg.packageType === 1) {
+            // Package 1: Scale based on investment amount
+            // Base: ₱100 → ₱20 profit → ₱120 total return
+            const baseAmount = 100;
+            const baseProfit = 20;
+            const baseTotal = 120;
+            const multiplier = pkg.amount / baseAmount;
+            
+            interestEarned = parseFloat((baseProfit * multiplier).toFixed(2));
+            totalEarnings = parseFloat((baseTotal * multiplier).toFixed(2));
+        } else if (pkg.packageType === 2) {
+            // Package 2: Scale based on investment amount
+            // Base: ₱500 → ₱250 profit → ₱750 total return
+            const baseAmount = 500;
+            const baseProfit = 250;
+            const baseTotal = 750;
+            const multiplier = pkg.amount / baseAmount;
+            
+            interestEarned = parseFloat((baseProfit * multiplier).toFixed(2));
+            totalEarnings = parseFloat((baseTotal * multiplier).toFixed(2));
+        } else if (pkg.packageType === 3) {
+            // Package 3: Scale based on investment amount
+            // Base: ₱1000 → ₱2000 profit → ₱3000 total return
+            const baseAmount = 1000;
+            const baseProfit = 2000;
+            const baseTotal = 3000;
+            const multiplier = pkg.amount / baseAmount;
+            
+            interestEarned = parseFloat((baseProfit * multiplier).toFixed(2));
+            totalEarnings = parseFloat((baseTotal * multiplier).toFixed(2));
+        }
 
         // Get user within the transaction
         const user = await User.findById(req.user._id).session(session);
@@ -819,19 +850,61 @@ exports.getActivePackages = async (req, res) => {
             const startDate = new Date(pkg.startDate);
             const endDate = new Date(pkg.endDate);
             const daysSinceStart = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
-            const totalDays = pkg.packageType === 1 ? 12 : 20;
+            const totalDays = pkg.packageType === 1 ? 12 : pkg.packageType === 2 ? 20 : 30;
             const daysRemaining = Math.max(0, totalDays - daysSinceStart);
             const isMatured = now >= endDate;
+
+            // Ensure all packages show correct daily income and total earnings
+            let displayDailyIncome = pkg.dailyIncome;
+            let totalEarnings = 0;
+            
+            if (pkg.packageType === 1) {
+                // Package 1: Scale based on investment amount
+                // Base: ₱100 → ₱1.667 daily → ₱120 total return
+                const baseAmount = 100;
+                const baseDaily = 1.667;
+                const baseTotal = 120;
+                const multiplier = pkg.amount / baseAmount;
+                
+                displayDailyIncome = baseDaily * multiplier;
+                if (isMatured) {
+                    totalEarnings = baseTotal * multiplier;
+                }
+            } else if (pkg.packageType === 2) {
+                // Package 2: Scale based on investment amount
+                // Base: ₱500 → ₱12.5 daily → ₱750 total return
+                const baseAmount = 500;
+                const baseDaily = 12.5;
+                const baseTotal = 750;
+                const multiplier = pkg.amount / baseAmount;
+                
+                displayDailyIncome = baseDaily * multiplier;
+                if (isMatured) {
+                    totalEarnings = baseTotal * multiplier;
+                }
+            } else if (pkg.packageType === 3) {
+                // Package 3: Scale based on investment amount
+                // Base: ₱1000 → ₱100 daily → ₱3000 total return
+                const baseAmount = 1000;
+                const baseDaily = 100;
+                const baseTotal = 3000;
+                const multiplier = pkg.amount / baseAmount;
+                
+                displayDailyIncome = baseDaily * multiplier;
+                if (isMatured) {
+                    totalEarnings = baseTotal * multiplier;
+                }
+            }
 
             return {
                 _id: pkg._id,
                 packageType: pkg.packageType,
                 amount: pkg.amount,
                 status: pkg.status,
-                dailyIncome: pkg.dailyIncome,
+                dailyIncome: displayDailyIncome,
                 daysRemaining,
                 isMatured,
-                totalEarnings: isMatured ? (pkg.amount + (pkg.dailyIncome * totalDays)) : 0,
+                totalEarnings: totalEarnings,
                 claimed: pkg.claimed
             };
         });

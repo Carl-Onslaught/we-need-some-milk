@@ -61,7 +61,7 @@ const settingsSchema = new mongoose.Schema({
         default: {
             package1: { amount: 100, duration: 12, income: 20 },
             package2: { amount: 500, duration: 20, income: 50 },
-            package3: { amount: 1000, duration: 30, income: 80 },
+            package3: { amount: 1000, duration: 30, income: 200 }, // 200% profit = ₱2000, total return ₱3000
             package4: { amount: 5000, duration: 45, income: 120 }
         }
     },

@@ -23,17 +23,20 @@ router.post('/request', auth, async (req, res) => {
     const { packageType, amount } = req.body;
     
     // Validate package type and amount
-    if (![1, 2].includes(packageType)) {
+    if (![1, 2, 3].includes(packageType)) {
       return res.status(400).json({ message: 'Invalid package type' });
     }
 
     // Validate amount based on package type
     if ((packageType === 1 && amount !== 100) || 
-        (packageType === 2 && amount !== 500)) {
+        (packageType === 2 && amount !== 500) ||
+        (packageType === 3 && amount < 1000)) {
       return res.status(400).json({ 
         message: packageType === 1 
           ? 'Package 1 amount must be ₱100' 
-          : 'Package 2 amount must be ₱500' 
+          : packageType === 2
+          ? 'Package 2 amount must be ₱500'
+          : 'Package 3 amount must be at least ₱1000'
       });
     }
     
@@ -68,14 +71,30 @@ router.post('/request', auth, async (req, res) => {
     // Calculate package details
     const startDate = new Date();
     const endDate = new Date(startDate);
-    const duration = packageType === 1 ? 12 : 20; // 12 or 20 days
+    const duration = packageType === 1 ? 12 : packageType === 2 ? 20 : 30; // 12, 20, or 30 days
     endDate.setDate(endDate.getDate() + duration);
     
-    // Calculate total interest and daily income
-    const totalInterest = packageType === 1 
-      ? amount * 0.20  // 20% for Package 1
-      : amount * 0.50; // 50% for Package 2
-    const dailyIncome = totalInterest / duration;
+    // Calculate daily income for all packages
+    let dailyIncome;
+    if (packageType === 1) {
+      // Package 1: ₱100 investment → ₱1.667 daily → ₱120 total return (20% profit)
+      const baseAmount = 100;
+      const baseDaily = 1.667;
+      const multiplier = amount / baseAmount;
+      dailyIncome = baseDaily * multiplier;
+    } else if (packageType === 2) {
+      // Package 2: ₱500 investment → ₱12.5 daily → ₱750 total return (50% profit)
+      const baseAmount = 500;
+      const baseDaily = 12.5;
+      const multiplier = amount / baseAmount;
+      dailyIncome = baseDaily * multiplier;
+    } else if (packageType === 3) {
+      // Package 3: ₱1000 investment → ₱100 daily → ₱3000 total return (200% profit)
+      const baseAmount = 1000;
+      const baseDaily = 100;
+      const multiplier = amount / baseAmount;
+      dailyIncome = baseDaily * multiplier;
+    }
     
     const package = new Package({
       user: req.user.id,

@@ -5909,3 +5909,7 @@
 2025-07-26T12:12:13.809Z - Migration failed: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-26T12:12:13.802Z }" (type Object) at path "dailyClicks"
 2025-07-26T12:26:31.895Z - Migration failed: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-26T12:26:31.872Z }" (type Object) at path "dailyClicks"
 2025-07-26T12:29:34.559Z - Migration failed: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-26T12:29:34.552Z }" (type Object) at path "dailyClicks"
+2025-07-27T12:56:29.554Z - Migration failed: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-27T12:56:29.514Z }" (type Object) at path "dailyClicks"
+2025-07-27T12:57:55.518Z - WebSocket notification error: ReferenceError: calculateUserEarnings is not defined
+2025-07-27T12:58:08.187Z - WebSocket notification error: ReferenceError: calculateUserEarnings is not defined
+2025-07-27T13:34:55.098Z - Migration failed: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-27T13:34:55.072Z }" (type Object) at path "dailyClicks"

@@ -301,7 +301,7 @@ export default function SharedWithdrawal() {
                               py={1}
                               borderRadius="md"
                             >
-                              {withdrawal.package === 1 ? '12 Days' : '20 Days'}
+                              {withdrawal.package === 1 ? '12 Days' : withdrawal.package === 2 ? '20 Days' : '30 Days'}
                             </Badge>
                           </Td>
                           <Td color="#FDB137" fontWeight="bold" verticalAlign="middle" px={4} py={3}>
