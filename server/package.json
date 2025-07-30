@@ -6,7 +6,8 @@
   "scripts": {
     "start": "node server.js",
     "dev": "nodemon server.js",
-    "process-interest": "node scripts/processInterest.js"
+    "process-interest": "node scripts/processInterest.js",
+    "migrate": "node scripts/fixDailyClicksMigration.js"
   },
   "keywords": [],
   "author": "",

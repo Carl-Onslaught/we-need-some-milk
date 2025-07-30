@@ -20,6 +20,7 @@ const publicSettingsRoutes = require('./routes/settings');
 const { MONGO_OPTIONS } = require('./config');
 const { schedulePackageUpdates } = require('./utils/scheduler');
 const logger = require('./utils/logger');
+const { runMigrations } = require('./utils/migrationHelper');
 
 // Load environment variables
 dotenv.config({ path: path.resolve(__dirname, '.env') });
@@ -119,6 +120,9 @@ const connectWithRetry = async () => {
     console.log('Attempting MongoDB connection...', process.env.MONGODB_URI);
     await mongoose.connect(process.env.MONGODB_URI, MONGO_OPTIONS);
     console.log('Connected to MongoDB successfully');
+    
+    // Run migrations after successful connection
+    await runMigrations();
   } catch (err) {
     console.error('MongoDB connection error:', err);
     console.log('Retrying connection in 5 seconds...');
