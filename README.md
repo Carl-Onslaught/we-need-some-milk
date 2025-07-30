@@ -88,4 +88,4 @@ The default admin account will be created on first run:
 
 ## License
 
-[MIT License](LICENSE)
+[MIT License](LICENSE) 
