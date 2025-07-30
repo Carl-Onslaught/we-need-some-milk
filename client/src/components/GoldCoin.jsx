@@ -3,8 +3,8 @@ import { Box, useToast } from '@chakra-ui/react';
 import './GoldCoin.css';
 
 // Import sound files
-const clickSoundUrl = new URL('/sounds/click.mp3', import.meta.url).href;
-const coinSoundUrl = new URL('/sounds/coin.mp3', import.meta.url).href;
+const clickSoundUrl = '/sounds/click.mp3';
+const coinSoundUrl = '/sounds/coin.mp3';
 
 const GoldCoin = ({ onEarn, dailyClicks, maxClicks }) => {
   const [isAnimating, setIsAnimating] = useState(false);
@@ -18,6 +18,8 @@ const GoldCoin = ({ onEarn, dailyClicks, maxClicks }) => {
     // Initialize audio elements
     const initAudio = async () => {
       try {
+        console.log('Loading audio files from:', { clickSoundUrl, coinSoundUrl });
+        
         // Create and configure audio elements
         coinSound.current = new Audio(coinSoundUrl);
         clickSound.current = new Audio(clickSoundUrl);
@@ -25,6 +27,26 @@ const GoldCoin = ({ onEarn, dailyClicks, maxClicks }) => {
         // Set volume and preload
         coinSound.current.volume = 0.5;
         clickSound.current.volume = 0.5;
+        
+        // Add error handling for audio loading
+        coinSound.current.addEventListener('error', (e) => {
+          console.error('Error loading coin sound:', e);
+          console.error('Coin sound URL:', coinSoundUrl);
+        });
+        
+        clickSound.current.addEventListener('error', (e) => {
+          console.error('Error loading click sound:', e);
+          console.error('Click sound URL:', clickSoundUrl);
+        });
+        
+        // Add load event listeners
+        coinSound.current.addEventListener('canplaythrough', () => {
+          console.log('Coin sound loaded successfully');
+        });
+        
+        clickSound.current.addEventListener('canplaythrough', () => {
+          console.log('Click sound loaded successfully');
+        });
         
         // Preload sounds
         await Promise.all([
@@ -70,8 +92,16 @@ const GoldCoin = ({ onEarn, dailyClicks, maxClicks }) => {
       const playSound = async (sound) => {
         if (sound && sound.current) {
           try {
-            sound.current.currentTime = 0;
-            await sound.current.play();
+            // Check if audio is ready to play
+            if (sound.current.readyState >= 2) {
+              sound.current.currentTime = 0;
+              await sound.current.play();
+            } else {
+              console.warn('Audio not ready, attempting to load and play');
+              sound.current.load();
+              sound.current.currentTime = 0;
+              await sound.current.play();
+            }
           } catch (error) {
             console.error('Error playing sound:', error);
           }
