@@ -112,6 +112,13 @@ const userSchema = new mongoose.Schema({
   totalWithdraw: {
     type: Number,
     default: 0
+  },
+  clickingTaskActivated: {
+    type: Boolean,
+    default: false
+  },
+  clickingTaskActivatedAt: {
+    type: Date
   }
 }, {
   timestamps: true

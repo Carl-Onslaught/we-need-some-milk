@@ -83,7 +83,7 @@ function Register() {
       await register(formData);
       toast({
         title: 'Registration Submitted Successfully',
-        description: `Your account registration is pending admin approval. Please pay the ₱100 registration fee to complete your registration. Contact the admin for payment instructions.`,
+        description: `Your account has been created successfully! You can now access your dashboard. The clicking task is disabled until you activate it with ₱100 balance.`,
         status: 'success',
         duration: 8000,
         isClosable: true,

@@ -8,7 +8,7 @@ const transactionSchema = new mongoose.Schema({
   },
   type: {
     type: String,
-    enum: ['registration', 'click', 'referral', 'investment', 'interest', 'withdrawal'],
+    enum: ['registration', 'click', 'referral', 'investment', 'interest', 'withdrawal', 'clicking_task_activation', 'shared_capital_claim', 'shared_capital_return'],
     required: true
   },
   amount: {
@@ -16,6 +16,10 @@ const transactionSchema = new mongoose.Schema({
     required: true
   },
   description: String,
+  referralType: {
+    type: String,
+    enum: ['direct', 'indirect']
+  },
   status: {
     type: String,
     enum: ['pending', 'completed', 'failed'],

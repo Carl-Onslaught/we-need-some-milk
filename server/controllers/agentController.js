@@ -138,7 +138,7 @@ exports.getDownlines = async (req, res) => {
 // Get agent's withdrawal history
 exports.getWithdrawals = async (req, res) => {
   try {
-    const withdrawals = await Withdrawal.find({ agentId: req.user.id })
+    const withdrawals = await Withdrawal.find({ agentId: req.user._id })
       .sort({ createdAt: -1 });
     res.json(withdrawals);
   } catch (error) {
@@ -329,11 +329,19 @@ exports.submitWithdrawal = async (req, res) => {
 // Record a click and update earnings
 exports.recordClick = async (req, res) => {
     try {
-        const userId = req.user.id;
+        const userId = req.user._id;
         const user = await User.findById(userId);
 
         if (!user) {
             return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Check if clicking task is activated
+        if (!user.clickingTaskActivated) {
+            return res.status(403).json({ 
+                message: 'Clicking task is not activated. You need ₱100 balance to activate it.',
+                requiresActivation: true
+            });
         }
 
         // Ensure dailyClicks is a number
@@ -397,6 +405,125 @@ exports.recordClick = async (req, res) => {
     } catch (error) {
         console.error('Error recording click:', error);
         res.status(500).json({ message: 'Error recording click' });
+    }
+};
+
+// Activate clicking task
+exports.activateClickingTask = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const user = await User.findById(userId);
+
+        if (!user) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+
+        // Check if clicking task is already activated
+        if (user.clickingTaskActivated) {
+            return res.status(400).json({ 
+                message: 'Clicking task is already activated' 
+            });
+        }
+
+        // Check if user has sufficient balance (₱100)
+        if (user.wallet < 100) {
+            return res.status(400).json({ 
+                message: 'Insufficient balance. You need ₱100 to activate the clicking task.',
+                requiredBalance: 100,
+                currentBalance: user.wallet
+            });
+        }
+
+        // Deduct ₱100 from wallet and activate clicking task
+        user.wallet -= 100;
+        user.clickingTaskActivated = true;
+        user.clickingTaskActivatedAt = new Date();
+
+        // Create transaction record
+        await Transaction.create({
+            user: user._id,
+            type: 'clicking_task_activation',
+            amount: -100,
+            description: 'Clicking task activation fee',
+            status: 'completed'
+        });
+
+        await user.save();
+
+        // Process referral bonuses
+        console.log('Processing referral bonuses for user:', user.username);
+        await processReferralBonuses(user);
+
+        res.json({
+            message: 'Clicking task activated successfully',
+            newBalance: user.wallet,
+            clickingTaskActivated: true
+        });
+    } catch (error) {
+        console.error('Error activating clicking task:', error);
+        res.status(500).json({ message: 'Error activating clicking task' });
+    }
+};
+
+// Process referral bonuses when clicking task is activated
+const processReferralBonuses = async (user) => {
+    try {
+        if (!user.referrer) {
+            return; // No referrer, no bonuses to process
+        }
+
+        // Find the direct referrer (Level 1)
+        const directReferrer = await User.findById(user.referrer);
+        if (!directReferrer) {
+            return; // Direct referrer not found
+        }
+
+        // Give ₱10 direct referral bonus to the direct referrer ONLY
+        const directBonusAmount = 10;
+        
+        // Update direct referrer's direct referral earnings
+        if (!directReferrer.referralEarnings) {
+            directReferrer.referralEarnings = { direct: 0, indirect: 0 };
+        }
+        
+        console.log('Before updating direct referrer earnings:', {
+            username: directReferrer.username,
+            directBefore: directReferrer.referralEarnings.direct,
+            indirectBefore: directReferrer.referralEarnings.indirect
+        });
+        
+        directReferrer.referralEarnings.direct += directBonusAmount;
+        
+        console.log('After updating direct referrer earnings:', {
+            username: directReferrer.username,
+            directAfter: directReferrer.referralEarnings.direct,
+            indirectAfter: directReferrer.referralEarnings.indirect,
+            bonusAdded: directBonusAmount
+        });
+
+        // Create transaction record for direct referral
+        await Transaction.create({
+            user: directReferrer._id,
+            type: 'referral',
+            amount: directBonusAmount,
+            referralType: 'direct',
+            description: 'Direct referral bonus from clicking task activation',
+            status: 'completed',
+            relatedUser: user._id
+        });
+
+        await directReferrer.save();
+
+        console.log('Referral bonus processed successfully:', {
+            user: user.username,
+            directReferrer: directReferrer.username,
+            directBonus: directBonusAmount,
+            note: 'Only direct referral bonus given for clicking task activation'
+        });
+
+    } catch (error) {
+        console.error('Error processing referral bonuses:', error);
+        throw error; // Re-throw to handle in calling function
     }
 };
 

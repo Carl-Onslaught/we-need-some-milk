@@ -39,6 +39,9 @@ router.post('/withdraw', async (req, res, next) => {
 // Record a click
 router.post('/click', agentController.recordClick);
 
+// Activate clicking task
+router.post('/activate-clicking-task', agentController.activateClickingTask);
+
 // Get agent's team
 router.get('/team', agentController.getDownlines);
 

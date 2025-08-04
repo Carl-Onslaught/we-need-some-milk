@@ -160,6 +160,16 @@ const processReferralCommissions = async (user, investment) => {
 
       const commissionAmount = investment.amount * commissionRate;
 
+      // Check if the referred user has activated their clicking task
+      // Only give commissions if clicking task is activated
+      if (!user.clickingTaskActivated) {
+        console.log(`Skipping commission for referrer ${referrer._id} - user ${user._id} has not activated clicking task`);
+        processedUsers.add(referrer._id.toString());
+        currentUser = referrer;
+        level++;
+        continue;
+      }
+
       // Create referral transaction
       const transaction = new Transaction({
         user: referrer._id,

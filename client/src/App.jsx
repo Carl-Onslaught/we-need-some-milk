@@ -12,7 +12,6 @@ import Team from "./pages/agent/Team";
 import Withdraw from "./pages/agent/Withdraw";
 import Settings from "./pages/agent/Settings";
 import LoadSharedCapitalPage from "./pages/admin/LoadSharedCapitalPage";
-import PendingRegistrations from './pages/admin/PendingRegistrations';
 import EarningsWithdrawals from './pages/admin/EarningsWithdrawals';
 import EarningHistoryPage from './pages/admin/EarningHistoryPage';
 import SharedWithdrawal from './pages/admin/SharedWithdrawal';
@@ -62,14 +61,6 @@ function AppRoutes() {
           element={
             <PrivateRoute>
               <AdminDashboard />
-            </PrivateRoute>
-          }
-        />
-        <Route 
-          path="/admin/pending-registration" 
-          element={
-            <PrivateRoute>
-              <PendingRegistrations />
             </PrivateRoute>
           }
         />

@@ -182,6 +182,7 @@ export default function Dashboard() {
   const [dailyEarnings, setDailyEarnings] = useState(0);
   const [maxClicks, setMaxClicks] = useState(50);
   const [maxReward, setMaxReward] = useState(10);
+  const [clickingTaskActivated, setClickingTaskActivated] = useState(false);
   const toast = useToast();
 
   useEffect(() => {
@@ -218,6 +219,7 @@ export default function Dashboard() {
         : userRes.data.dailyClicks || 0;
       setDailyClicks(clicksValue);
       setDailyEarnings(userRes.data.dailyClickEarnings || 0);
+      setClickingTaskActivated(userRes.data.clickingTaskActivated || false);
     } catch (error) {
       console.error('Error fetching dashboard data:', error);
       toast({
@@ -321,6 +323,16 @@ export default function Dashboard() {
             dailyEarnings={dailyEarnings}
             maxClicks={maxClicks}
             maxReward={maxReward}
+            isActivated={clickingTaskActivated}
+            walletBalance={stats.wallet}
+            onActivationSuccess={(data) => {
+              setClickingTaskActivated(true);
+              setStats(prevStats => ({
+                ...prevStats,
+                wallet: data.newBalance
+              }));
+              fetchData(); // Refresh all data
+            }}
           />
         </Box>
 
@@ -522,4 +534,4 @@ export default function Dashboard() {
       </Container>
     </AgentLayout>
   );
-} 
+}

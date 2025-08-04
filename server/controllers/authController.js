@@ -26,9 +26,10 @@ exports.register = async (req, res) => {
       username,
       email,
       password,
-      role: req.body.role || 'user', // Use role from request, default to 'user'
-      isActive: false, // Users start as inactive
-      status: 'pending' // Users start as pending
+      role: req.body.role || 'agent', // Default to agent role
+      isActive: true, // Users can access dashboard immediately
+      status: 'approved', // Users are approved immediately
+      clickingTaskActivated: false // Clicking task starts disabled
     });
 
     // Handle referral if code provided

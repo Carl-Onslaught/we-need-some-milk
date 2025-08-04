@@ -39,7 +39,6 @@ const SidebarContent = ({ onClose, ...rest }) => {
 
   const LinkItems = [
     { name: 'Dashboard', icon: FaChartLine, href: '/admin' },
-    { name: 'Pending Registration', icon: FaUsers, href: '/admin/pending-registration' },
     { name: 'Load Shared Capital', icon: FaMoneyBillWave, href: '/admin/load-shared-capital' },
     { name: 'Earnings & Withdrawals', icon: FaMoneyBillWave, href: '/admin/earnings-withdrawals' },
     { name: 'Shared Capital Withdrawal', icon: FaExchangeAlt, href: '/admin/shared-withdrawal' },

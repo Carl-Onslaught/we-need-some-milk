@@ -6,7 +6,7 @@ import './GoldCoin.css';
 const clickSoundUrl = new URL('/sounds/click.mp3', import.meta.url).href;
 const coinSoundUrl = new URL('/sounds/coin.mp3', import.meta.url).href;
 
-const GoldCoin = ({ onEarn, dailyClicks, maxClicks }) => {
+const GoldCoin = ({ onEarn, dailyClicks, maxClicks, disabled = false }) => {
   const [isAnimating, setIsAnimating] = useState(false);
   const toast = useToast();
   const [coins, setCoins] = useState([]);
@@ -54,7 +54,7 @@ const GoldCoin = ({ onEarn, dailyClicks, maxClicks }) => {
   }, []);
 
   const handleCoinClick = async () => {
-    if (isAnimating || !goldCoinAreaRef.current) {
+    if (isAnimating || !goldCoinAreaRef.current || disabled) {
       return;
     }
     

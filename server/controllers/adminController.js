@@ -681,28 +681,6 @@ exports.approveRegistration = async (req, res) => {
     if (result.modifiedCount === 0 && result.nModified === 0) {
       return res.status(404).json({ message: 'User not found or not updated.' });
     }
-    // === Credit direct referral bonus to referrer ===
-    const approvedUser = await User.findById(id).select('referrer');
-    if (approvedUser && approvedUser.referrer) {
-      const bonus = 10; // ₱10 bonus
-      // atomically increment the referrer's direct referral earnings without loading the whole document
-      await User.updateOne(
-        { _id: approvedUser.referrer },
-        {
-          $inc: { 'referralEarnings.direct': bonus }
-        },
-        { runValidators: false }
-      );
-
-      await Transaction.create({
-        user: approvedUser.referrer,
-        type: 'referral',
-        amount: bonus,
-        referralType: 'direct',
-        description: 'Direct referral bonus from new agent activation',
-        status: 'completed'
-      });
-    }
 
     res.json({
       message: 'Registration approved successfully',
