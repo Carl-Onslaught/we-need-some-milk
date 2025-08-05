@@ -2,11 +2,11 @@ const express = require('express');
 const router = express.Router();
 const auth = require('../middleware/auth');
 const PackageRequest = require('../models/PackageRequest');
-const investmentController = require('../controllers/investmentController');
+const agentController = require('../controllers/agentController');
 
 // Shared Capital Package Request
 // Claim matured package
-router.post('/claim-package', auth, investmentController.claimInvestment);
+router.post('/claim-package', auth, agentController.claimPackage);
 
 // Shared Capital Package Request
 router.post('/shared-capital', auth, async (req, res) => {

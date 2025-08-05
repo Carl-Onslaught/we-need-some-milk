@@ -301,7 +301,7 @@ router.get('/packages/active', agentController.getActivePackages);
 router.get('/stats', agentController.getAgentStats);
 
 // Claim matured package
-router.post('/claim-package', auth, agentController.claimPackage);
+router.post('/claim-package', agentController.claimPackage);
 
 // Claim all matured packages
 router.post('/claim-packages', async (req, res) => {
