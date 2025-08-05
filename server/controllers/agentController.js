@@ -769,6 +769,13 @@ async function processMaturedPackages() {
 
 // Add new endpoint to claim matured package
 exports.claimPackage = async (req, res) => {
+    console.log('Claim package request received:', { 
+        packageId: req.body.packageId, 
+        userId: req.user._id,
+        userAgent: req.headers['user-agent'],
+        timestamp: new Date().toISOString()
+    });
+    
     const session = await mongoose.startSession();
     session.startTransaction();
     
@@ -784,13 +791,17 @@ exports.claimPackage = async (req, res) => {
         const pkg = await Package.findOne({
             _id: packageId,
             user: req.user._id,
-            status: 'active'
+            status: { $in: ['active', 'completed'] }  // Allow both active and completed packages
         }).session(session);
 
         if (!pkg) {
             await session.abortTransaction();
             session.endSession();
-            return res.status(404).json({ message: 'Package not found or already claimed' });
+            return res.status(404).json({ 
+                success: false,
+                message: 'Package not found or already claimed',
+                error: 'PACKAGE_NOT_FOUND'
+            });
         }
 
         const endDate = new Date(pkg.endDate);
@@ -856,6 +867,7 @@ exports.claimPackage = async (req, res) => {
         // Update package status
         pkg.claimed = true;
         pkg.claimedAt = now;
+        pkg.status = 'completed';  // Update status to completed after claiming
         await pkg.save({ session });
 
         // Credit principal + interest to Shared Capital Earnings

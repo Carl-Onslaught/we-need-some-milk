@@ -288,7 +288,13 @@ export default function Dashboard() {
 
   const handleClaimPackage = async (packageId) => {
     try {
+      console.log('Claiming package with ID:', packageId);
+      console.log('API URL:', axios.defaults.baseURL);
+      console.log('Request URL:', `${axios.defaults.baseURL}/agent/claim-package`);
+      
       const response = await axios.post('/agent/claim-package', { packageId });
+      
+      console.log('Claim response:', response.data);
       
       toast({
         title: 'Package Claimed',
@@ -302,6 +308,9 @@ export default function Dashboard() {
       fetchData();
     } catch (error) {
       console.error('Error claiming package:', error);
+      console.error('Error response:', error.response);
+      console.error('Error request:', error.request);
+      
       toast({
         title: 'Error',
         description: error.response?.data?.message || 'Failed to claim package',

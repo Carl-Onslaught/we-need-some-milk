@@ -5916,3 +5916,4 @@
 2025-07-30T06:18:16.554Z - Migration failed: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-30T06:18:16.500Z }" (type Object) at path "dailyClicks"
 2025-07-30T07:15:18.991Z - Migration failed: ValidationError: dailyClicks: Cast to Number failed for value "{ count: 0, lastReset: 2025-07-30T07:15:18.965Z }" (type Object) at path "dailyClicks"
 2025-08-04T00:37:40.451Z - Error activating clicking task: ValidationError: type: `clicking_task_activation` is not a valid enum value for path `type`.
+2025-08-05T12:48:06.749Z - WebSocket notification error: ReferenceError: calculateUserEarnings is not defined
