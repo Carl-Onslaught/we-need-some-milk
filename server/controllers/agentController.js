@@ -880,11 +880,10 @@ exports.claimPackage = async (req, res) => {
         // Notify via WebSocket (outside transaction)
         try {
             if (global.io) {
-                const earnings = await calculateUserEarnings(req.user._id);
                 global.io.emit('earnings_update', {
                     type: 'earnings_update',
                     agentId: req.user._id,
-                    earnings
+                    earnings: { total: totalEarnings }
                 });
             }
         } catch (wsError) {

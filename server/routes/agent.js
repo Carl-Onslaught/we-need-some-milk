@@ -269,28 +269,6 @@ router.post('/packages/activate', auth, async (req, res) => {
   }
 });
 
-// Get active packages
-router.get('/packages/active', [auth, isActive], async (req, res) => {
-  try {
-    console.log('Fetching active packages for user:', req.user.id);
-    
-    const packages = await Package.find({
-      user: req.user.id,
-      status: 'active'
-    }).sort({ createdAt: -1 });
-
-    console.log('Found packages:', packages);
-    
-    res.json({ packages });
-  } catch (error) {
-    console.error('Error fetching active packages:', error);
-    res.status(500).json({ 
-      message: 'Server error',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined
-    });
-  }
-});
-
 // Claim matured package earnings
 router.post('/packages/claim', agentController.claimMaturedPackage);
 
@@ -370,7 +348,7 @@ router.post('/claim-packages', async (req, res) => {
             global.io.emit('earnings_update', {
                 type: 'earnings_update',
                 agentId: req.user._id,
-                earnings: await agentController.calculateUserEarnings(req.user._id)
+                earnings: { total: totalClaimed }
             });
         }
 
