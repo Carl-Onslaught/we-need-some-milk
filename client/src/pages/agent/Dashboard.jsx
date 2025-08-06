@@ -205,12 +205,30 @@ export default function Dashboard() {
       const now = new Date();
       const packages = Array.isArray(packagesRes.data) ? packagesRes.data : packagesRes.data.packages || [];
       const packagesWithDays = packages.map(pkg => {
-        const start = new Date(pkg.startDate);
-        const end = new Date(pkg.endDate);
-        const totalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-        const daysLeft = Math.max(0, Math.ceil((end - now) / (1000 * 60 * 60 * 24)));
-        const isMatured = daysLeft === 0;
-        return { ...pkg, daysRemaining: daysLeft, totalDays, isMatured };
+        // Use the server-calculated values if available, otherwise calculate locally
+        let daysRemaining = pkg.daysRemaining;
+        let totalDays = pkg.totalDays;
+        let isMatured = pkg.isMatured;
+        
+        // If server didn't provide these values, calculate them
+        if (typeof daysRemaining === 'undefined' || typeof totalDays === 'undefined') {
+          const start = new Date(pkg.startDate);
+          const end = new Date(pkg.endDate);
+          
+          // Check if dates are valid
+          if (isNaN(start.getTime()) || isNaN(end.getTime())) {
+            console.error('Invalid dates for package:', pkg._id, { startDate: pkg.startDate, endDate: pkg.endDate });
+            daysRemaining = 0;
+            totalDays = pkg.packageType === 1 ? 12 : pkg.packageType === 2 ? 20 : 30;
+            isMatured = true;
+          } else {
+            totalDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+            daysRemaining = Math.max(0, Math.ceil((end - now) / (1000 * 60 * 60 * 24)));
+            isMatured = daysRemaining === 0;
+          }
+        }
+        
+        return { ...pkg, daysRemaining, totalDays, isMatured };
       });
       setActivePackages(packagesWithDays);
       // Set daily clicks and earnings from user data

@@ -973,12 +973,44 @@ exports.getActivePackages = async (req, res) => {
 
         const now = new Date();
         const formattedPackages = packages.map(pkg => {
+            // Debug logging for packages with potential date issues
+            if (!pkg.startDate || !pkg.endDate) {
+                console.error('Package with missing dates:', {
+                    _id: pkg._id,
+                    startDate: pkg.startDate,
+                    endDate: pkg.endDate,
+                    packageType: pkg.packageType
+                });
+            }
+            
             const startDate = new Date(pkg.startDate);
             const endDate = new Date(pkg.endDate);
-            const daysSinceStart = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
-            const totalDays = pkg.packageType === 1 ? 12 : pkg.packageType === 2 ? 20 : 30;
-            const daysRemaining = Math.max(0, totalDays - daysSinceStart);
-            const isMatured = now >= endDate;
+            
+            // Check if dates are valid
+            let daysSinceStart, totalDays, daysRemaining, isMatured;
+            
+            if (isNaN(startDate.getTime()) || isNaN(endDate.getTime())) {
+                console.error('Package with invalid dates:', {
+                    _id: pkg._id,
+                    startDate: pkg.startDate,
+                    endDate: pkg.endDate,
+                    packageType: pkg.packageType
+                });
+                // Set default values for invalid dates
+                const defaultStartDate = new Date();
+                const defaultEndDate = new Date();
+                defaultEndDate.setDate(defaultEndDate.getDate() + (pkg.packageType === 1 ? 12 : pkg.packageType === 2 ? 20 : 30));
+                
+                daysSinceStart = Math.floor((now - defaultStartDate) / (1000 * 60 * 60 * 24));
+                totalDays = pkg.packageType === 1 ? 12 : pkg.packageType === 2 ? 20 : 30;
+                daysRemaining = Math.max(0, totalDays - daysSinceStart);
+                isMatured = now >= defaultEndDate;
+            } else {
+                daysSinceStart = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+                totalDays = pkg.packageType === 1 ? 12 : pkg.packageType === 2 ? 20 : 30;
+                daysRemaining = Math.max(0, totalDays - daysSinceStart);
+                isMatured = now >= endDate;
+            }
 
             // Ensure all packages show correct daily income and total earnings
             let displayDailyIncome = pkg.dailyIncome;
@@ -1027,8 +1059,11 @@ exports.getActivePackages = async (req, res) => {
                 packageType: pkg.packageType,
                 amount: pkg.amount,
                 status: pkg.status,
+                startDate: pkg.startDate,
+                endDate: pkg.endDate,
                 dailyIncome: displayDailyIncome,
                 daysRemaining,
+                totalDays,
                 isMatured,
                 totalEarnings: totalEarnings,
                 claimed: pkg.claimed
