@@ -776,6 +776,8 @@ exports.claimPackage = async (req, res) => {
         const { packageId } = req.body;
         const now = new Date();
 
+        console.log('Claim package request:', { packageId, userId: req.user._id });
+
         if (!packageId) {
             return res.status(400).json({ message: 'Package ID is required' });
         }
@@ -786,6 +788,14 @@ exports.claimPackage = async (req, res) => {
             user: req.user._id,
             status: 'active'
         }).session(session);
+
+        console.log('Found package:', pkg ? { 
+            _id: pkg._id, 
+            packageType: pkg.packageType, 
+            amount: pkg.amount, 
+            claimed: pkg.claimed,
+            endDate: pkg.endDate 
+        } : 'Package not found');
 
         if (!pkg) {
             await session.abortTransaction();
@@ -847,6 +857,11 @@ exports.claimPackage = async (req, res) => {
 
         // Get user within the transaction
         const user = await User.findById(req.user._id).session(session);
+        console.log('Found user:', user ? { 
+            _id: user._id, 
+            sharedEarnings: user.sharedEarnings 
+        } : 'User not found');
+        
         if (!user) {
             await session.abortTransaction();
             session.endSession();
@@ -859,11 +874,17 @@ exports.claimPackage = async (req, res) => {
         await pkg.save({ session });
 
         // Credit principal + interest to Shared Capital Earnings
+        const oldSharedEarnings = user.sharedEarnings || 0;
         user.sharedEarnings = parseFloat(((user.sharedEarnings || 0) + totalEarnings).toFixed(2));
+        console.log('Updating user sharedEarnings:', { 
+            old: oldSharedEarnings, 
+            new: user.sharedEarnings, 
+            added: totalEarnings 
+        });
         await user.save({ session });
 
         // Create transaction record
-        await SharedCapitalTransaction.create([{
+        const transaction = new SharedCapitalTransaction({
             user: req.user._id,
             type: 'earning',
             amount: totalEarnings,
@@ -871,7 +892,13 @@ exports.claimPackage = async (req, res) => {
             status: 'completed',
             description: `Claimed Package ${pkg.packageType}: principal ₱${pkg.amount.toLocaleString()} + interest ₱${interestEarned.toLocaleString()}`,
             createdAt: now
-        }], { session });
+        });
+        console.log('Creating transaction:', { 
+            user: req.user._id, 
+            amount: totalEarnings, 
+            package: `Package ${pkg.packageType}` 
+        });
+        await transaction.save({ session });
 
         // Commit the transaction
         await session.commitTransaction();
@@ -891,7 +918,7 @@ exports.claimPackage = async (req, res) => {
             // Don't fail the request if WebSocket notification fails
         }
 
-        res.json({
+        const response = {
             success: true,
             message: 'Package claimed successfully',
             total: totalEarnings,
@@ -899,9 +926,13 @@ exports.claimPackage = async (req, res) => {
             interest: interestEarned,
             packageType: pkg.packageType,
             claimDate: now
-        });
+        };
+        
+        console.log('Claim package success:', response);
+        res.json(response);
     } catch (error) {
         console.error('Error claiming package:', error);
+        console.error('Error stack:', error.stack);
         
         // Only abort if session is still active
         if (session.inTransaction()) {
@@ -918,6 +949,14 @@ exports.claimPackage = async (req, res) => {
             return res.status(400).json({ 
                 success: false,
                 message: 'Validation error',
+                error: error.message 
+            });
+        }
+
+        if (error.name === 'CastError') {
+            return res.status(400).json({ 
+                success: false,
+                message: 'Invalid package ID format',
                 error: error.message 
             });
         }
