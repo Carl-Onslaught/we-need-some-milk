@@ -281,8 +281,7 @@ router.get('/stats', agentController.getAgentStats);
 // Claim matured package
 router.post('/claim-package', agentController.claimPackage);
 
-// Simple claim package (fallback)
-router.post('/claim-package-simple', agentController.claimPackageSimple);
+
 
 // Test endpoint to check if packages exist
 router.get('/test-packages', async (req, res) => {
