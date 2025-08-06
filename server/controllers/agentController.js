@@ -1034,42 +1034,42 @@ exports.getActivePackages = async (req, res) => {
             // Ensure all packages show correct daily income and total earnings
             let displayDailyIncome = pkg.dailyIncome;
             let totalEarnings = 0;
-            
             if (pkg.packageType === 1) {
-                // Package 1: Scale based on investment amount
-                // Base: ₱100 → ₱1.667 daily → ₱120 total return
                 const baseAmount = 100;
                 const baseDaily = 1.667;
                 const baseTotal = 120;
                 const multiplier = pkg.amount / baseAmount;
-                
                 displayDailyIncome = baseDaily * multiplier;
                 if (isMatured) {
                     totalEarnings = baseTotal * multiplier;
+                } else {
+                    // Calculate earnings so far for active package
+                    const daysEarned = totalDays - daysRemaining;
+                    totalEarnings = displayDailyIncome * daysEarned;
                 }
             } else if (pkg.packageType === 2) {
-                // Package 2: Scale based on investment amount
-                // Base: ₱500 → ₱12.5 daily → ₱750 total return
                 const baseAmount = 500;
                 const baseDaily = 12.5;
                 const baseTotal = 750;
                 const multiplier = pkg.amount / baseAmount;
-                
                 displayDailyIncome = baseDaily * multiplier;
                 if (isMatured) {
                     totalEarnings = baseTotal * multiplier;
+                } else {
+                    const daysEarned = totalDays - daysRemaining;
+                    totalEarnings = displayDailyIncome * daysEarned;
                 }
             } else if (pkg.packageType === 3) {
-                // Package 3: Scale based on investment amount
-                // Base: ₱1000 → ₱100 daily → ₱3000 total return
                 const baseAmount = 1000;
                 const baseDaily = 100;
                 const baseTotal = 3000;
                 const multiplier = pkg.amount / baseAmount;
-                
                 displayDailyIncome = baseDaily * multiplier;
                 if (isMatured) {
                     totalEarnings = baseTotal * multiplier;
+                } else {
+                    const daysEarned = totalDays - daysRemaining;
+                    totalEarnings = displayDailyIncome * daysEarned;
                 }
             }
 
@@ -1084,7 +1084,7 @@ exports.getActivePackages = async (req, res) => {
                 daysRemaining,
                 totalDays,
                 isMatured,
-                totalEarnings: totalEarnings,
+                totalEarnings: Math.max(0, Math.floor(totalEarnings)),
                 claimed: pkg.claimed
             };
         });
