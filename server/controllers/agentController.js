@@ -769,10 +769,11 @@ async function processMaturedPackages() {
 
 // Add new endpoint to claim matured package
 exports.claimPackage = async (req, res) => {
-    const session = await mongoose.startSession();
-    session.startTransaction();
-    
+    let session;
     try {
+        session = await mongoose.startSession();
+        session.startTransaction();
+        
         const { packageId } = req.body;
         const now = new Date();
 
@@ -783,24 +784,32 @@ exports.claimPackage = async (req, res) => {
         }
 
         // Find the package with session for transaction
-        const pkg = await Package.findOne({
-            _id: packageId,
-            user: req.user._id,
-            status: 'active'
-        }).session(session);
+        let pkg;
+        try {
+            pkg = await Package.findOne({
+                _id: packageId,
+                user: req.user._id,
+                status: 'active'
+            }).session(session);
 
-        console.log('Found package:', pkg ? { 
-            _id: pkg._id, 
-            packageType: pkg.packageType, 
-            amount: pkg.amount, 
-            claimed: pkg.claimed,
-            endDate: pkg.endDate 
-        } : 'Package not found');
+            console.log('Found package:', pkg ? { 
+                _id: pkg._id, 
+                packageType: pkg.packageType, 
+                amount: pkg.amount, 
+                claimed: pkg.claimed,
+                endDate: pkg.endDate 
+            } : 'Package not found');
 
-        if (!pkg) {
+            if (!pkg) {
+                await session.abortTransaction();
+                session.endSession();
+                return res.status(404).json({ message: 'Package not found or already claimed' });
+            }
+        } catch (findError) {
+            console.error('Error finding package:', findError);
             await session.abortTransaction();
             session.endSession();
-            return res.status(404).json({ message: 'Package not found or already claimed' });
+            return res.status(500).json({ message: 'Error finding package', error: findError.message });
         }
 
         const endDate = new Date(pkg.endDate);
@@ -856,53 +865,93 @@ exports.claimPackage = async (req, res) => {
         }
 
         // Get user within the transaction
-        const user = await User.findById(req.user._id).session(session);
-        console.log('Found user:', user ? { 
-            _id: user._id, 
-            sharedEarnings: user.sharedEarnings 
-        } : 'User not found');
-        
-        if (!user) {
+        let user;
+        try {
+            user = await User.findById(req.user._id).session(session);
+            console.log('Found user:', user ? { 
+                _id: user._id, 
+                sharedEarnings: user.sharedEarnings 
+            } : 'User not found');
+            
+            if (!user) {
+                await session.abortTransaction();
+                session.endSession();
+                return res.status(404).json({ message: 'User not found' });
+            }
+        } catch (userError) {
+            console.error('Error finding user:', userError);
             await session.abortTransaction();
             session.endSession();
-            return res.status(404).json({ message: 'User not found' });
+            return res.status(500).json({ message: 'Error finding user', error: userError.message });
         }
 
         // Update package status
-        pkg.claimed = true;
-        pkg.claimedAt = now;
-        await pkg.save({ session });
+        try {
+            pkg.claimed = true;
+            pkg.claimedAt = now;
+            await pkg.save({ session });
+            console.log('Package updated successfully');
+        } catch (packageError) {
+            console.error('Error updating package:', packageError);
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(500).json({ message: 'Error updating package', error: packageError.message });
+        }
 
         // Credit principal + interest to Shared Capital Earnings
-        const oldSharedEarnings = user.sharedEarnings || 0;
-        user.sharedEarnings = parseFloat(((user.sharedEarnings || 0) + totalEarnings).toFixed(2));
-        console.log('Updating user sharedEarnings:', { 
-            old: oldSharedEarnings, 
-            new: user.sharedEarnings, 
-            added: totalEarnings 
-        });
-        await user.save({ session });
+        try {
+            const oldSharedEarnings = user.sharedEarnings || 0;
+            user.sharedEarnings = parseFloat(((user.sharedEarnings || 0) + totalEarnings).toFixed(2));
+            console.log('Updating user sharedEarnings:', { 
+                old: oldSharedEarnings, 
+                new: user.sharedEarnings, 
+                added: totalEarnings 
+            });
+            await user.save({ session });
+            console.log('User updated successfully');
+        } catch (userSaveError) {
+            console.error('Error updating user:', userSaveError);
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(500).json({ message: 'Error updating user', error: userSaveError.message });
+        }
 
         // Create transaction record
-        const transaction = new SharedCapitalTransaction({
-            user: req.user._id,
-            type: 'earning',
-            amount: totalEarnings,
-            package: `Package ${pkg.packageType}`,
-            status: 'completed',
-            description: `Claimed Package ${pkg.packageType}: principal ₱${pkg.amount.toLocaleString()} + interest ₱${interestEarned.toLocaleString()}`,
-            createdAt: now
-        });
-        console.log('Creating transaction:', { 
-            user: req.user._id, 
-            amount: totalEarnings, 
-            package: `Package ${pkg.packageType}` 
-        });
-        await transaction.save({ session });
+        try {
+            const transaction = new SharedCapitalTransaction({
+                user: req.user._id,
+                type: 'earning',
+                amount: totalEarnings,
+                package: `Package ${pkg.packageType}`,
+                status: 'completed',
+                description: `Claimed Package ${pkg.packageType}: principal ₱${pkg.amount.toLocaleString()} + interest ₱${interestEarned.toLocaleString()}`,
+                createdAt: now
+            });
+            console.log('Creating transaction:', { 
+                user: req.user._id, 
+                amount: totalEarnings, 
+                package: `Package ${pkg.packageType}` 
+            });
+            await transaction.save({ session });
+            console.log('Transaction created successfully');
+        } catch (transactionError) {
+            console.error('Error creating transaction:', transactionError);
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(500).json({ message: 'Error creating transaction', error: transactionError.message });
+        }
 
         // Commit the transaction
-        await session.commitTransaction();
-        session.endSession();
+        try {
+            await session.commitTransaction();
+            session.endSession();
+            console.log('Transaction committed successfully');
+        } catch (commitError) {
+            console.error('Error committing transaction:', commitError);
+            await session.abortTransaction();
+            session.endSession();
+            return res.status(500).json({ message: 'Error committing transaction', error: commitError.message });
+        }
 
         // Notify via WebSocket (outside transaction)
         try {
@@ -935,13 +984,21 @@ exports.claimPackage = async (req, res) => {
         console.error('Error stack:', error.stack);
         
         // Only abort if session is still active
-        if (session.inTransaction()) {
-            await session.abortTransaction();
+        if (session && session.inTransaction()) {
+            try {
+                await session.abortTransaction();
+            } catch (abortError) {
+                console.error('Error aborting transaction:', abortError);
+            }
         }
         
         // Ensure session is always ended
-        if (session.inTransaction()) {
-            session.endSession();
+        if (session) {
+            try {
+                session.endSession();
+            } catch (endError) {
+                console.error('Error ending session:', endError);
+            }
         }
 
         // More specific error messages
@@ -961,6 +1018,108 @@ exports.claimPackage = async (req, res) => {
             });
         }
 
+        res.status(500).json({ 
+            success: false,
+            message: 'Failed to claim package',
+            error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+        });
+    }
+};
+
+// Simple fallback claim function without transactions
+exports.claimPackageSimple = async (req, res) => {
+    try {
+        const { packageId } = req.body;
+        console.log('Simple claim package request:', { packageId, userId: req.user._id });
+
+        if (!packageId) {
+            return res.status(400).json({ message: 'Package ID is required' });
+        }
+
+        // Find the package
+        const pkg = await Package.findOne({
+            _id: packageId,
+            user: req.user._id,
+            status: 'active'
+        });
+
+        if (!pkg) {
+            return res.status(404).json({ message: 'Package not found or already claimed' });
+        }
+
+        if (pkg.claimed) {
+            return res.status(400).json({ message: 'Package has already been claimed' });
+        }
+
+        const now = new Date();
+        const endDate = new Date(pkg.endDate);
+        if (now < endDate) {
+            return res.status(400).json({ 
+                message: 'Package has not matured yet',
+                maturityDate: endDate
+            });
+        }
+
+        // Calculate earnings
+        let totalEarnings, interestEarned;
+        if (pkg.packageType === 1) {
+            const baseAmount = 100;
+            const baseProfit = 20;
+            const baseTotal = 120;
+            const multiplier = pkg.amount / baseAmount;
+            interestEarned = parseFloat((baseProfit * multiplier).toFixed(2));
+            totalEarnings = parseFloat((baseTotal * multiplier).toFixed(2));
+        } else if (pkg.packageType === 2) {
+            const baseAmount = 500;
+            const baseProfit = 250;
+            const baseTotal = 750;
+            const multiplier = pkg.amount / baseAmount;
+            interestEarned = parseFloat((baseProfit * multiplier).toFixed(2));
+            totalEarnings = parseFloat((baseTotal * multiplier).toFixed(2));
+        } else if (pkg.packageType === 3) {
+            const baseAmount = 1000;
+            const baseProfit = 2000;
+            const baseTotal = 3000;
+            const multiplier = pkg.amount / baseAmount;
+            interestEarned = parseFloat((baseProfit * multiplier).toFixed(2));
+            totalEarnings = parseFloat((baseTotal * multiplier).toFixed(2));
+        }
+
+        // Update package
+        pkg.claimed = true;
+        pkg.claimedAt = now;
+        await pkg.save();
+
+        // Update user
+        const user = await User.findById(req.user._id);
+        user.sharedEarnings = parseFloat(((user.sharedEarnings || 0) + totalEarnings).toFixed(2));
+        await user.save();
+
+        // Create transaction record
+        const transaction = new SharedCapitalTransaction({
+            user: req.user._id,
+            type: 'earning',
+            amount: totalEarnings,
+            package: `Package ${pkg.packageType}`,
+            status: 'completed',
+            description: `Claimed Package ${pkg.packageType}: principal ₱${pkg.amount.toLocaleString()} + interest ₱${interestEarned.toLocaleString()}`,
+            createdAt: now
+        });
+        await transaction.save();
+
+        console.log('Simple claim package success:', { totalEarnings, principal: pkg.amount, interest: interestEarned });
+
+        res.json({
+            success: true,
+            message: 'Package claimed successfully',
+            total: totalEarnings,
+            principal: pkg.amount,
+            interest: interestEarned,
+            packageType: pkg.packageType,
+            claimDate: now
+        });
+    } catch (error) {
+        console.error('Error in simple claim package:', error);
         res.status(500).json({ 
             success: false,
             message: 'Failed to claim package',

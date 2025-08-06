@@ -281,6 +281,59 @@ router.get('/stats', agentController.getAgentStats);
 // Claim matured package
 router.post('/claim-package', agentController.claimPackage);
 
+// Simple claim package (fallback)
+router.post('/claim-package-simple', agentController.claimPackageSimple);
+
+// Test endpoint to check if packages exist
+router.get('/test-packages', async (req, res) => {
+  try {
+    console.log('Testing packages for user:', req.user._id);
+    
+    const packages = await Package.find({
+      user: req.user._id,
+      status: 'active'
+    }).select('_id packageType amount claimed endDate startDate');
+    
+    console.log('Found packages:', packages);
+    
+    res.json({
+      success: true,
+      packages: packages,
+      count: packages.length,
+      userId: req.user._id
+    });
+  } catch (error) {
+    console.error('Test packages error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
+// Test endpoint to check database connection
+router.get('/test-db', async (req, res) => {
+  try {
+    const packageCount = await Package.countDocuments();
+    const userCount = await User.countDocuments();
+    const transactionCount = await Transaction.countDocuments();
+    
+    res.json({
+      success: true,
+      packageCount,
+      userCount,
+      transactionCount,
+      mongooseState: mongoose.connection.readyState
+    });
+  } catch (error) {
+    console.error('Test DB error:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message 
+    });
+  }
+});
+
 // Claim all matured packages
 router.post('/claim-packages', async (req, res) => {
     try {
